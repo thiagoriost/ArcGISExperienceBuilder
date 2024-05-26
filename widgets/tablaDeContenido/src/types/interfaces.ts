@@ -8,7 +8,7 @@ export interface TablaDeContenidoInterface {
     ATRIBUTO: string;
     TITULOCAPA: string;
     METADATOSERVICIO: string;
-    IDTEMATICAPADRE: number | string;
+    IDTEMATICAPADRE: number;
     NOMBRECAPA: string;
     IDTEMATICA: number;
     URLSERVICIOWFS: string;
@@ -39,13 +39,13 @@ export enum Estado {
     I = "I",
 }
 
-export interface capaInterface { 
+export interface capaInterface {
     id: string;
     idCapaMapa: string;
     text: string;
     type: string;
     parent: string;
-    state: { 
+    state: {
         checked: boolean;
     };
     url: string;
@@ -54,4 +54,10 @@ export interface capaInterface {
     urlMetadatoServicio: string;
     DESCARGACAPA: boolean;
     urlMapServer: string;
+}
+
+export interface tablaContenInterface {
+    IDTEMATICA: number;
+    NOMBRETEMATICA: string;
+    capas: any[];
 }
