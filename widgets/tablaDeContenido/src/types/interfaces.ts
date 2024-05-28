@@ -1,20 +1,20 @@
 export interface TablaDeContenidoInterface {
-    DESCRIPCIONSERVICIO: Descripcionservicio;
-    IDCAPA: number;
-    METADATOCAPA: string;
-    URL: string;
-    VISIBLE: boolean;
-    NOMBRETEMATICA: string;
-    ATRIBUTO: string;
-    TITULOCAPA: string;
-    METADATOSERVICIO: string;
-    IDTEMATICAPADRE: number;
-    NOMBRECAPA: string;
-    IDTEMATICA: number;
-    URLSERVICIOWFS: string;
-    ESTADO?: Estado;
-    DESCARGACAPA?: boolean;
     [key: string]: any; // Para manejar cualquier otra propiedad dinámica
+    ATRIBUTO?: string;
+    DESCARGACAPA?: boolean;
+    DESCRIPCIONSERVICIO?: Descripcionservicio;
+    ESTADO?: Estado;
+    IDCAPA?: number;
+    IDTEMATICA?: number;
+    IDTEMATICAPADRE?: number;
+    METADATOCAPA?: string;
+    METADATOSERVICIO?: string;
+    NOMBRECAPA?: string;
+    NOMBRETEMATICA?: string;
+    TITULOCAPA?: string;
+    URL?: string;
+    URLSERVICIOWFS?: string;
+    VISIBLE?: boolean;
 }
 
 export enum Descripcionservicio {
@@ -32,6 +32,7 @@ export enum Descripcionservicio {
     Salud = "Salud",
     Sgc = "SGC",
     SusceptibilidadIncendios = "Susceptibilidad Incendios",
+    'Ambiental Ajustado' = "Ambiental Ajustado"
 }
 
 export enum Estado {
@@ -60,4 +61,34 @@ export interface tablaContenInterface {
     IDTEMATICA: number;
     NOMBRETEMATICA: string;
     capas: any[];
+}
+
+export interface datosBasicosInterface{
+    IDTEMATICAPADRE: number;
+    IDTEMATICA: number;
+    NOMBRETEMATICA: string;
+    TITULOCAPA?: string;
+}
+
+export interface interfaceCapasNietos {
+    capas: interfCapa[];
+    tematicasNietas: any[] | {
+        capasBisnietos: TablaDeContenidoInterface[];
+        IDTEMATICAPADRE: number;
+        IDTEMATICA: number;
+        NOMBRETEMATICA: string;
+        TITULOCAPA?: string;
+        
+    }[] | { capasBisnietos: undefined[];
+        IDTEMATICAPADRE: number;
+        IDTEMATICA: number;
+        NOMBRETEMATICA: string;
+        TITULOCAPA?: string;
+        
+    }[];
+}
+
+export interface interfCapa{
+    IDCAPA: number;
+    IDTEMATICA: number;
 }
