@@ -92,3 +92,53 @@ export interface interfCapa{
     IDCAPA: number;
     IDTEMATICA: number;
 }
+
+export interface TematicasTablaDeContenidoInterface {
+    IDTEMATICAPADRE: number;
+    IDTEMATICA:      number;
+    NOMBRETEMATICA:  string;
+    TITULOCAPA:      string;
+    capasHijas?:     TematicasTablaDeContenidoInterface[] | ItemResponseTablaContenido[];
+    capasNietas?:    CapasTematicas[];
+}
+
+export interface CapasTematicas {
+    DESCRIPCIONSERVICIO?: Descripcionservicio;
+    IDCAPA?:              number;
+    METADATOCAPA?:        string;
+    URL?:                 string;
+    VISIBLE?:             boolean;
+    NOMBRETEMATICA:       string;
+    ESTADO?:              Estado;
+    ATRIBUTO?:            string;
+    TITULOCAPA:           string;
+    METADATOSERVICIO?:    string;
+    IDTEMATICAPADRE:      number;
+    NOMBRECAPA?:          string;
+    DESCARGACAPA?:        boolean;
+    IDTEMATICA:           number;
+    URLSERVICIOWFS?:      string;
+    capasBisnietos?:      CapasTematicas[];
+}
+export interface ItemResponseTablaContenido {
+    ATRIBUTO:            string;
+    DESCRIPCIONSERVICIO: string;
+    IDCAPA:              number;
+    IDTEMATICA:          number;
+    IDTEMATICAPADRE:     number;
+    METADATOCAPA:        string;
+    METADATOSERVICIO:    string;
+    NOMBRECAPA:          string;
+    NOMBRETEMATICA:      string;
+    TITULOCAPA:          string;
+    URL:                 string;
+    URLSERVICIOWFS:      string;
+    VISIBLE:             boolean;
+}
+
+export interface DatosBasicos {
+    IDTEMATICAPADRE: number;
+    IDTEMATICA:      number;
+    NOMBRETEMATICA:  string;
+    TITULOCAPA:      string;
+}
