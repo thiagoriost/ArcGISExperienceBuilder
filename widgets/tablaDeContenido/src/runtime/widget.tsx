@@ -4,6 +4,7 @@ import { JimuMapViewComponent, JimuMapView } from 'jimu-arcgis'; // The map obje
 import './style.css';
 import { CapasTematicas, ItemResponseTablaContenido, TablaDeContenidoInterface, datosBasicosInterface, interfCapa, interfaceCapasNietos } from "../types/interfaces";
 import renderTree from "./renderTree";
+import Widget_Tree from "./widgetTree";
 
 
 const Widget = (props: AllWidgetProps<any>) => {
@@ -146,7 +147,8 @@ const Widget = (props: AllWidgetProps<any>) => {
 
 
     <div >
-      {renderTree(groupedLayers)}
+      {/* {renderTree(groupedLayers)} */}
+      <Widget_Tree nodes={groupedLayers}/>
     </div>
 
 

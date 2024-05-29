@@ -3,6 +3,9 @@ import { useState } from "react";
 import { FaChevronRight, FaChevronDown } from 'react-icons/fa';
 import { interfCapa } from "../types/interfaces";
 
+import './style.css';
+
+
 
 
 const renderTree = (nodes) => {
@@ -30,8 +33,10 @@ const renderTree = (nodes) => {
     
     const Node = ({ node, level = 0 }) => {
         const isExpanded = expandedItems[node.IDTEMATICA];
-        const hasChildren = (node.capasHijas?.length >= 1) || (node.capasNietas?.length > 0 && node.IDTEMATICAPADRE > 0) 
-          || (node.capasBisnietos?.length >= 1 );
+        const hasChildren = 
+            (node.capasHijas?.length >= 1) ||
+            (node.capasNietas?.length > 0 && node.IDTEMATICAPADRE > 0) ||
+            (node.capasBisnietos?.length >= 1 );
           
         const isChecked = node.capasNietas ? node.capasNietas[0].IDCAPA:node.IDCAPA
         return (
