@@ -141,7 +141,8 @@ const Widget = (props: AllWidgetProps<any>) => {
     const isExpanded = expandedItems[node.IDTEMATICA];
     const hasChildren = (node.capasHijas?.length >= 1) || (node.capasNietas?.length > 0 && node.IDTEMATICAPADRE > 0) 
       || (node.capasBisnietos?.length >= 1 );
-
+      
+    const isChecked = node.capasNietas ? node.capasNietas[0].IDCAPA:node.IDCAPA
     return (
       <div style={{ marginLeft: level * 20 + 'px' }}>
         <div>
@@ -152,7 +153,7 @@ const Widget = (props: AllWidgetProps<any>) => {
             ((node.URL || (node.capasNietas?.length < 2 && node.IDTEMATICAPADRE == 0)) ) ? (
               <input 
                 type="checkbox" 
-                checked={!!checkedItems[node.IDCAPA]} 
+                checked={!!checkedItems[isChecked]} 
                 onChange={() => handleCheck(node)} 
               />
             ) : null
@@ -182,10 +183,10 @@ const Widget = (props: AllWidgetProps<any>) => {
   };
 
   const handleCheck = (capa: interfCapa) => {
-    console.log(capa)
+    const capaTemp = capa.capasNietas ? capa.capasNietas[0].IDCAPA:capa.IDCAPA
     setCheckedItems(prevState => ({
       ...prevState,
-      [capa.IDCAPA]: !prevState[capa.IDCAPA],
+      [capaTemp]: !prevState[capaTemp],
     }));
   };
 
