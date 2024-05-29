@@ -40,6 +40,73 @@ export enum Estado {
     I = "I",
 }
 
+export interface interfaceCapasNietos {
+    capas: interfCapa[];
+    tematicasNietas: {
+        capasBisnietos: TablaDeContenidoInterface[];
+        IDTEMATICAPADRE: number;
+        IDTEMATICA: number;
+        NOMBRETEMATICA: string;
+        TITULOCAPA?: string;
+        
+    }[];
+}
+export interface interfCapa{
+    IDCAPA: number;
+    IDTEMATICA: number;
+    capasNietas: any[];
+}
+
+export interface datosBasicosInterface{
+    IDTEMATICAPADRE: number;
+    IDTEMATICA: number;
+    NOMBRETEMATICA: string;
+    TITULOCAPA?: string;
+}
+export interface ItemResponseTablaContenido {
+    ATRIBUTO:            string;
+    DESCRIPCIONSERVICIO: Descripcionservicio;
+    IDCAPA:              number;
+    IDTEMATICA:          number;
+    IDTEMATICAPADRE:     number;
+    METADATOCAPA:        string;
+    METADATOSERVICIO:    string;
+    NOMBRECAPA:          string;
+    NOMBRETEMATICA:      string;
+    TITULOCAPA:          string;
+    URL:                 string;
+    URLSERVICIOWFS:      string;
+    VISIBLE:             boolean;
+}
+
+export interface Tematicas {
+    IDTEMATICAPADRE: number;
+    IDTEMATICA:      number;
+    NOMBRETEMATICA:  string;
+    TITULOCAPA:      string;
+    capasHijas?:     Tematicas[];
+    capasNietas?:    CapasTematicas[];
+}
+export interface CapasTematicas {
+    DESCRIPCIONSERVICIO?: Descripcionservicio;
+    IDCAPA?:              number;
+    METADATOCAPA?:        string;
+    URL?:                 string;
+    VISIBLE?:             boolean;
+    NOMBRETEMATICA?:       string;
+    ESTADO?:              Estado;
+    ATRIBUTO?:            string;
+    TITULOCAPA?:           string;
+    METADATOSERVICIO?:    string;
+    IDTEMATICAPADRE?:      number;
+    NOMBRECAPA?:          string;
+    DESCARGACAPA?:        boolean;
+    IDTEMATICA?:           number;
+    URLSERVICIOWFS?:       string;
+    capasBisnietos?:       CapasTematicas[];
+    capasHijas?:           any[];
+}
+/* 
 export interface capaInterface {
     id: string;
     idCapaMapa: string;
@@ -63,82 +130,21 @@ export interface tablaContenInterface {
     capas: any[];
 }
 
-export interface datosBasicosInterface{
-    IDTEMATICAPADRE: number;
-    IDTEMATICA: number;
-    NOMBRETEMATICA: string;
-    TITULOCAPA?: string;
-}
 
-export interface interfaceCapasNietos {
-    capas: interfCapa[];
-    tematicasNietas: any[] | {
-        capasBisnietos: TablaDeContenidoInterface[];
-        IDTEMATICAPADRE: number;
-        IDTEMATICA: number;
-        NOMBRETEMATICA: string;
-        TITULOCAPA?: string;
-        
-    }[] | { capasBisnietos: undefined[];
-        IDTEMATICAPADRE: number;
-        IDTEMATICA: number;
-        NOMBRETEMATICA: string;
-        TITULOCAPA?: string;
-        
-    }[];
-}
 
-export interface interfCapa{
-    IDCAPA: number;
-    IDTEMATICA: number;
-}
+
+
+
 
 export interface TematicasTablaDeContenidoInterface {
     IDTEMATICAPADRE: number;
     IDTEMATICA:      number;
-    NOMBRETEMATICA:  string;
+    NOMBRETEMATICA?:  string;
     TITULOCAPA:      string;
     capasHijas?:     TematicasTablaDeContenidoInterface[] | ItemResponseTablaContenido[];
     capasNietas?:    CapasTematicas[];
 }
 
-export interface CapasTematicas {
-    DESCRIPCIONSERVICIO?: Descripcionservicio;
-    IDCAPA?:              number;
-    METADATOCAPA?:        string;
-    URL?:                 string;
-    VISIBLE?:             boolean;
-    NOMBRETEMATICA:       string;
-    ESTADO?:              Estado;
-    ATRIBUTO?:            string;
-    TITULOCAPA:           string;
-    METADATOSERVICIO?:    string;
-    IDTEMATICAPADRE:      number;
-    NOMBRECAPA?:          string;
-    DESCARGACAPA?:        boolean;
-    IDTEMATICA:           number;
-    URLSERVICIOWFS?:      string;
-    capasBisnietos?:      CapasTematicas[];
-}
-export interface ItemResponseTablaContenido {
-    ATRIBUTO:            string;
-    DESCRIPCIONSERVICIO: string;
-    IDCAPA:              number;
-    IDTEMATICA:          number;
-    IDTEMATICAPADRE:     number;
-    METADATOCAPA:        string;
-    METADATOSERVICIO:    string;
-    NOMBRECAPA:          string;
-    NOMBRETEMATICA:      string;
-    TITULOCAPA:          string;
-    URL:                 string;
-    URLSERVICIOWFS:      string;
-    VISIBLE:             boolean;
-}
 
-export interface DatosBasicos {
-    IDTEMATICAPADRE: number;
-    IDTEMATICA:      number;
-    NOMBRETEMATICA:  string;
-    TITULOCAPA:      string;
-}
+
+ */

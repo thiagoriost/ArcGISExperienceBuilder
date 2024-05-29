@@ -3,3 +3,7 @@
     display: flex;
     justify-content: space-around;
 }
+
+.app-root-emotion-cache-ltr-mgnm3r .widget-content{
+    overflow-y: auto !important;
+}
