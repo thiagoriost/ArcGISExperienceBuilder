@@ -3,14 +3,12 @@ import { useState, useEffect } from "react";
 import { JimuMapViewComponent, JimuMapView } from 'jimu-arcgis'; // The map object can be accessed using the JimuMapViewComponent
 import './style.css';
 import { CapasTematicas, ItemResponseTablaContenido, TablaDeContenidoInterface, datosBasicosInterface, interfCapa, interfaceCapasNietos } from "../types/interfaces";
-import { FaChevronRight, FaChevronDown } from 'react-icons/fa';
+import renderTree from "./renderTree";
 
 
 const Widget = (props: AllWidgetProps<any>) => {
   const [varJimuMapView, setJimuMapView] = useState<JimuMapView>(); // To add the layer to the Map, a reference to the Map must be saved into the component state.
-  const [checkedItems, setCheckedItems] = useState({});
   const [groupedLayers, setGroupedLayers] = useState([]);
-  const [expandedItems, setExpandedItems] = useState({});
 
 
 
@@ -122,7 +120,6 @@ const Widget = (props: AllWidgetProps<any>) => {
     setGroupedLayers(tematicas);
   }
 
-
   const fetchLayers = async () => {
     const url = 'https://sigquindio.gov.co:8443/ADMINSERV/AdminGeoApplication/AdminGeoWebServices/getTablaContenidoJsTree/public';
     try {
@@ -135,74 +132,6 @@ const Widget = (props: AllWidgetProps<any>) => {
     } catch (error) {
       console.error('Error fetching layers:', error);
     }
-  };
-
-  const Node = ({ node, level = 0 }) => {
-    const isExpanded = expandedItems[node.IDTEMATICA];
-    const hasChildren = (node.capasHijas?.length >= 1) || (node.capasNietas?.length > 0 && node.IDTEMATICAPADRE > 0) 
-      || (node.capasBisnietos?.length >= 1 );
-      
-    const isChecked = node.capasNietas ? node.capasNietas[0].IDCAPA:node.IDCAPA
-    return (
-      <div style={{ marginLeft: level * 20 + 'px' }}>
-        <div>
-          <span onClick={() => handleExpandCollapse(node.IDTEMATICA)} style={{ cursor: 'pointer' }}>
-            {hasChildren ? (isExpanded ? <FaChevronDown /> : <FaChevronRight />) : null}
-          </span>
-          {
-            ((node.URL || (node.capasNietas?.length < 2 && node.IDTEMATICAPADRE == 0)) ) ? (
-              <input 
-                type="checkbox" 
-                checked={!!checkedItems[isChecked]} 
-                onChange={() => handleCheck(node)} 
-              />
-            ) : null
-          }
-          { 
-            (((node.capasHijas?.length >= 1) || (node.capasNietas?.length > 1) || (node.capasBisnietos?.length >= 1)
-            || (node.IDTEMATICAPADRE > 0 ) && !node.URL) )
-              ? node.NOMBRETEMATICA 
-              : node.TITULOCAPA
-          }
-        </div>
-        {isExpanded && hasChildren && (
-          <div>
-            {node.capasHijas && node.capasHijas.map(child => (
-              <Node key={child.IDTEMATICA} node={child} level={level + 1} />
-            ))}
-            {node.capasNietas && node.capasNietas.map(child => (
-              <Node key={child.IDTEMATICA} node={child} level={level + 1} />
-            ))}
-            {node.capasBisnietos && node.capasBisnietos.map(child => (
-              <Node key={child.IDTEMATICA} node={child} level={level + 1} />
-            ))}
-          </div>
-        )}
-      </div>
-    );
-  };
-
-  const handleCheck = (capa: interfCapa) => {
-    const capaTemp = capa.capasNietas ? capa.capasNietas[0].IDCAPA:capa.IDCAPA
-    setCheckedItems(prevState => ({
-      ...prevState,
-      [capaTemp]: !prevState[capaTemp],
-    }));
-  };
-
-  // Manejar expansión y colapso de las temáticas
-  const handleExpandCollapse = (id) => {
-    console.log("expand => ", {id})
-    setExpandedItems(prevState => ({
-      ...prevState,
-      [id]: !prevState[id],
-    }));
-  };
-
-  const renderTree = (nodes) => {
-    return nodes.map(node => (
-      <Node key={node.IDTEMATICA} node={node} />
-    ));
   };
 
   useEffect(() => {
