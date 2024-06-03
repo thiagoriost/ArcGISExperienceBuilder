@@ -1,22 +1,25 @@
 import React, { useState, useEffect } from 'react';
-import { FaChevronRight, FaChevronDown, FaSearch, FaTimes } from 'react-icons/fa';
+import { FaChevronRight, FaChevronDown, FaSearch, FaTimes, FaWindowClose, FaPowerOff } from 'react-icons/fa';
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import FeatureLayer from "esri/layers/FeatureLayer";
-import Slider from 'rc-slider';
 import 'rc-slider/assets/index.css'; import 'react-tabs/style/react-tabs.css';
 import '../../styles/style.css';
-import { InterfaceContextMenu, ItemResponseTablaContenido, Tematicas } from '../../types/interfaces';
+import { CapasTematicas, InterfaceContextMenu, ItemResponseTablaContenido, Tematicas } from '../../types/interfaces';
 import { ContexMenu } from './ContexMenu';
+import { JimuMapView } from 'jimu-arcgis';
 
+interface Widget_Tree_Props {
+    dataTablaContenido:CapasTematicas[];
+    varJimuMapView: JimuMapView;
+}
 
-
-
-const Widget_Tree: React.FC<any> = ({ dataTablaContenido, varJimuMapView }) => {
+const Widget_Tree: React.FC<Widget_Tree_Props> = ({ dataTablaContenido, varJimuMapView }) => {
     const [expandedItems, setExpandedItems] = useState({});
     const [checkedItems, setCheckedItems] = useState({});
     const [searchQuery, setSearchQuery] = useState('');
     const [capasSelectd, setCapasSelectd] = useState<ItemResponseTablaContenido[]>([]); // para ser renderizadas en el tab "Orden Capas"
     const [contextMenu, setContextMenu] = useState<InterfaceContextMenu>(null);
+    const [featuresLayersDeployed, setFeaturesLayersDeployed] = useState([]);
 
     const handleExpandCollapse = (id: string | number) => {
         setExpandedItems(prevState => ({
@@ -27,19 +30,13 @@ const Widget_Tree: React.FC<any> = ({ dataTablaContenido, varJimuMapView }) => {
 
     const handleCheck = (capa: ItemResponseTablaContenido) => {
         const IDCAPA = capa.capasNietas ? capa.capasNietas[0].IDCAPA : capa.IDCAPA;
-        setCheckedItems(prevState => ({
-            ...prevState,
-            [IDCAPA]: !prevState[IDCAPA],
-        }));
+        setCheckedItems(prevState => ({ ...prevState, [IDCAPA]: !prevState[IDCAPA], }));
+        capa.VISIBLE = !capa.VISIBLE;
         setCapasSelectd(prevState => {
             const newState = prevState.includes(capa) ? prevState.filter(item => item !== capa) : [...prevState, capa];
             return newState;
         });
-
-        const layer = new FeatureLayer({
-            url: `${capa.URL}/${capa.NOMBRECAPA}`
-          });
-        varJimuMapView.view.map.add(layer)
+        capa.VISIBLE ? dibujaCapasSeleccionadas([capa], varJimuMapView) : removerFeatureLayer(capa);
     };
 
     const handleReset = () => {
@@ -49,10 +46,9 @@ const Widget_Tree: React.FC<any> = ({ dataTablaContenido, varJimuMapView }) => {
     const handleRightClick = (e: React.MouseEvent<HTMLDivElement, MouseEvent>, capa: ItemResponseTablaContenido) => {
         e.preventDefault();
         if (capa.URL) {
-            console.log(e.clientX, e.clientY, e.clientY - 90)
             setContextMenu({
-                mouseX: e.clientX + 20,
-                mouseY: e.clientY - 90,
+                mouseX: e.clientX + 50,
+                mouseY: e.clientY - 70,
                 capa
             });
         }
@@ -110,7 +106,7 @@ const Widget_Tree: React.FC<any> = ({ dataTablaContenido, varJimuMapView }) => {
         );
     };
     
-    const filterdataTablaContenido = (dataTablaContenido: Tematicas[]) => {
+    const filterdataTablaContenido = (dataTablaContenido: CapasTematicas[]) => {
         if (searchQuery === '') {
           return dataTablaContenido;
         }
@@ -170,7 +166,7 @@ const Widget_Tree: React.FC<any> = ({ dataTablaContenido, varJimuMapView }) => {
      * @param dataTablaContenido 
      * @returns componente Nodo donde renderizara, tematica padre, tematicas y/o capas hijas, tematicas y/o capas nietas y capas bisnietas
      */
-    const renderTree = (dataTablaContenido: Tematicas[]) => {        
+    const renderTree = (dataTablaContenido: CapasTematicas[]) => {        
         const filteredDataTablaContenido = filterdataTablaContenido(dataTablaContenido);
         console.log(filteredDataTablaContenido)
         
@@ -180,10 +176,38 @@ const Widget_Tree: React.FC<any> = ({ dataTablaContenido, varJimuMapView }) => {
 
     };
 
+    const dibujaCapasSeleccionadas = (capasToRender: ItemResponseTablaContenido[], varJimuMapView: JimuMapView) => {
+
+        console.log(capasToRender)
+        capasToRender.forEach(capa =>{
+            const url = capa.URL?capa.URL:capa.capasNietas[0].URL;
+            const nombreCapa = capa.NOMBRECAPA?capa.NOMBRECAPA:capa.capasNietas[0].NOMBRECAPA
+            const layer = new FeatureLayer({
+                url: `${url}/${nombreCapa}`
+            });
+            varJimuMapView.view.map.add(layer);
+            setFeaturesLayersDeployed(features => [...features,{capa,layer}]);
+        });
+    }
+
+    const removerFeatureLayer = (capa: ItemResponseTablaContenido) => {
+        const {layer} = featuresLayersDeployed.filter(({capa:capaDeployed}) => capaDeployed.IDCAPA == capa.IDCAPA)[0];
+        varJimuMapView.view.map.remove(layer);
+        setFeaturesLayersDeployed(featuresLayersDeployed.filter(item => item.capa.IDCAPA != capa.IDCAPA));
+        console.log(capasSelectd)
+        console.log(featuresLayersDeployed)
+    }
+
+    const removeAllLayers = () => {
+        
+        capasSelectd.forEach(capa => handleCheck(capa));
+
+    }
+
     useEffect(() => {
         const capasVisibles = recorreTodasLasCapasTablaContenido(dataTablaContenido);
         setCapasSelectd( capasVisibles );
-        dibujaCapasSeleccionadas(capasVisibles);
+        dibujaCapasSeleccionadas(capasVisibles, varJimuMapView);        
         return () => {}
     }, [dataTablaContenido])
     
@@ -201,7 +225,9 @@ const Widget_Tree: React.FC<any> = ({ dataTablaContenido, varJimuMapView }) => {
             <Tabs>
                 <TabList>
                     <Tab>Tabla de contenido</Tab>
-                    <Tab>Orden Capas</Tab>
+                    {
+                        capasSelectd.length>0 && <Tab>Orden Capas</Tab>
+                    }
                 </TabList>
 
                 <TabPanel>
@@ -218,21 +244,35 @@ const Widget_Tree: React.FC<any> = ({ dataTablaContenido, varJimuMapView }) => {
                             <button onClick={handleReset} style={{ marginLeft: '10px', padding: '5px 10px', borderRadius: '4px', border: 'none', backgroundColor: '#007bff', color: 'white', cursor: 'pointer' }}>
                                 <FaTimes />
                             </button>
+                            {
+                                capasSelectd.length>0 &&
+                                <button onClick={()=>removeAllLayers()} style={{ marginLeft: '10px', padding: '5px 10px', borderRadius: '4px', border: 'none', backgroundColor: '#007bff', color: 'white', cursor: 'pointer' }}>
+                                    <FaPowerOff />
+                                </button>
+                            }
+                            
+
                         </div>
                         <div >
                             { renderTree(dataTablaContenido)}
                         </div>
                     </div>
                 </TabPanel>
-                <TabPanel>
-                    <div className="checked-layers" style={{ padding: '20px', backgroundColor: '#f8f9fa', color: '#FF7D29' }}>
-                        <ul>
-                            {capasSelectd.map(capa => (
-                                <li key={capa.IDCAPA}>{capa.NOMBRETEMATICA} - {capa.TITULOCAPA}</li>
-                            ))}
-                        </ul>
-                    </div>
-                </TabPanel>            
+                {
+                    capasSelectd.length>0 &&
+                        <TabPanel>
+                            <div className="checked-layers" style={{ padding: '20px', backgroundColor: '#f8f9fa', color: '#FF7D29' }}>
+                                <ul>
+                                    {capasSelectd.map(capa => (
+                                        <>
+                                            <li key={capa.IDCAPA}>{capa.NOMBRETEMATICA} - {capa.TITULOCAPA}</li>
+                                            <hr />
+                                        </>
+                                    ))}
+                                </ul>
+                            </div>
+                        </TabPanel>            
+                }
             </Tabs>            
             <ContexMenu contextMenu={contextMenu} setContextMenu={setContextMenu}/>
         </>
@@ -241,40 +281,30 @@ const Widget_Tree: React.FC<any> = ({ dataTablaContenido, varJimuMapView }) => {
 export default Widget_Tree;
 
 
-const dibujaCapasSeleccionadas = (capasVisibles: ItemResponseTablaContenido[]) => {
-
-        console.log(capasVisibles)
-
-
-}
-
 /**
      * Buscas las capas que tienen la propiedad @VISIBLE para ser visualidas en el Tab "Orden Capas"
      * @param dataTablaContenido 
      */
-const recorreTodasLasCapasTablaContenido = (dataTablaContenido: Tematicas[]) => {
+const recorreTodasLasCapasTablaContenido = (dataTablaContenido: CapasTematicas[]) => {
 
     const capasVisibles: ItemResponseTablaContenido[]  = [];
 
     const bucleRecursivo = (dataTablaContenido) => {
         for (const capa of dataTablaContenido) {
 
-          if (capa.URL && capa.VISIBLE) {
-              
-            // if (capasVisibles.length<1) {
-                capasVisibles.push(capa);                    
-            // }
-          }
+        if (capa.URL && capa.VISIBLE) {
+            capasVisibles.push(capa);                    
+        }
     
-          if (capa.capasHijas) {
+        if (capa.capasHijas) {
             bucleRecursivo(capa.capasHijas);
-          }
-          if (capa.capasNietas) {
+        }
+        if (capa.capasNietas) {
             bucleRecursivo(capa.capasNietas);
-          }
-          if (capa.capasBisnietos) {
+        }
+        if (capa.capasBisnietos) {
             bucleRecursivo(capa.capasBisnietos);
-          }
+        }
         }
     };
     
@@ -283,4 +313,3 @@ const recorreTodasLasCapasTablaContenido = (dataTablaContenido: Tematicas[]) => 
     // setCapasSelectd(capasVisibles);
     return capasVisibles
 }
-
