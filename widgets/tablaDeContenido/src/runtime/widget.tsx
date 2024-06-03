@@ -1,18 +1,14 @@
 import { React, AllWidgetProps } from "jimu-core";
 import { useState, useEffect } from "react";
 import { JimuMapViewComponent, JimuMapView } from 'jimu-arcgis'; // The map object can be accessed using the JimuMapViewComponent
-import './style.css';
+import '../styles/style.css';
 import { CapasTematicas, ItemResponseTablaContenido, TablaDeContenidoInterface, datosBasicosInterface, interfCapa, interfaceCapasNietos } from "../types/interfaces";
-import renderTree from "./renderTree";
-import Widget_Tree from "./widgetTree";
-
+import renderTree from "./components/renderTree";
+import Widget_Tree from "./components/widgetTree";
 
 const Widget = (props: AllWidgetProps<any>) => {
   const [varJimuMapView, setJimuMapView] = useState<JimuMapView>(); // To add the layer to the Map, a reference to the Map must be saved into the component state.
-  const [groupedLayers, setGroupedLayers] = useState([]);
-
-
-
+  const [groupedLayers, setGroupedLayers] = useState<CapasTematicas[]>([]);
 
   const activeViewChangeHandler = (jmv: JimuMapView) => {
     if (jmv) {
@@ -145,12 +141,10 @@ const Widget = (props: AllWidgetProps<any>) => {
         <JimuMapViewComponent useMapWidgetId={props.useMapWidgetIds?.[0]} onActiveViewChange={activeViewChangeHandler} />
       )}
 
-
-    <div >
-      {/* {renderTree(groupedLayers)} */}
-      <Widget_Tree nodes={groupedLayers}/>
-    </div>
-
+      <div >
+        {/* {renderTree(groupedLayers)} */}
+        <Widget_Tree dataTablaContenido={groupedLayers} varJimuMapView={varJimuMapView}/>
+      </div>
 
     </div>
   );

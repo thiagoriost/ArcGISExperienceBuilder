@@ -77,6 +77,7 @@ export interface ItemResponseTablaContenido {
     URL:                 string;
     URLSERVICIOWFS:      string;
     VISIBLE:             boolean;
+    capasNietas?: ItemResponseTablaContenido[]
 }
 
 export interface Tematicas {
@@ -88,63 +89,27 @@ export interface Tematicas {
     capasNietas?:    CapasTematicas[];
 }
 export interface CapasTematicas {
-    DESCRIPCIONSERVICIO?: Descripcionservicio;
-    IDCAPA?:              number;
-    METADATOCAPA?:        string;
-    URL?:                 string;
-    VISIBLE?:             boolean;
-    NOMBRETEMATICA?:       string;
-    ESTADO?:              Estado;
     ATRIBUTO?:            string;
-    TITULOCAPA?:           string;
-    METADATOSERVICIO?:    string;
-    IDTEMATICAPADRE?:      number;
-    NOMBRECAPA?:          string;
-    DESCARGACAPA?:        boolean;
-    IDTEMATICA?:           number;
-    URLSERVICIOWFS?:       string;
     capasBisnietos?:       CapasTematicas[];
     capasHijas?:           any[];
-}
-/* 
-export interface capaInterface {
-    id: string;
-    idCapaMapa: string;
-    text: string;
-    type: string;
-    parent: string;
-    state: {
-        checked: boolean;
-    };
-    url: string;
-    idCapaDeServicio: string;
-    urlMetadatoCapa: string;
-    urlMetadatoServicio: string;
-    DESCARGACAPA: boolean;
-    urlMapServer: string;
+    DESCARGACAPA?:        boolean;
+    DESCRIPCIONSERVICIO?: Descripcionservicio;
+    ESTADO?:              Estado;
+    IDCAPA?:              number;
+    IDTEMATICA?:           number;
+    IDTEMATICAPADRE?:      number;
+    METADATOCAPA?:        string;
+    METADATOSERVICIO?:    string;
+    NOMBRECAPA?:          string;
+    NOMBRETEMATICA?:       string;
+    TITULOCAPA?:           string;
+    URL?:                 string;
+    URLSERVICIOWFS?:       string;
+    VISIBLE?:             boolean;
 }
 
-export interface tablaContenInterface {
-    IDTEMATICA: number;
-    NOMBRETEMATICA: string;
-    capas: any[];
+export interface InterfaceContextMenu {
+    mouseX: number;
+    mouseY: number;
+    capa:   ItemResponseTablaContenido;
 }
-
-
-
-
-
-
-
-export interface TematicasTablaDeContenidoInterface {
-    IDTEMATICAPADRE: number;
-    IDTEMATICA:      number;
-    NOMBRETEMATICA?:  string;
-    TITULOCAPA:      string;
-    capasHijas?:     TematicasTablaDeContenidoInterface[] | ItemResponseTablaContenido[];
-    capasNietas?:    CapasTematicas[];
-}
-
-
-
- */

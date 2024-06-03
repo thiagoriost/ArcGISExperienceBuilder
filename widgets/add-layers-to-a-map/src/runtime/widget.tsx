@@ -7,7 +7,7 @@ import FeatureLayer from "esri/layers/FeatureLayer";
 const { useState } = React
 const iconNode = <StarFilled />;
 
-const Widget = (props: AllWidgetProps<any>) => {
+const Widget: React.FC<any> = (props: AllWidgetProps<any>) => {
   
     const [jimuMapView, setJimuMapView] = useState<JimuMapView>(); //To add the layer to the Map, a reference to the Map must be saved into the component state.
     
