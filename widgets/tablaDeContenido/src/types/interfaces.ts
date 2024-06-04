@@ -111,5 +111,64 @@ export interface CapasTematicas {
 export interface InterfaceContextMenu {
     mouseX: number;
     mouseY: number;
-    capa:   ItemResponseTablaContenido;
+    capa_Feature: {
+        capa: ItemResponseTablaContenido;
+        layer: InterfaceLayer
+    }  
+}
+
+export interface InterfaceLayer {
+    id:                    string;
+    showLegend:            boolean;
+    listMode:              string;
+    disablePopup:          boolean;
+    title:                 string;
+    url:                   string;
+    visibility:            boolean;
+    layerType:             string;
+    refreshInterval:       number;
+    layerDefinition:       LayerDefinition;
+    timeAnimation:         boolean;
+    showLabels:            boolean;
+    screenSizePerspective: boolean;
+    opacity:               number;
+}
+
+export interface LayerDefinition {
+    minScale:             number;
+    maxScale:             number;
+    definitionExpression: null;
+    drawingInfo:          DrawingInfo;
+}
+
+export interface DrawingInfo {
+    renderer: Renderer;
+}
+
+export interface Renderer {
+    type:              string;
+    field1:            string;
+    fieldDelimiter:    string;
+    uniqueValueGroups: UniqueValueGroup[];
+    uniqueValueInfos:  UniqueValueInfo[];
+}
+
+export interface UniqueValueGroup {
+    classes: UniqueValueInfo[];
+}
+
+export interface UniqueValueInfo {
+    description: string;
+    label:       string;
+    symbol:      Symbol;
+    values?:     Array<string[]>;
+    value?:      string;
+}
+
+export interface Symbol {
+    type:     string;
+    color:    number[];
+    outline?: Symbol;
+    style:    string;
+    width?:   number;
 }

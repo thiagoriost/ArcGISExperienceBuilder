@@ -40,7 +40,7 @@ const Widget_Tree: React.FC<Widget_Tree_Props> = ({ dataTablaContenido, varJimuM
     };
 
     const handleReset = () => {
-        setSearchQuery('');
+        setSearchQuery('');        
     };
 
     const handleRightClick = (e: React.MouseEvent<HTMLDivElement, MouseEvent>, capa: ItemResponseTablaContenido) => {
@@ -49,7 +49,7 @@ const Widget_Tree: React.FC<Widget_Tree_Props> = ({ dataTablaContenido, varJimuM
             setContextMenu({
                 mouseX: e.clientX + 50,
                 mouseY: e.clientY - 70,
-                capa
+                capa_Feature: featuresLayersDeployed.filter(e=>e.capa == capa)[0]
             });
         }
     };
@@ -274,9 +274,9 @@ const Widget_Tree: React.FC<Widget_Tree_Props> = ({ dataTablaContenido, varJimuM
                         </TabPanel>            
                 }
             </Tabs>            
-            <ContexMenu contextMenu={contextMenu} setContextMenu={setContextMenu}/>
+            <ContexMenu contextMenu={contextMenu} setContextMenu={setContextMenu} varJimuMapView={varJimuMapView}/>
         </>
-);
+    );
 };
 export default Widget_Tree;
 

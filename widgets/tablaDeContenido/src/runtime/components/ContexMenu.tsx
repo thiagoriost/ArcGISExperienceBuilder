@@ -1,19 +1,28 @@
 import { Slider } from 'jimu-ui';
 import React, { ChangeEvent } from 'react'
+import FeatureLayer from "esri/layers/FeatureLayer";
+import { JimuMapView } from 'jimu-arcgis';
+import { InterfaceContextMenu } from '../../types/interfaces';
 
-export const ContexMenu = ({contextMenu, setContextMenu}) => {
+interface ContexMenu_Props {
+    contextMenu: InterfaceContextMenu;
+    varJimuMapView: JimuMapView;
+    setContextMenu?: any;
+}
+
+export const ContexMenu: React.FC<ContexMenu_Props> = ({contextMenu, setContextMenu, varJimuMapView}) => {
 
     const handleCloseContextMenu = () => {
         setContextMenu(null);
     };
 
     const handleMetadataClick = () => {
-        console.log(`Metadatos de la capa: ${contextMenu.capa.TITULOCAPA}`, contextMenu.capa);
+        console.log(`Metadatos de la capa: ${contextMenu.capa_Feature.capa.TITULOCAPA}`, contextMenu.capa_Feature.capa);
         handleCloseContextMenu();
     };
 
     const handleChangeSlider = ({target}: ChangeEvent<HTMLInputElement>): void => {
-        console.log(parseInt(target.value))
+        contextMenu.capa_Feature.layer.opacity = Number(target.value)/10;
     }
 
   return (
@@ -33,7 +42,7 @@ export const ContexMenu = ({contextMenu, setContextMenu}) => {
                         color: 'black'
                     }}
                 >
-                    {contextMenu.capa.VISIBLE && <Slider defaultValue={0} onChange={handleChangeSlider} size='sm' step={10}/>}
+                    {contextMenu.capa_Feature.capa.VISIBLE && <Slider defaultValue={10} onChange={handleChangeSlider} size='sm' min={0} max={10} step={1}/>}
                     
                     <p onClick={handleMetadataClick}>Metadato Capa</p>
                     <p>Metadato Servicio</p>
