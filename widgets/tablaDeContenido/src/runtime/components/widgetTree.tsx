@@ -39,9 +39,9 @@ const Widget_Tree: React.FC<Widget_Tree_Props> = ({ dataTablaContenido, varJimuM
         capa.VISIBLE ? dibujaCapasSeleccionadas([capa], varJimuMapView) : removerFeatureLayer(capa);
     };
 
-    const handleReset = () => {
-        setSearchQuery('');        
-    };
+    const handleReset = () => setSearchQuery('');
+
+    const handleCloseContextMenu = () => setContextMenu(null);
 
     const handleRightClick = (e: React.MouseEvent<HTMLDivElement, MouseEvent>, capa: ItemResponseTablaContenido) => {
         e.preventDefault();
@@ -86,7 +86,7 @@ const Widget_Tree: React.FC<Widget_Tree_Props> = ({ dataTablaContenido, varJimuM
 
         return (
             <div style={{ marginLeft: level * 20 + 'px' }} onContextMenu={(e) => handleRightClick(e, capa)}>
-                <div>
+                <div className='rowCheck'>
                     <span onClick={() => handleExpandCollapse(capa.IDTEMATICA)} style={{ cursor: 'pointer' }}>
                         {hasChildren ? (isExpanded ? <FaChevronDown /> : <FaChevronRight />) : null}
                     </span>
@@ -96,6 +96,7 @@ const Widget_Tree: React.FC<Widget_Tree_Props> = ({ dataTablaContenido, varJimuM
                                 type="checkbox"
                                 checked={!!checkedItems[isChecked]}
                                 onChange={() => handleCheck(capa)}
+                                style={{marginRight:'10px'}}
                             />
                         ) : null
                     }
@@ -186,23 +187,31 @@ const Widget_Tree: React.FC<Widget_Tree_Props> = ({ dataTablaContenido, varJimuM
                 url: `${url}/${nombreCapa}`
             });
             varJimuMapView.view.map.add(layer);
-            setFeaturesLayersDeployed(features => [...features,{capa,layer}]);
+            setFeaturesLayersDeployed(features => [...features,{capa: capa.IDCAPA ? capa : capa.capasNietas[0], layer}]);
         });
     }
 
     const removerFeatureLayer = (capa: ItemResponseTablaContenido) => {
-        const {layer} = featuresLayersDeployed.filter(({capa:capaDeployed}) => capaDeployed.IDCAPA == capa.IDCAPA)[0];
-        varJimuMapView.view.map.remove(layer);
-        setFeaturesLayersDeployed(featuresLayersDeployed.filter(item => item.capa.IDCAPA != capa.IDCAPA));
+
+        const layer = featuresLayersDeployed.filter(({capa:capaDeployed}) => (capaDeployed.IDCAPA ? capaDeployed.IDCAPA : capaDeployed.capasNietas[0].IDCAPA) == (capa.IDCAPA?capa.IDCAPA:capa.capasNietas[0].IDCAPA))[0].layer;
+
+        console.log(layer)
+        
+        varJimuMapView.view.map.remove(layer);            
+        setTimeout(() => {
+            for (let index = 0; index < 2; index++) {   
+                varJimuMapView.view.map.add(layer);         
+                setTimeout(() => {
+                    varJimuMapView.view.map.remove(layer);                                
+                }, 500);
+            }            
+        }, 1000);
+        setFeaturesLayersDeployed(featuresLayersDeployed.filter(item => item.capa.IDCAPA != (capa.IDCAPA ? capa.IDCAPA : capa.capasNietas[0].IDCAPA)));
         console.log(capasSelectd)
         console.log(featuresLayersDeployed)
     }
 
-    const removeAllLayers = () => {
-        
-        capasSelectd.forEach(capa => handleCheck(capa));
-
-    }
+    const removeAllLayers = () => capasSelectd.forEach(capa => handleCheck(capa));
 
     useEffect(() => {
         const capasVisibles = recorreTodasLasCapasTablaContenido(dataTablaContenido);
@@ -231,7 +240,7 @@ const Widget_Tree: React.FC<Widget_Tree_Props> = ({ dataTablaContenido, varJimuM
                 </TabList>
 
                 <TabPanel>
-                    <div className="tree-container" style={{ maxHeight: '500px', overflowY: 'auto', padding: '20px', backgroundColor: '#FEFFD2', color: '#FF7D29' }}>
+                    <div className="tree-container" onClick={handleCloseContextMenu} style={{ maxHeight: '500px', overflowY: 'auto', padding: '20px', backgroundColor: '#FEFFD2', color: '#FF7D29' }}>
                         <div className="search-bar" style={{ marginBottom: '10px', display: 'flex', alignItems: 'center' }}>
                             <FaSearch style={{ marginRight: '10px' }} />
                             <input

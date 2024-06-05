@@ -17,8 +17,8 @@ export const ContexMenu: React.FC<ContexMenu_Props> = ({contextMenu, setContextM
     };
 
     const handleMetadataClick = () => {
-        console.log(`Metadatos de la capa: ${contextMenu.capa_Feature.capa.TITULOCAPA}`, contextMenu.capa_Feature.capa);
-        handleCloseContextMenu();
+        console.log(`Metadatos de la capa: ${contextMenu.capa_Feature?.capa.TITULOCAPA}`, contextMenu.capa_Feature.capa);
+        // handleCloseContextMenu();
     };
 
     const handleChangeSlider = ({target}: ChangeEvent<HTMLInputElement>): void => {
@@ -42,13 +42,15 @@ export const ContexMenu: React.FC<ContexMenu_Props> = ({contextMenu, setContextM
                         color: 'black'
                     }}
                 >
-                    {contextMenu.capa_Feature.capa.VISIBLE && <Slider defaultValue={10} onChange={handleChangeSlider} size='sm' min={0} max={10} step={1}/>}
+                    {contextMenu.capa_Feature?.capa.VISIBLE && 
+                        <>
+                            <Slider defaultValue={10} onChange={handleChangeSlider} size='sm' min={0} max={10} step={1}/>
+                            <hr />
+                        </>
+                    }
                     
-                    <p onClick={handleMetadataClick}>Metadato Capa</p>
-                    <p>Metadato Servicio</p>
-                    <button onClick={handleCloseContextMenu} style={{ marginLeft: '10px', padding: '5px 10px', borderRadius: '4px', border: 'none', backgroundColor: '#007bff', color: 'white', cursor: 'pointer' }}>
-                                cerrar
-                            </button>
+                    <p className='pointer' onClick={handleMetadataClick}>Metadato Capa</p>
+                    <p className='pointer'> Metadato Servicio</p>                    
                 </div>
             )
         }

@@ -47,3 +47,12 @@
   .checked-layers li {
     padding: 5px 0;
   }
+
+  .rowCheck{
+    display: flex;
+    align-items: center;
+  }
+
+  .pointer{
+    cursor: pointer;
+  }
