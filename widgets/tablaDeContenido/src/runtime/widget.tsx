@@ -6,15 +6,32 @@ import { CapasTematicas, ItemResponseTablaContenido, TablaDeContenidoInterface, 
 import renderTree from "./components/renderTree";
 import Widget_Tree from "./components/widgetTree";
 
+/**
+ * 
+ * @param props 
+ * @returns 
+ */
 const Widget = (props: AllWidgetProps<any>) => {
   const [varJimuMapView, setJimuMapView] = useState<JimuMapView>(); // To add the layer to the Map, a reference to the Map must be saved into the component state.
-  const [groupedLayers, setGroupedLayers] = useState<CapasTematicas[]>([]);
+  const [groupedLayers, setGroupedLayers] = useState<CapasTematicas[]>([]); //
 
+  /**
+   * 
+   * @param jmv 
+   */
   const activeViewChangeHandler = (jmv: JimuMapView) => {
     if (jmv) {
       setJimuMapView(jmv);
     }
   };
+
+  /**
+   * 
+   * @param capasNietos 
+   * @param ItemResponseTablaContenido 
+   * @param datosBasicos 
+   * @returns 
+   */
   const agregarTematicaNietaNueva = (capasNietos, ItemResponseTablaContenido: ItemResponseTablaContenido, datosBasicos:datosBasicosInterface) => {
 
     //Define una nueva capa basada en ItemResponseTablaContenido.
@@ -35,6 +52,12 @@ const Widget = (props: AllWidgetProps<any>) => {
     };
   }
 
+  /**
+   * 
+   * @param capasNietos 
+   * @param ItemResponseTablaContenido 
+   * @returns 
+   */
   const validaSiExisteCApaNieto = (capasNietos: interfaceCapasNietos, ItemResponseTablaContenido:ItemResponseTablaContenido) => {
     return !capasNietos.capas.some(capaNieta =>
       capaNieta.IDCAPA === ItemResponseTablaContenido.IDCAPA &&
@@ -42,6 +65,10 @@ const Widget = (props: AllWidgetProps<any>) => {
     );
   }
 
+  /**
+   * 
+   * @param responseTablaDeContenido 
+   */
   const ordenarDataTablaContenido = (responseTablaDeContenido: any[] | TablaDeContenidoInterface) => {
     const tematicas:CapasTematicas[] = [];
     let capasNietos: interfaceCapasNietos = { capas: [], tematicasNietas: [] };
@@ -117,6 +144,9 @@ const Widget = (props: AllWidgetProps<any>) => {
     setGroupedLayers(tematicas);
   }
 
+  /**
+   * 
+   */
   const fetchLayers = async () => {
     const url = 'https://sigquindio.gov.co:8443/ADMINSERV/AdminGeoApplication/AdminGeoWebServices/getTablaContenidoJsTree/public';
     try {
@@ -131,6 +161,9 @@ const Widget = (props: AllWidgetProps<any>) => {
     }
   };
 
+  /**
+   * 
+   */
   useEffect(() => {
     fetchLayers();
   }, []);

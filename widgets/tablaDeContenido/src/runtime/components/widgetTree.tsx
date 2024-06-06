@@ -7,20 +7,31 @@ import '../../styles/style.css';
 import { CapasTematicas, InterfaceContextMenu, ItemResponseTablaContenido, Tematicas } from '../../types/interfaces';
 import { ContexMenu } from './ContexMenu';
 import { JimuMapView } from 'jimu-arcgis';
+import DragAndDrop from './DragAndDrop';
 
 interface Widget_Tree_Props {
     dataTablaContenido:CapasTematicas[];
     varJimuMapView: JimuMapView;
 }
 
+/**
+ * 
+ * @param param0 
+ * @returns 
+ */
 const Widget_Tree: React.FC<Widget_Tree_Props> = ({ dataTablaContenido, varJimuMapView }) => {
-    const [expandedItems, setExpandedItems] = useState({});
-    const [checkedItems, setCheckedItems] = useState({});
-    const [searchQuery, setSearchQuery] = useState('');
+    const [expandedItems, setExpandedItems] = useState({}); //
+    const [checkedItems, setCheckedItems] = useState({}); //
+    const [searchQuery, setSearchQuery] = useState(''); //
     const [capasSelectd, setCapasSelectd] = useState<ItemResponseTablaContenido[]>([]); // para ser renderizadas en el tab "Orden Capas"
-    const [contextMenu, setContextMenu] = useState<InterfaceContextMenu>(null);
-    const [featuresLayersDeployed, setFeaturesLayersDeployed] = useState([]);
+    const [contextMenu, setContextMenu] = useState<InterfaceContextMenu>(null); //
+    const [featuresLayersDeployed, setFeaturesLayersDeployed] = useState([]); //
+    const [banderaRefreshCapas, setBanderaRefreshCapas] = useState<boolean>(false);
 
+    /**
+     * 
+     * @param id 
+     */
     const handleExpandCollapse = (id: string | number) => {
         setExpandedItems(prevState => ({
             ...prevState,
@@ -28,6 +39,10 @@ const Widget_Tree: React.FC<Widget_Tree_Props> = ({ dataTablaContenido, varJimuM
         }));
     };
 
+    /**
+     * 
+     * @param capa 
+     */
     const handleCheck = (capa: ItemResponseTablaContenido) => {
         const IDCAPA = capa.capasNietas ? capa.capasNietas[0].IDCAPA : capa.IDCAPA;
         setCheckedItems(prevState => ({ ...prevState, [IDCAPA]: !prevState[IDCAPA], }));
@@ -39,10 +54,23 @@ const Widget_Tree: React.FC<Widget_Tree_Props> = ({ dataTablaContenido, varJimuM
         capa.VISIBLE ? dibujaCapasSeleccionadas([capa], varJimuMapView) : removerFeatureLayer(capa);
     };
 
+    /**
+     * 
+     * @returns 
+     */
     const handleReset = () => setSearchQuery('');
 
+    /**
+     * 
+     * @returns 
+     */
     const handleCloseContextMenu = () => setContextMenu(null);
 
+    /**
+     * 
+     * @param e 
+     * @param capa 
+     */
     const handleRightClick = (e: React.MouseEvent<HTMLDivElement, MouseEvent>, capa: ItemResponseTablaContenido) => {
         e.preventDefault();
         if (capa.URL) {
@@ -54,6 +82,11 @@ const Widget_Tree: React.FC<Widget_Tree_Props> = ({ dataTablaContenido, varJimuM
         }
     };
 
+    /**
+     * 
+     * @param param0 
+     * @returns 
+     */
     const Nodo = ({ capa, level = 0 }) => {
         const isExpanded = expandedItems[capa.IDTEMATICA];
         const hasChildren =
@@ -107,6 +140,11 @@ const Widget_Tree: React.FC<Widget_Tree_Props> = ({ dataTablaContenido, varJimuM
         );
     };
     
+    /**
+     * 
+     * @param dataTablaContenido 
+     * @returns 
+     */
     const filterdataTablaContenido = (dataTablaContenido: CapasTematicas[]) => {
         if (searchQuery === '') {
           return dataTablaContenido;
@@ -177,6 +215,11 @@ const Widget_Tree: React.FC<Widget_Tree_Props> = ({ dataTablaContenido, varJimuM
 
     };
 
+    /**
+     * 
+     * @param capasToRender 
+     * @param varJimuMapView 
+     */
     const dibujaCapasSeleccionadas = (capasToRender: ItemResponseTablaContenido[], varJimuMapView: JimuMapView) => {
 
         console.log(capasToRender)
@@ -191,12 +234,14 @@ const Widget_Tree: React.FC<Widget_Tree_Props> = ({ dataTablaContenido, varJimuM
         });
     }
 
+    /**
+     * 
+     * @param capa 
+     */
     const removerFeatureLayer = (capa: ItemResponseTablaContenido) => {
 
         const layer = featuresLayersDeployed.filter(({capa:capaDeployed}) => (capaDeployed.IDCAPA ? capaDeployed.IDCAPA : capaDeployed.capasNietas[0].IDCAPA) == (capa.IDCAPA?capa.IDCAPA:capa.capasNietas[0].IDCAPA))[0].layer;
-
         console.log(layer)
-        
         varJimuMapView.view.map.remove(layer);            
         setTimeout(() => {
             for (let index = 0; index < 2; index++) {   
@@ -209,10 +254,18 @@ const Widget_Tree: React.FC<Widget_Tree_Props> = ({ dataTablaContenido, varJimuM
         setFeaturesLayersDeployed(featuresLayersDeployed.filter(item => item.capa.IDCAPA != (capa.IDCAPA ? capa.IDCAPA : capa.capasNietas[0].IDCAPA)));
         console.log(capasSelectd)
         console.log(featuresLayersDeployed)
+        varJimuMapView.view.zoom = varJimuMapView.view.zoom -0.00000001
     }
 
+    /**
+     * 
+     * @returns 
+     */
     const removeAllLayers = () => capasSelectd.forEach(capa => handleCheck(capa));
 
+    /**
+     * 
+     */
     useEffect(() => {
         const capasVisibles = recorreTodasLasCapasTablaContenido(dataTablaContenido);
         setCapasSelectd( capasVisibles );
@@ -220,6 +273,9 @@ const Widget_Tree: React.FC<Widget_Tree_Props> = ({ dataTablaContenido, varJimuM
         return () => {}
     }, [dataTablaContenido])
     
+    /**
+     * 
+     */
     useEffect(() => {
         console.log({varJimuMapView})
       
@@ -228,6 +284,57 @@ const Widget_Tree: React.FC<Widget_Tree_Props> = ({ dataTablaContenido, varJimuM
         
       }
     }, [varJimuMapView])
+
+    const reorderLayers  = ({view}) => {
+
+        let toChangeFeaturesLayersDeployed = featuresLayersDeployed;
+        const layersMap = view.map.allLayers.toArray()
+        const ordenCapas=[]
+        layersMap.forEach( (l: { id: any; }) => console.log(l.id));
+        layersMap.forEach((layerMap: { id: any; }, item: any) => {
+            let existeEnFeaturesLayersDeployed = false;
+            toChangeFeaturesLayersDeployed.forEach(FeaLayerDep => {
+                if (layerMap.id == FeaLayerDep.layer.id) {
+                    existeEnFeaturesLayersDeployed = true;
+                }
+            })
+            if (!existeEnFeaturesLayersDeployed) {
+                ordenCapas.push({
+                    position: item,
+                    layerMap
+                })
+            }
+        })
+        const nuevoOrden=[]
+        layersMap.forEach((lyrMp: any, item: any) => {
+            let existePosicion = false;
+            ordenCapas.forEach(ordeCapa => {
+                if (item == ordeCapa.position) {
+                    nuevoOrden.push(ordeCapa.layerMap)
+                    existePosicion = true;
+                }
+            })
+            if (!existePosicion) {
+                nuevoOrden.push(toChangeFeaturesLayersDeployed[0].layer);
+                toChangeFeaturesLayersDeployed = toChangeFeaturesLayersDeployed.slice(1);
+            }
+        })
+        nuevoOrden.forEach( l => console.log(l.id));
+        nuevoOrden.forEach( (layer, i) => view.map.reorder(layer,i));
+        // Forzar la actualización de la vista del mapa
+        // view.refresh();  // Esta línea fuerza la actualización de la vista del mapa
+        view.zoom = view.zoom -0.00000001
+    }
+
+    useEffect(() => {
+      
+        if (varJimuMapView) {
+            reorderLayers(varJimuMapView)
+        }
+    
+      return () => {}
+    }, [banderaRefreshCapas])
+    
     
     return (
         <>
@@ -271,14 +378,7 @@ const Widget_Tree: React.FC<Widget_Tree_Props> = ({ dataTablaContenido, varJimuM
                     capasSelectd.length>0 &&
                         <TabPanel>
                             <div className="checked-layers" style={{ padding: '20px', backgroundColor: '#f8f9fa', color: '#FF7D29' }}>
-                                <ul>
-                                    {capasSelectd.map(capa => (
-                                        <>
-                                            <li key={capa.IDCAPA}>{capa.NOMBRETEMATICA} - {capa.TITULOCAPA}</li>
-                                            <hr />
-                                        </>
-                                    ))}
-                                </ul>
+                                <DragAndDrop items={featuresLayersDeployed} setItems={setFeaturesLayersDeployed} setBanderaRefreshCapas={setBanderaRefreshCapas}/>                               
                             </div>
                         </TabPanel>            
                 }

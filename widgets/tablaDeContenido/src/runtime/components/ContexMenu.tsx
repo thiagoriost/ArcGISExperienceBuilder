@@ -10,19 +10,39 @@ interface ContexMenu_Props {
     setContextMenu?: any;
 }
 
+/**
+ * 
+ * @param param0 
+ * @returns 
+ */
 export const ContexMenu: React.FC<ContexMenu_Props> = ({contextMenu, setContextMenu, varJimuMapView}) => {
 
+    /**
+     * 
+     */
     const handleCloseContextMenu = () => {
         setContextMenu(null);
     };
 
+    /**
+     * 
+     */
     const handleMetadataClick = () => {
         console.log(`Metadatos de la capa: ${contextMenu.capa_Feature?.capa.TITULOCAPA}`, contextMenu.capa_Feature.capa);
         // handleCloseContextMenu();
     };
 
+    /**
+     * 
+     * @param param0 
+     */
     const handleChangeSlider = ({target}: ChangeEvent<HTMLInputElement>): void => {
         contextMenu.capa_Feature.layer.opacity = Number(target.value)/10;
+    }
+
+    const abrirMetadata = (url: string) => {        
+        console.log({url})
+        window.open(url, '_blank', 'noopener,noreferrer');
     }
 
   return (
@@ -48,9 +68,14 @@ export const ContexMenu: React.FC<ContexMenu_Props> = ({contextMenu, setContextM
                             <hr />
                         </>
                     }
-                    
-                    <p className='pointer' onClick={handleMetadataClick}>Metadato Capa</p>
-                    <p className='pointer'> Metadato Servicio</p>                    
+                    {
+                        contextMenu.capa_Feature.capa.METADATOCAPA &&
+                            <p className='pointer' onClick={()=>abrirMetadata(contextMenu.capa_Feature.capa.METADATOCAPA)}>Metadato Capa</p>
+                    }
+                    {
+                        contextMenu.capa_Feature.capa.METADATOSERVICIO &&
+                        <p className='pointer' onClick={()=>abrirMetadata(contextMenu.capa_Feature.capa.METADATOSERVICIO)}> Metadato Servicio</p>                    
+                    }
                 </div>
             )
         }
