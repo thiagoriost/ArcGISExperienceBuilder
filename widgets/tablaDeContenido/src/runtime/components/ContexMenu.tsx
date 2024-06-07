@@ -1,8 +1,9 @@
 import { Slider } from 'jimu-ui';
-import React, { ChangeEvent } from 'react'
-import FeatureLayer from "esri/layers/FeatureLayer";
+import React, { ChangeEvent, useEffect } from 'react'
 import { JimuMapView } from 'jimu-arcgis';
 import { InterfaceContextMenu } from '../../types/interfaces';
+import { CloseCircleOutlined } from 'jimu-icons/outlined/editor/close-circle'
+import '../../styles/styles_ContexMenu.css'
 
 interface ContexMenu_Props {
     contextMenu: InterfaceContextMenu;
@@ -17,20 +18,6 @@ interface ContexMenu_Props {
  */
 export const ContexMenu: React.FC<ContexMenu_Props> = ({contextMenu, setContextMenu, varJimuMapView}) => {
 
-    /**
-     * 
-     */
-    const handleCloseContextMenu = () => {
-        setContextMenu(null);
-    };
-
-    /**
-     * 
-     */
-    const handleMetadataClick = () => {
-        console.log(`Metadatos de la capa: ${contextMenu.capa_Feature?.capa.TITULOCAPA}`, contextMenu.capa_Feature.capa);
-        // handleCloseContextMenu();
-    };
 
     /**
      * 
@@ -45,10 +32,17 @@ export const ContexMenu: React.FC<ContexMenu_Props> = ({contextMenu, setContextM
         window.open(url, '_blank', 'noopener,noreferrer');
     }
 
+    useEffect(() => {
+      
+        console.log({contextMenu})
+      return () => {}
+    }, [contextMenu])
+    
+
   return (
     <>
         {
-            contextMenu && (
+            (contextMenu && (contextMenu?.capa_Feature?.capa.METADATOCAPA || contextMenu?.capa_Feature?.capa.METADATOSERVICIO || contextMenu.capa_Feature.capa.VISIBLE)) && (
                 <div
                     style={{
                         position: 'absolute',
@@ -62,11 +56,17 @@ export const ContexMenu: React.FC<ContexMenu_Props> = ({contextMenu, setContextM
                         color: 'black'
                     }}
                 >
-                    {contextMenu.capa_Feature?.capa.VISIBLE && 
-                        <>
-                            <Slider defaultValue={10} onChange={handleChangeSlider} size='sm' min={0} max={10} step={1}/>
-                            <hr />
-                        </>
+                    <div className='row_contextmenu'>
+                        <CloseCircleOutlined size='m' color='red' onClick={()=>setContextMenu(null)} className='pointer'/>
+                        <p>{contextMenu.capa_Feature.capa.TITULOCAPA}</p>
+                    </div>
+                    <hr />
+                    {
+                        contextMenu.capa_Feature.capa.VISIBLE && 
+                            <>
+                                <Slider defaultValue={10} onChange={handleChangeSlider} size='sm' min={0} max={10} step={1}/>
+                                <hr />
+                            </>
                     }
                     {
                         contextMenu.capa_Feature.capa.METADATOCAPA &&
@@ -74,7 +74,7 @@ export const ContexMenu: React.FC<ContexMenu_Props> = ({contextMenu, setContextM
                     }
                     {
                         contextMenu.capa_Feature.capa.METADATOSERVICIO &&
-                        <p className='pointer' onClick={()=>abrirMetadata(contextMenu.capa_Feature.capa.METADATOSERVICIO)}> Metadato Servicio</p>                    
+                            <p className='pointer' onClick={()=>abrirMetadata(contextMenu.capa_Feature.capa.METADATOSERVICIO)}> Metadato Servicio</p>                    
                     }
                 </div>
             )

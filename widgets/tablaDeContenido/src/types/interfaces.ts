@@ -1,3 +1,5 @@
+import Layer from "@arcgis/core/layers/Layer";
+
 export interface TablaDeContenidoInterface {
     [key: string]: any; // Para manejar cualquier otra propiedad dinámica
     ATRIBUTO?: string;
@@ -48,64 +50,65 @@ export interface interfaceCapasNietos {
         IDTEMATICA: number;
         NOMBRETEMATICA: string;
         TITULOCAPA?: string;
-        
+
     }[];
 }
-export interface interfCapa{
+export interface interfCapa {
     IDCAPA: number;
     IDTEMATICA: number;
     capasNietas: any[];
 }
 
-export interface datosBasicosInterface{
+export interface datosBasicosInterface {
     IDTEMATICAPADRE: number;
     IDTEMATICA: number;
     NOMBRETEMATICA: string;
     TITULOCAPA?: string;
 }
 export interface ItemResponseTablaContenido {
-    ATRIBUTO:            string;
+    ATRIBUTO: string;
     DESCRIPCIONSERVICIO: Descripcionservicio;
-    IDCAPA:              number;
-    IDTEMATICA:          number;
-    IDTEMATICAPADRE:     number;
-    METADATOCAPA:        string;
-    METADATOSERVICIO:    string;
-    NOMBRECAPA:          string;
-    NOMBRETEMATICA:      string;
-    TITULOCAPA:          string;
-    URL:                 string;
-    URLSERVICIOWFS:      string;
-    VISIBLE:             boolean;
+    IDCAPA: number;
+    IDTEMATICA: number;
+    IDTEMATICAPADRE: number;
+    METADATOCAPA: string;
+    METADATOSERVICIO: string;
+    NOMBRECAPA: string;
+    NOMBRETEMATICA: string;
+    TITULOCAPA: string;
+    URL: string;
+    URLSERVICIOWFS: string;
+    VISIBLE: boolean;
+    capasHijas?: Tematicas[];
     capasNietas?: ItemResponseTablaContenido[]
 }
 
 export interface Tematicas {
     IDTEMATICAPADRE: number;
-    IDTEMATICA:      number;
-    NOMBRETEMATICA:  string;
-    TITULOCAPA:      string;
-    capasHijas?:     Tematicas[];
-    capasNietas?:    CapasTematicas[];
+    IDTEMATICA: number;
+    NOMBRETEMATICA: string;
+    TITULOCAPA: string;
+    capasHijas?: Tematicas[];
+    capasNietas?: CapasTematicas[];
 }
 export interface CapasTematicas {
-    ATRIBUTO?:            string;
-    capasBisnietos?:       CapasTematicas[];
-    capasHijas?:           any[];
-    DESCARGACAPA?:        boolean;
+    ATRIBUTO?: string;
+    capasBisnietos?: CapasTematicas[];
+    capasHijas?: any[];
+    DESCARGACAPA?: boolean;
     DESCRIPCIONSERVICIO?: Descripcionservicio;
-    ESTADO?:              Estado;
-    IDCAPA?:              number;
-    IDTEMATICA?:           number;
-    IDTEMATICAPADRE?:      number;
-    METADATOCAPA?:        string;
-    METADATOSERVICIO?:    string;
-    NOMBRECAPA?:          string;
-    NOMBRETEMATICA?:       string;
-    TITULOCAPA?:           string;
-    URL?:                 string;
-    URLSERVICIOWFS?:       string;
-    VISIBLE?:             boolean;
+    ESTADO?: Estado;
+    IDCAPA?: number;
+    IDTEMATICA?: number;
+    IDTEMATICAPADRE?: number;
+    METADATOCAPA?: string;
+    METADATOSERVICIO?: string;
+    NOMBRECAPA?: string;
+    NOMBRETEMATICA?: string;
+    TITULOCAPA?: string;
+    URL?: string;
+    URLSERVICIOWFS?: string;
+    VISIBLE?: boolean;
 }
 
 export interface InterfaceContextMenu {
@@ -113,32 +116,32 @@ export interface InterfaceContextMenu {
     mouseY: number;
     capa_Feature: {
         capa: ItemResponseTablaContenido;
-        layer: InterfaceLayer
-    }  
+        layer: Layer
+    }
 }
 
 export interface InterfaceLayer {
-    id:                    string;
-    showLegend:            boolean;
-    listMode:              string;
-    disablePopup:          boolean;
-    title:                 string;
-    url:                   string;
-    visibility:            boolean;
-    layerType:             string;
-    refreshInterval:       number;
-    layerDefinition:       LayerDefinition;
-    timeAnimation:         boolean;
-    showLabels:            boolean;
-    screenSizePerspective: boolean;
-    opacity:               number;
+    id?: string;
+    showLegend?: boolean;
+    listMode?: string;
+    disablePopup?: boolean;
+    title?: string;
+    url?: string;
+    visibility?: boolean;
+    layerType?: string;
+    refreshInterval?: number;
+    layerDefinition?: LayerDefinition;
+    timeAnimation?: boolean;
+    showLabels?: boolean;
+    screenSizePerspective?: boolean;
+    opacity?: number;
 }
 
 export interface LayerDefinition {
-    minScale:             number;
-    maxScale:             number;
+    minScale: number;
+    maxScale: number;
     definitionExpression: null;
-    drawingInfo:          DrawingInfo;
+    drawingInfo: DrawingInfo;
 }
 
 export interface DrawingInfo {
@@ -146,11 +149,11 @@ export interface DrawingInfo {
 }
 
 export interface Renderer {
-    type:              string;
-    field1:            string;
-    fieldDelimiter:    string;
+    type: string;
+    field1: string;
+    fieldDelimiter: string;
     uniqueValueGroups: UniqueValueGroup[];
-    uniqueValueInfos:  UniqueValueInfo[];
+    uniqueValueInfos: UniqueValueInfo[];
 }
 
 export interface UniqueValueGroup {
@@ -159,16 +162,21 @@ export interface UniqueValueGroup {
 
 export interface UniqueValueInfo {
     description: string;
-    label:       string;
-    symbol:      Symbol;
-    values?:     Array<string[]>;
-    value?:      string;
+    label: string;
+    symbol: Symbol;
+    values?: Array<string[]>;
+    value?: string;
 }
 
 export interface Symbol {
-    type:     string;
-    color:    number[];
+    type: string;
+    color: number[];
     outline?: Symbol;
-    style:    string;
-    width?:   number;
+    style: string;
+    width?: number;
+}
+
+export interface InterfaceFeaturesLayersDeployed {
+    capa:  ItemResponseTablaContenido;
+    layer: Layer;
 }

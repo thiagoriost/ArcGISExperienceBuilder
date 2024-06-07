@@ -7,16 +7,18 @@ import renderTree from "./components/renderTree";
 import Widget_Tree from "./components/widgetTree";
 
 /**
- * 
+ * Widget que se encarga de consultar la data de la tabla de contenido y renderizar el arbol de capas
+ * @author Rigoberto Rios rigoriosh@gmail.com
  * @param props 
- * @returns 
+ * @returns Widget
  */
 const Widget = (props: AllWidgetProps<any>) => {
+
   const [varJimuMapView, setJimuMapView] = useState<JimuMapView>(); // To add the layer to the Map, a reference to the Map must be saved into the component state.
-  const [groupedLayers, setGroupedLayers] = useState<CapasTematicas[]>([]); //
+  const [groupedLayers, setGroupedLayers] = useState<CapasTematicas[]>([]); // arreglo donde se almacenara la tabla de contenido ordenada
 
   /**
-   * 
+   * En este metodo se referencia el mapa base
    * @param jmv 
    */
   const activeViewChangeHandler = (jmv: JimuMapView) => {
@@ -26,7 +28,7 @@ const Widget = (props: AllWidgetProps<any>) => {
   };
 
   /**
-   * 
+   * Metodo que crea un objeto nuevo de capas y tematicas nietas
    * @param capasNietos 
    * @param ItemResponseTablaContenido 
    * @param datosBasicos 
@@ -53,7 +55,7 @@ const Widget = (props: AllWidgetProps<any>) => {
   }
 
   /**
-   * 
+   * Metodo para validar si existe capa nieto
    * @param capasNietos 
    * @param ItemResponseTablaContenido 
    * @returns 
@@ -66,7 +68,7 @@ const Widget = (props: AllWidgetProps<any>) => {
   }
 
   /**
-   * 
+   * En este metodo se separa las capas padres, hijas, nietas y bisnietas.
    * @param responseTablaDeContenido 
    */
   const ordenarDataTablaContenido = (responseTablaDeContenido: any[] | TablaDeContenidoInterface) => {
@@ -84,6 +86,9 @@ const Widget = (props: AllWidgetProps<any>) => {
       }
     };
 
+    /**
+     * Con este for se separa las capas padre con IDTEMATICAPADRE === 0
+     */
     responseTablaDeContenido.forEach((itemResponseTablaContenido: ItemResponseTablaContenido) => {
       const datosBasicos:datosBasicosInterface = {
         IDTEMATICAPADRE: itemResponseTablaContenido.IDTEMATICAPADRE,
@@ -102,6 +107,9 @@ const Widget = (props: AllWidgetProps<any>) => {
       }
     });
 
+    /**
+     * En este for se separa las capas nietas, capasBisnietos, y las hijas se agregan directamente al padre
+     */
     responseTablaDeContenido.forEach((itemResponseTablaContenido: ItemResponseTablaContenido) => {
       const datosBasicos:datosBasicosInterface = {
         IDTEMATICAPADRE: itemResponseTablaContenido.IDTEMATICAPADRE,
@@ -130,6 +138,9 @@ const Widget = (props: AllWidgetProps<any>) => {
       }
     });
 
+    /**
+     * En este for se asignan las capas hijas pendientes
+     */
     capasNietos.tematicasNietas.forEach(itemCapaNieta => {
       tematicas.forEach(itemTematica => {
         itemTematica.capasHijas.forEach(capaHija => {
@@ -140,12 +151,11 @@ const Widget = (props: AllWidgetProps<any>) => {
       });
     });
 
-    console.log({ tematicas });
     setGroupedLayers(tematicas);
   }
 
   /**
-   * 
+   * En este meto se realiza la consulta del jeison de la tabla de contenido
    */
   const fetchLayers = async () => {
     const url = 'https://sigquindio.gov.co:8443/ADMINSERV/AdminGeoApplication/AdminGeoWebServices/getTablaContenidoJsTree/public';
@@ -162,7 +172,7 @@ const Widget = (props: AllWidgetProps<any>) => {
   };
 
   /**
-   * 
+   * realiza la consulta de la data tabla de contenido la primera vez que se renderiza el componente
    */
   useEffect(() => {
     fetchLayers();
@@ -174,9 +184,8 @@ const Widget = (props: AllWidgetProps<any>) => {
         <JimuMapViewComponent useMapWidgetId={props.useMapWidgetIds?.[0]} onActiveViewChange={activeViewChangeHandler} />
       )}
 
-      <div >
-        {/* {renderTree(groupedLayers)} */}
-        <Widget_Tree dataTablaContenido={groupedLayers} varJimuMapView={varJimuMapView}/>
+      <div >        
+        <Widget_Tree dataTablaContenido={groupedLayers} setDataTablaContenido={setGroupedLayers} varJimuMapView={varJimuMapView}/>
       </div>
 
     </div>

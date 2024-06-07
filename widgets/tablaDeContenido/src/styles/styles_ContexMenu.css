@@ -1,0 +1,10 @@
+p{
+    margin-bottom: 0px !important;
+}
+
+.row_contextmenu{
+    display: flex;
+    /* flex-wrap: wrap; */
+    flex-direction: column !important;
+    align-items: end !important;
+}

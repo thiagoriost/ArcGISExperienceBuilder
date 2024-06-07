@@ -1,89 +1,75 @@
-import React, { useState, useEffect } from 'react';
-import { FaChevronRight, FaChevronDown, FaSearch, FaTimes, FaWindowClose, FaPowerOff } from 'react-icons/fa';
+import React, { useState, useEffect, Dispatch, SetStateAction } from 'react';
+import { FaChevronRight, FaChevronDown, FaSearch, FaTimes, FaPowerOff } from 'react-icons/fa';
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import FeatureLayer from "esri/layers/FeatureLayer";
 import 'rc-slider/assets/index.css'; import 'react-tabs/style/react-tabs.css';
 import '../../styles/style.css';
-import { CapasTematicas, InterfaceContextMenu, ItemResponseTablaContenido, Tematicas } from '../../types/interfaces';
+import { CapasTematicas, InterfaceContextMenu, InterfaceFeaturesLayersDeployed, InterfaceLayer, ItemResponseTablaContenido, Tematicas } from '../../types/interfaces';
 import { ContexMenu } from './ContexMenu';
 import { JimuMapView } from 'jimu-arcgis';
 import DragAndDrop from './DragAndDrop';
 
 interface Widget_Tree_Props {
-    dataTablaContenido:CapasTematicas[];
-    varJimuMapView: JimuMapView;
+    dataTablaContenido:CapasTematicas[]; // data ordenada
+    varJimuMapView: JimuMapView; // referencia al mapa
+    setDataTablaContenido: Dispatch<SetStateAction<CapasTematicas[]>> //  por el momento cuando se ajusta el VISIBLE de cada capa
 }
 
 /**
- * 
- * @param param0 
- * @returns 
+ * Widget que se encarga de renderizar la data ya ordenada de la tabla de contenido en forma de arbol
+ * @author Rigoberto Rios rigoriosh@gmail.com
+ * @param param0 segun interfac Widget_Tree_Props
+ * @returns Widget_Tree
  */
-const Widget_Tree: React.FC<Widget_Tree_Props> = ({ dataTablaContenido, varJimuMapView }) => {
-    const [expandedItems, setExpandedItems] = useState({}); //
-    const [checkedItems, setCheckedItems] = useState({}); //
-    const [searchQuery, setSearchQuery] = useState(''); //
-    const [capasSelectd, setCapasSelectd] = useState<ItemResponseTablaContenido[]>([]); // para ser renderizadas en el tab "Orden Capas"
-    const [contextMenu, setContextMenu] = useState<InterfaceContextMenu>(null); //
-    const [featuresLayersDeployed, setFeaturesLayersDeployed] = useState([]); //
-    const [banderaRefreshCapas, setBanderaRefreshCapas] = useState<boolean>(false);
+const Widget_Tree: React.FC<Widget_Tree_Props> = ({ dataTablaContenido, varJimuMapView, setDataTablaContenido }) => {
+    const [expandedItems, setExpandedItems] = useState({}); // almacena los nodos que son expandibles
+    const [checkedItems, setCheckedItems] = useState({}); // almacena los nodos que tienen la opcion de check y son checkeados
+    const [searchQuery, setSearchQuery] = useState<string>(''); // se utiliza para capturar la entrada del campo buscar capa
+    const [capasSelectd, setCapasSelectd] = useState<ItemResponseTablaContenido[]>([]); // almacena las capas seleccionadas, se emplea para ser renderizadas en el tab "Orden Capas"
+    const [contextMenu, setContextMenu] = useState<InterfaceContextMenu>(null); // controla el despliegue y data a mostrar en el contextMenu
+    const [featuresLayersDeployed, setFeaturesLayersDeployed] = useState<InterfaceFeaturesLayersDeployed[]>([]); // almacena los features y su metadata pintados en el mapa
+    const [banderaRefreshCapas, setBanderaRefreshCapas] = useState<boolean>(false); // bandera empleada para actualizar en el mapa el orden de las capas
 
     /**
-     * 
-     * @param id 
+     * Metodo que prende o apaga la capa a la que se le de click en el check y actualiza capasSelectd, checkedItems
+     * @param capa de tipo ItemResponseTablaContenido
      */
-    const handleExpandCollapse = (id: string | number) => {
-        setExpandedItems(prevState => ({
-            ...prevState,
-            [id]: !prevState[id],
-        }));
-    };
-
-    /**
-     * 
-     * @param capa 
-     */
-    const handleCheck = (capa: ItemResponseTablaContenido) => {
+    const handleCheck = (capa: ItemResponseTablaContenido, {target}) => {
         const IDCAPA = capa.capasNietas ? capa.capasNietas[0].IDCAPA : capa.IDCAPA;
-        setCheckedItems(prevState => ({ ...prevState, [IDCAPA]: !prevState[IDCAPA], }));
-        capa.VISIBLE = !capa.VISIBLE;
-        setCapasSelectd(prevState => {
-            const newState = prevState.includes(capa) ? prevState.filter(item => item !== capa) : [...prevState, capa];
-            return newState;
-        });
-        capa.VISIBLE ? dibujaCapasSeleccionadas([capa], varJimuMapView) : removerFeatureLayer(capa);
+        const capaToDeployContextmenu = capa.URL ? capa : capa.capasNietas ? capa.capasNietas.length == 1 ? capa.capasNietas[0] : undefined : undefined;
+        setCheckedItems(prevState => ({ ...prevState, [IDCAPA]: target.checked }));
+        capaToDeployContextmenu.VISIBLE = target.checked;
+        if (capasSelectd.length > 0 || target.checked) {
+            setCapasSelectd(prevState => {
+                const newState = prevState.includes(capaToDeployContextmenu) ? prevState.filter(item => item !== capaToDeployContextmenu) : [...prevState, capaToDeployContextmenu];
+                return newState;
+            });
+            capaToDeployContextmenu.VISIBLE ? dibujaCapasSeleccionadas([capaToDeployContextmenu], varJimuMapView) : removerFeatureLayer(capaToDeployContextmenu);            
+        }
     };
 
     /**
-     * 
-     * @returns 
+     * Metodo que controla el click derecho sobre una capa especifica para abrir el contextMenu
+     * @param e evento click
+     * @param capa capa seleccionada
      */
-    const handleReset = () => setSearchQuery('');
-
-    /**
-     * 
-     * @returns 
-     */
-    const handleCloseContextMenu = () => setContextMenu(null);
-
-    /**
-     * 
-     * @param e 
-     * @param capa 
-     */
-    const handleRightClick = (e: React.MouseEvent<HTMLDivElement, MouseEvent>, capa: ItemResponseTablaContenido) => {
+    const handleRightClick = (e: React.MouseEvent<HTMLDivElement, MouseEvent>, capa: ItemResponseTablaContenido ) => {
         e.preventDefault();
-        if (capa.URL) {
+        const capaToDeployContextmenu = capa.URL ? capa : capa.capasNietas ? capa.capasNietas.length == 1 ? capa.capasNietas[0] : undefined : undefined;
+        if (capaToDeployContextmenu) {
             setContextMenu({
                 mouseX: e.clientX + 50,
                 mouseY: e.clientY - 70,
-                capa_Feature: featuresLayersDeployed.filter(e=>e.capa == capa)[0]
+                capa_Feature: {
+                    capa:capaToDeployContextmenu,
+                    layer: featuresLayersDeployed.filter(e=>e.capa == capaToDeployContextmenu)[0]?.layer
+                }
             });
         }
     };
 
     /**
-     * 
+     * Metodo que se encarga de dibujar el arbol de capas
      * @param param0 
      * @returns 
      */
@@ -92,7 +78,7 @@ const Widget_Tree: React.FC<Widget_Tree_Props> = ({ dataTablaContenido, varJimuM
         const hasChildren =
             (capa.capasHijas?.length >= 1) ||
             (capa.capasNietas?.length > 0 && capa.IDTEMATICAPADRE > 0) ||
-            (capa.capasBisnietos?.length >= 1);
+            (capa.capasBisnietos?.length >= 1) || (searchQuery !== '' && !capa.URL);
 
         const isChecked = capa.capasNietas ? capa.capasNietas[0].IDCAPA : capa.IDCAPA;
 
@@ -118,9 +104,10 @@ const Widget_Tree: React.FC<Widget_Tree_Props> = ({ dataTablaContenido, varJimuM
         );
 
         return (
-            <div style={{ marginLeft: level * 20 + 'px' }} onContextMenu={(e) => handleRightClick(e, capa)}>
+            <div style={{ marginLeft: level * 20 + 'px' }} onContextMenu={(e) => { handleRightClick(e, capa) }}  >
                 <div className='rowCheck'>
-                    <span onClick={() => handleExpandCollapse(capa.IDTEMATICA)} style={{ cursor: 'pointer' }}>
+                    <span onClick={() => setExpandedItems(prevState => ({ ...prevState, [capa.IDTEMATICA]: !prevState[capa.IDTEMATICA]}))} 
+                        style={{ cursor: 'pointer' }}>
                         {hasChildren ? (isExpanded ? <FaChevronDown /> : <FaChevronRight />) : null}
                     </span>
                     {
@@ -128,7 +115,7 @@ const Widget_Tree: React.FC<Widget_Tree_Props> = ({ dataTablaContenido, varJimuM
                             <input
                                 type="checkbox"
                                 checked={!!checkedItems[isChecked]}
-                                onChange={() => handleCheck(capa)}
+                                onChange={(e) => handleCheck(capa, e)}
                                 style={{marginRight:'10px'}}
                             />
                         ) : null
@@ -141,7 +128,7 @@ const Widget_Tree: React.FC<Widget_Tree_Props> = ({ dataTablaContenido, varJimuM
     };
     
     /**
-     * 
+     * Metodo encargado de filtrar las capas que coinciden con el campo de busqueda
      * @param dataTablaContenido 
      * @returns 
      */
@@ -149,7 +136,6 @@ const Widget_Tree: React.FC<Widget_Tree_Props> = ({ dataTablaContenido, varJimuM
         if (searchQuery === '') {
           return dataTablaContenido;
         }
-      
         const filtereddataTablaContenido = [
           {
             IDTEMATICA: 555,
@@ -159,7 +145,6 @@ const Widget_Tree: React.FC<Widget_Tree_Props> = ({ dataTablaContenido, varJimuM
             capasHijas: []
           }
         ];
-      
         const capasHijas = [];
       
         const filtroRecursivo = (dataTablaContenido, searchQuery) => {
@@ -167,7 +152,6 @@ const Widget_Tree: React.FC<Widget_Tree_Props> = ({ dataTablaContenido, varJimuM
 
             if (capa.URL && capa.TITULOCAPA.toLowerCase().startsWith(searchQuery.toLowerCase())) {
               let existingNode = capasHijas.find(capaHija => capaHija.IDTEMATICA === capa.IDTEMATICA && capaHija.IDTEMATICAPADRE === capa.IDTEMATICAPADRE);
-                console.log({existingNode})
               if (existingNode) {
                 existingNode.capasNietas.push(capa);
               } else {
@@ -180,7 +164,6 @@ const Widget_Tree: React.FC<Widget_Tree_Props> = ({ dataTablaContenido, varJimuM
                 });
               }
             }
-      
             if (capa.capasHijas) {
               filtroRecursivo(capa.capasHijas, searchQuery);
             }
@@ -200,15 +183,13 @@ const Widget_Tree: React.FC<Widget_Tree_Props> = ({ dataTablaContenido, varJimuM
       };
       
     /**
-     * Recibe la data tabla contenido e inicia la logica, pasando primero por el filtrado de capas y despues mapa la respuesta del
+     * Recibe la data tabla contenido e inicia la logica, pasando primero por el filtrado de capas y despues mapea la respuesta del
      * filtro y renderizar los nodos
      * @param dataTablaContenido 
      * @returns componente Nodo donde renderizara, tematica padre, tematicas y/o capas hijas, tematicas y/o capas nietas y capas bisnietas
      */
     const renderTree = (dataTablaContenido: CapasTematicas[]) => {        
         const filteredDataTablaContenido = filterdataTablaContenido(dataTablaContenido);
-        console.log(filteredDataTablaContenido)
-        
         return filteredDataTablaContenido.map((capa: Tematicas) => (
             <Nodo key={capa.IDTEMATICA} capa={capa} />
         ));
@@ -216,13 +197,11 @@ const Widget_Tree: React.FC<Widget_Tree_Props> = ({ dataTablaContenido, varJimuM
     };
 
     /**
-     * 
+     * Metodo que dibuja en el mapa la capa chequeada y actualiza el state FeaturesLayersDeployed
      * @param capasToRender 
      * @param varJimuMapView 
      */
     const dibujaCapasSeleccionadas = (capasToRender: ItemResponseTablaContenido[], varJimuMapView: JimuMapView) => {
-
-        console.log(capasToRender)
         capasToRender.forEach(capa =>{
             const url = capa.URL?capa.URL:capa.capasNietas[0].URL;
             const nombreCapa = capa.NOMBRECAPA?capa.NOMBRECAPA:capa.capasNietas[0].NOMBRECAPA
@@ -235,63 +214,53 @@ const Widget_Tree: React.FC<Widget_Tree_Props> = ({ dataTablaContenido, varJimuM
     }
 
     /**
-     * 
+     * Metodo que quita del mapa una capa deschequeada y actualiza el state FeaturesLayersDeployed
      * @param capa 
      */
     const removerFeatureLayer = (capa: ItemResponseTablaContenido) => {
-
-        const layer = featuresLayersDeployed.filter(({capa:capaDeployed}) => (capaDeployed.IDCAPA ? capaDeployed.IDCAPA : capaDeployed.capasNietas[0].IDCAPA) == (capa.IDCAPA?capa.IDCAPA:capa.capasNietas[0].IDCAPA))[0].layer;
-        console.log(layer)
-        varJimuMapView.view.map.remove(layer);            
-        setTimeout(() => {
-            for (let index = 0; index < 2; index++) {   
-                varJimuMapView.view.map.add(layer);         
-                setTimeout(() => {
-                    varJimuMapView.view.map.remove(layer);                                
-                }, 500);
-            }            
-        }, 1000);
-        setFeaturesLayersDeployed(featuresLayersDeployed.filter(item => item.capa.IDCAPA != (capa.IDCAPA ? capa.IDCAPA : capa.capasNietas[0].IDCAPA)));
-        console.log(capasSelectd)
-        console.log(featuresLayersDeployed)
-        varJimuMapView.view.zoom = varJimuMapView.view.zoom -0.00000001
+        if (featuresLayersDeployed.length > 0) {
+            const layer = featuresLayersDeployed.filter(({capa:capaDeployed}) => (capaDeployed.IDCAPA ? capaDeployed.IDCAPA : capaDeployed.capasNietas[0].IDCAPA) == (capa.IDCAPA?capa.IDCAPA:capa.capasNietas[0].IDCAPA))[0].layer;
+            varJimuMapView.view.map.remove(layer);              
+            setFeaturesLayersDeployed(featuresLayersDeployed.filter(item => item.capa.IDCAPA != (capa.IDCAPA ? capa.IDCAPA : capa.capasNietas[0].IDCAPA)));
+            varJimuMapView.view.zoom = varJimuMapView.view.zoom -0.00000001            
+        }
     }
 
     /**
-     * 
+     * Metodo que quita todas las capas pintadas en el mapa y actauliza los states FeaturesLayersDeployed, apasSelectd,
+     * DataTablaContenido y SearchQuery
      * @returns 
      */
-    const removeAllLayers = () => capasSelectd.forEach(capa => handleCheck(capa));
-
-    /**
-     * 
-     */
-    useEffect(() => {
-        const capasVisibles = recorreTodasLasCapasTablaContenido(dataTablaContenido);
+    const removeAllLayers = () => {
+        featuresLayersDeployed.forEach(FL => varJimuMapView.view.map.remove(FL.layer));
+        setFeaturesLayersDeployed([]);
+        const {capasVisibles, clonedDataTablaContenido, apagarCapas} = recorreTodasLasCapasTablaContenido(dataTablaContenido, true);
         setCapasSelectd( capasVisibles );
-        dibujaCapasSeleccionadas(capasVisibles, varJimuMapView);        
-        return () => {}
-    }, [dataTablaContenido])
-    
+        if (apagarCapas) setDataTablaContenido(clonedDataTablaContenido)
+        varJimuMapView.view.zoom = varJimuMapView.view.zoom - 0.00000001;
+        renderTree(dataTablaContenido);
+        setSearchQuery('');
+    };
+
     /**
-     * 
+     * Recorre la tabla de contenido en buscas de capas a dibujar por el parametro VISIBLE = true y las dibuja
      */
     useEffect(() => {
-        console.log({varJimuMapView})
-      
-    
-      return () => {
-        
-      }
-    }, [varJimuMapView])
+        const {capasVisibles} = recorreTodasLasCapasTablaContenido(dataTablaContenido);
+        setCapasSelectd( capasVisibles );
+        dibujaCapasSeleccionadas(capasVisibles, varJimuMapView);     
+        return () => {}
+    }, [dataTablaContenido])    
 
+    /**
+     * Se encarga de reordenar las capas dibujadas en el mapa segun lo modificado en el tab Orden Capas
+     * @param param0 
+     */
     const reorderLayers  = ({view}) => {
-
         let toChangeFeaturesLayersDeployed = featuresLayersDeployed;
         const layersMap = view.map.allLayers.toArray()
         const ordenCapas=[]
-        layersMap.forEach( (l: { id: any; }) => console.log(l.id));
-        layersMap.forEach((layerMap: { id: any; }, item: any) => {
+        layersMap.forEach((layerMap: { id: string; }, item: number) => {
             let existeEnFeaturesLayersDeployed = false;
             toChangeFeaturesLayersDeployed.forEach(FeaLayerDep => {
                 if (layerMap.id == FeaLayerDep.layer.id) {
@@ -306,7 +275,7 @@ const Widget_Tree: React.FC<Widget_Tree_Props> = ({ dataTablaContenido, varJimuM
             }
         })
         const nuevoOrden=[]
-        layersMap.forEach((lyrMp: any, item: any) => {
+        layersMap.forEach((lyrMp: any, item: number) => {
             let existePosicion = false;
             ordenCapas.forEach(ordeCapa => {
                 if (item == ordeCapa.position) {
@@ -319,13 +288,15 @@ const Widget_Tree: React.FC<Widget_Tree_Props> = ({ dataTablaContenido, varJimuM
                 toChangeFeaturesLayersDeployed = toChangeFeaturesLayersDeployed.slice(1);
             }
         })
-        nuevoOrden.forEach( l => console.log(l.id));
         nuevoOrden.forEach( (layer, i) => view.map.reorder(layer,i));
         // Forzar la actualización de la vista del mapa
         // view.refresh();  // Esta línea fuerza la actualización de la vista del mapa
         view.zoom = view.zoom -0.00000001
     }
 
+    /**
+     * Detecta cambio en banderaRefreshCapas y ejecuta la logia reorderLayers siempre y cuando exista la referencia del mapa
+     */
     useEffect(() => {
       
         if (varJimuMapView) {
@@ -334,7 +305,6 @@ const Widget_Tree: React.FC<Widget_Tree_Props> = ({ dataTablaContenido, varJimuM
     
       return () => {}
     }, [banderaRefreshCapas])
-    
     
     return (
         <>
@@ -347,7 +317,7 @@ const Widget_Tree: React.FC<Widget_Tree_Props> = ({ dataTablaContenido, varJimuM
                 </TabList>
 
                 <TabPanel>
-                    <div className="tree-container" onClick={handleCloseContextMenu} style={{ maxHeight: '500px', overflowY: 'auto', padding: '20px', backgroundColor: '#FEFFD2', color: '#FF7D29' }}>
+                    <div className="tree-container" onClick={()=>setContextMenu(null)} style={{ maxHeight: '500px', overflowY: 'auto', padding: '20px', backgroundColor: '#FEFFD2', color: '#FF7D29' }}>
                         <div className="search-bar" style={{ marginBottom: '10px', display: 'flex', alignItems: 'center' }}>
                             <FaSearch style={{ marginRight: '10px' }} />
                             <input
@@ -357,7 +327,7 @@ const Widget_Tree: React.FC<Widget_Tree_Props> = ({ dataTablaContenido, varJimuM
                                 onChange={(e) => setSearchQuery(e.target.value)}
                                 style={{ width: '100%', padding: '5px', borderRadius: '4px', border: '1px solid #ccc' }}
                             />
-                            <button onClick={handleReset} style={{ marginLeft: '10px', padding: '5px 10px', borderRadius: '4px', border: 'none', backgroundColor: '#007bff', color: 'white', cursor: 'pointer' }}>
+                            <button onClick={()=>setSearchQuery('')} style={{ marginLeft: '10px', padding: '5px 10px', borderRadius: '4px', border: 'none', backgroundColor: '#007bff', color: 'white', cursor: 'pointer' }}>
                                 <FaTimes />
                             </button>
                             {
@@ -366,8 +336,6 @@ const Widget_Tree: React.FC<Widget_Tree_Props> = ({ dataTablaContenido, varJimuM
                                     <FaPowerOff />
                                 </button>
                             }
-                            
-
                         </div>
                         <div >
                             { renderTree(dataTablaContenido)}
@@ -389,36 +357,32 @@ const Widget_Tree: React.FC<Widget_Tree_Props> = ({ dataTablaContenido, varJimuM
 };
 export default Widget_Tree;
 
-
 /**
      * Buscas las capas que tienen la propiedad @VISIBLE para ser visualidas en el Tab "Orden Capas"
      * @param dataTablaContenido 
      */
-const recorreTodasLasCapasTablaContenido = (dataTablaContenido: CapasTematicas[]) => {
-
+const recorreTodasLasCapasTablaContenido = (dataTablaContenido: CapasTematicas[], apagarCapas: boolean = false) => {
     const capasVisibles: ItemResponseTablaContenido[]  = [];
-
-    const bucleRecursivo = (dataTablaContenido) => {
-        for (const capa of dataTablaContenido) {
-
-        if (capa.URL && capa.VISIBLE) {
-            capasVisibles.push(capa);                    
-        }
-    
-        if (capa.capasHijas) {
-            bucleRecursivo(capa.capasHijas);
-        }
-        if (capa.capasNietas) {
-            bucleRecursivo(capa.capasNietas);
-        }
-        if (capa.capasBisnietos) {
-            bucleRecursivo(capa.capasBisnietos);
-        }
-        }
+    const clonedDataTablaContenido: CapasTematicas[] = JSON.parse(JSON.stringify(dataTablaContenido));
+    const bucleRecursivo = (clonedDataTablaContenido) => {
+        clonedDataTablaContenido.map( capa => {
+            if (capa.URL && capa.VISIBLE && apagarCapas) {
+                capa.VISIBLE = false;
+            }
+            if (capa.URL && capa.VISIBLE && !apagarCapas) {
+                capasVisibles.push(capa);                    
+            }
+            if (capa.capasHijas) {
+                bucleRecursivo(capa.capasHijas);
+            }
+            if (capa.capasNietas) {
+                bucleRecursivo(capa.capasNietas);
+            }
+            if (capa.capasBisnietos) {
+                bucleRecursivo(capa.capasBisnietos);
+            }
+        })
     };
-    
-    bucleRecursivo(dataTablaContenido);
-    console.log({capasVisibles})
-    // setCapasSelectd(capasVisibles);
-    return capasVisibles
+    bucleRecursivo(clonedDataTablaContenido);
+    return {capasVisibles, clonedDataTablaContenido, apagarCapas}
 }
