@@ -1,5 +1,5 @@
 import { Slider } from 'jimu-ui';
-import React, { ChangeEvent, useEffect } from 'react'
+import React, { ChangeEvent } from 'react'
 import { JimuMapView } from 'jimu-arcgis';
 import { InterfaceContextMenu } from '../../types/interfaces';
 import { CloseCircleOutlined } from 'jimu-icons/outlined/editor/close-circle'
@@ -12,7 +12,8 @@ interface ContexMenu_Props {
 }
 
 /**
- * 
+ * Componente encargado de renderizar al dar click derecho en una capa, el ContexMenu
+ * con las opciones de transparencia, info metadatas, si aplican
  * @param param0 
  * @returns 
  */
@@ -20,40 +21,29 @@ export const ContexMenu: React.FC<ContexMenu_Props> = ({contextMenu, setContextM
 
 
     /**
-     * 
-     * @param param0 
+     * capatura el valor del slider y cambia la opacidad de la capa.
      */
     const handleChangeSlider = ({target}: ChangeEvent<HTMLInputElement>): void => {
         contextMenu.capa_Feature.layer.opacity = Number(target.value)/10;
     }
 
+    /**
+     *  Se encar de abrir una ventana nueva apuntando al servidor de la metadata
+     * @param url // sobre la que abrila la nueva ventana
+     */
     const abrirMetadata = (url: string) => {        
-        console.log({url})
         window.open(url, '_blank', 'noopener,noreferrer');
     }
-
-    useEffect(() => {
-      
-        console.log({contextMenu})
-      return () => {}
-    }, [contextMenu])
-    
 
   return (
     <>
         {
             (contextMenu && (contextMenu?.capa_Feature?.capa.METADATOCAPA || contextMenu?.capa_Feature?.capa.METADATOSERVICIO || contextMenu.capa_Feature.capa.VISIBLE)) && (
                 <div
-                    style={{
-                        position: 'absolute',
+                    className='container_contextmenu'
+                    style={{                        
                         top: contextMenu.mouseY,
-                        left: contextMenu.mouseX,
-                        backgroundColor: 'white',
-                        boxShadow: '0px 0px 10px rgba(0,0,0,0.1)',
-                        zIndex: 1000,
-                        padding: '10px',
-                        borderRadius: '5px',
-                        color: 'black'
+                        left: contextMenu.mouseX,                        
                     }}
                 >
                     <div className='row_contextmenu'>

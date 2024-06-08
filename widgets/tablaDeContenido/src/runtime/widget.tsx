@@ -2,8 +2,7 @@ import { React, AllWidgetProps } from "jimu-core";
 import { useState, useEffect } from "react";
 import { JimuMapViewComponent, JimuMapView } from 'jimu-arcgis'; // The map object can be accessed using the JimuMapViewComponent
 import '../styles/style.css';
-import { CapasTematicas, ItemResponseTablaContenido, TablaDeContenidoInterface, datosBasicosInterface, interfCapa, interfaceCapasNietos } from "../types/interfaces";
-import renderTree from "./components/renderTree";
+import { CapasTematicas, ItemResponseTablaContenido, TablaDeContenidoInterface, datosBasicosInterface, interfaceCapasNietos } from "../types/interfaces";
 import Widget_Tree from "./components/widgetTree";
 
 /**

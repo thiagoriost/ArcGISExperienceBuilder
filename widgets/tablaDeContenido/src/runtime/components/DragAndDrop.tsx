@@ -1,58 +1,77 @@
 import React, { useState } from 'react'
+import { InterfaceFeaturesLayersDeployed } from '../../types/interfaces';
 import '../../styles/style.css'
 
+/**
+ * Widget que se encarga de manejar el drag and drop en el tab order capas
+ * @author Rigoberto Rios - rigoriosh@gmail.com
+ * @param param0 
+ * @returns 
+ */
 const DragAndDrop = ({items, setItems, setBanderaRefreshCapas}) => {
-    // const [items, setItems] = useState(['Item 1', 'Item 2', 'Item 3', 'Item 4', 'Item 5']);
-    const [draggedItem, setDraggedItem] = useState(null);
-  
-    const handleDragStart = (event:any, index:any) => {
-        console.log(index)
+    
+  const [draggedItem, setDraggedItem] = useState(null); //almacena el item seleccionado
+
+  /**
+   * captura el inicio del item q se esta arrastrando
+   * @param event 
+   * @param index 
+   */
+  const handleDragStart = (event:any, index:number) => {
+    setDraggedItem(index);
+    event.dataTransfer.effectAllowed = 'move';
+    event.dataTransfer.setData('text/html', event.target.parentNode);
+    event.target.classList.add('dragging');
+  };
+
+  /**
+   * Captura el momento en el que se mueve el item a cambiar de nivel
+   * @param event 
+   * @param index 
+   */
+  const handleDragOver = (event:any, index:number) => {
+    event.preventDefault();
+    event.dataTransfer.dropEffect = 'move';
+    const draggedIndex = draggedItem;
+    if (draggedIndex !== index) {
+      const newItems = [...items];
+      const [removed] = newItems.splice(draggedIndex, 1);
+      newItems.splice(index, 0, removed);
+      setItems(newItems);
       setDraggedItem(index);
-      event.dataTransfer.effectAllowed = 'move';
-      event.dataTransfer.setData('text/html', event.target.parentNode);
-      event.target.classList.add('dragging');
-    };
-  
-    const handleDragOver = (event:any, index:any) => {
-      event.preventDefault();
-      console.log(index)
-      event.dataTransfer.dropEffect = 'move';
-      const draggedIndex = draggedItem;
-      if (draggedIndex !== index) {
-        const newItems = [...items];
-        const [removed] = newItems.splice(draggedIndex, 1);
-        newItems.splice(index, 0, removed);
-        setItems(newItems);
-        setDraggedItem(index);
-        setBanderaRefreshCapas((e: boolean) => !e)
-      }
-    };
-  
-    const handleDragEnd = (event:any) => {
-        console.log(11111111111)
-      event.target.classList.remove('dragging');
-      setDraggedItem(null);
-    };
-  
-    return (
-      <ul className="drag-and-drop">
-        {items.map((item, index) => (
-          <>
-            <li
-              key={index}
-              className={`draggable ${draggedItem === index ? 'dragging' : ''} pointer`}
-              draggable
-              onDragStart={(event) => handleDragStart(event, index)}
-              onDragOver={(event) => handleDragOver(event, index)}
-              onDragEnd={handleDragEnd}
-            >
-              - {item.capa.NOMBRETEMATICA} - {item.capa.TITULOCAPA}
-            </li>
-            <hr />
-          </>
-        ))}
-      </ul>
-    );
+      setBanderaRefreshCapas((e: boolean) => !e)
+    }
+  };
+
+
+  /**
+   * Captura el momento en el que se suelta el item a cambiar de nivel
+   * @param event 
+   */
+  const handleDragEnd = (event:any) => {
+    event.target.classList.remove('dragging');
+    setDraggedItem(null);
+  };
+
+  return (
+    <ul className="drag-and-drop">
+      {items.map((item: InterfaceFeaturesLayersDeployed, index: number) => (
+        <>
+          <li
+            key={index}
+            className={`draggable ${draggedItem === index ? 'dragging' : ''} pointer`}
+            draggable
+            onDragStart={(event) => handleDragStart(event, index)}
+            onDragOver={(event) => handleDragOver(event, index)}
+            onDragEnd={handleDragEnd}
+          >
+            - {item.capa.NOMBRETEMATICA} - {item.capa.TITULOCAPA}
+          </li>
+          <hr />
+        </>
+      ))}
+    </ul>
+  );
 }
 
 export default DragAndDrop

@@ -1,13 +1,19 @@
 import React, { useState, useEffect, Dispatch, SetStateAction } from 'react';
-import { FaChevronRight, FaChevronDown, FaSearch, FaTimes, FaPowerOff } from 'react-icons/fa';
+import { WidgetQueryOutlined } from 'jimu-icons/outlined/brand/widget-query'
+import { RightOutlined } from 'jimu-icons/outlined/directional/right'
+import { WrongOutlined } from 'jimu-icons/outlined/suggested/wrong'
+import { DownOutlined } from 'jimu-icons/outlined/directional/down'
+import { ClearOutlined } from 'jimu-icons/outlined/editor/clear'
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import FeatureLayer from "esri/layers/FeatureLayer";
-import 'rc-slider/assets/index.css'; import 'react-tabs/style/react-tabs.css';
-import '../../styles/style.css';
-import { CapasTematicas, InterfaceContextMenu, InterfaceFeaturesLayersDeployed, InterfaceLayer, ItemResponseTablaContenido, Tematicas } from '../../types/interfaces';
 import { ContexMenu } from './ContexMenu';
 import { JimuMapView } from 'jimu-arcgis';
+import { Button } from 'jimu-ui'
 import DragAndDrop from './DragAndDrop';
+import { CapasTematicas, InterfaceContextMenu, InterfaceFeaturesLayersDeployed, ItemResponseTablaContenido, Tematicas } from '../../types/interfaces';
+import 'rc-slider/assets/index.css'; import 'react-tabs/style/react-tabs.css';
+import '../../styles/style.css';
+import '../../styles/styles_widgetTree.css';
 
 interface Widget_Tree_Props {
     dataTablaContenido:CapasTematicas[]; // data ordenada
@@ -17,7 +23,7 @@ interface Widget_Tree_Props {
 
 /**
  * Widget que se encarga de renderizar la data ya ordenada de la tabla de contenido en forma de arbol
- * @author Rigoberto Rios rigoriosh@gmail.com
+ * @author Rigoberto Rios - rigoriosh@gmail.com
  * @param param0 segun interfac Widget_Tree_Props
  * @returns Widget_Tree
  */
@@ -108,7 +114,7 @@ const Widget_Tree: React.FC<Widget_Tree_Props> = ({ dataTablaContenido, varJimuM
                 <div className='rowCheck'>
                     <span onClick={() => setExpandedItems(prevState => ({ ...prevState, [capa.IDTEMATICA]: !prevState[capa.IDTEMATICA]}))} 
                         style={{ cursor: 'pointer' }}>
-                        {hasChildren ? (isExpanded ? <FaChevronDown /> : <FaChevronRight />) : null}
+                        {hasChildren ? (isExpanded ? <DownOutlined /> : <RightOutlined />) : null}
                     </span>
                     {
                         ((capa.URL || (capa.capasNietas?.length < 2 && capa.IDTEMATICAPADRE == 0))) ? (
@@ -317,24 +323,24 @@ const Widget_Tree: React.FC<Widget_Tree_Props> = ({ dataTablaContenido, varJimuM
                 </TabList>
 
                 <TabPanel>
-                    <div className="tree-container" onClick={()=>setContextMenu(null)} style={{ maxHeight: '500px', overflowY: 'auto', padding: '20px', backgroundColor: '#FEFFD2', color: '#FF7D29' }}>
-                        <div className="search-bar" style={{ marginBottom: '10px', display: 'flex', alignItems: 'center' }}>
-                            <FaSearch style={{ marginRight: '10px' }} />
+                    <div className="tree-container" onClick={()=>setContextMenu(null)}>
+                        <div className="search-bar">
+                            <WidgetQueryOutlined size={'l'}/>
                             <input
                                 type="text"
                                 placeholder="Buscar capas..."
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
-                                style={{ width: '100%', padding: '5px', borderRadius: '4px', border: '1px solid #ccc' }}
-                            />
-                            <button onClick={()=>setSearchQuery('')} style={{ marginLeft: '10px', padding: '5px 10px', borderRadius: '4px', border: 'none', backgroundColor: '#007bff', color: 'white', cursor: 'pointer' }}>
-                                <FaTimes />
-                            </button>
+                                className='input-search'
+                            />                            
+                            <Button onClick={()=>setSearchQuery('')} size="sm" type="secondary" >
+                                    <ClearOutlined />
+                            </Button>
                             {
                                 capasSelectd.length>0 &&
-                                <button onClick={()=>removeAllLayers()} style={{ marginLeft: '10px', padding: '5px 10px', borderRadius: '4px', border: 'none', backgroundColor: '#007bff', color: 'white', cursor: 'pointer' }}>
-                                    <FaPowerOff />
-                                </button>
+                                    <Button onClick={()=>removeAllLayers()} size="sm" type="secondary" >
+                                        <WrongOutlined />
+                                    </Button>                                
                             }
                         </div>
                         <div >
@@ -345,7 +351,7 @@ const Widget_Tree: React.FC<Widget_Tree_Props> = ({ dataTablaContenido, varJimuM
                 {
                     capasSelectd.length>0 &&
                         <TabPanel>
-                            <div className="checked-layers" style={{ padding: '20px', backgroundColor: '#f8f9fa', color: '#FF7D29' }}>
+                            <div className="checked-layers tab-order-capas">
                                 <DragAndDrop items={featuresLayersDeployed} setItems={setFeaturesLayersDeployed} setBanderaRefreshCapas={setBanderaRefreshCapas}/>                               
                             </div>
                         </TabPanel>            
