@@ -1,5 +1,3 @@
-import Layer from "@arcgis/core/layers/Layer";
-
 export interface TablaDeContenidoInterface {
     [key: string]: any; // Para manejar cualquier otra propiedad dinámica
     ATRIBUTO?: string;
@@ -17,6 +15,11 @@ export interface TablaDeContenidoInterface {
     URL?: string;
     URLSERVICIOWFS?: string;
     VISIBLE?: boolean;
+}
+
+export enum Estado {
+    A = "A",
+    I = "I",
 }
 
 export enum Descripcionservicio {
@@ -37,34 +40,13 @@ export enum Descripcionservicio {
     'Ambiental Ajustado' = "Ambiental Ajustado"
 }
 
-export enum Estado {
-    A = "A",
-    I = "I",
-}
-
-export interface interfaceCapasNietos {
-    capas: interfCapa[];
-    tematicasNietas: {
-        capasBisnietos: TablaDeContenidoInterface[];
-        IDTEMATICAPADRE: number;
-        IDTEMATICA: number;
-        NOMBRETEMATICA: string;
-        TITULOCAPA?: string;
-
-    }[];
-}
-export interface interfCapa {
-    IDCAPA: number;
-    IDTEMATICA: number;
-    capasNietas: any[];
-}
-
 export interface datosBasicosInterface {
     IDTEMATICAPADRE: number;
     IDTEMATICA: number;
     NOMBRETEMATICA: string;
     TITULOCAPA?: string;
 }
+
 export interface ItemResponseTablaContenido {
     ATRIBUTO: string;
     DESCRIPCIONSERVICIO: Descripcionservicio;
@@ -88,9 +70,19 @@ export interface Tematicas {
     IDTEMATICA: number;
     NOMBRETEMATICA: string;
     TITULOCAPA: string;
-    capasHijas?: Tematicas[];
-    capasNietas?: CapasTematicas[];
+    capasHijas?: TematicasCapasBisnietos[];
+    capasNietas: CapasTematicas[] | TematicasCapasBisnietos[];
+
 }
+
+export interface TematicasCapasBisnietos {
+    capasBisnietos?: CapasTematicas[];
+    IDTEMATICA: number;
+    IDTEMATICAPADRE: number;
+    NOMBRETEMATICA: string;
+    TITULOCAPA: string;
+}
+
 export interface CapasTematicas {
     ATRIBUTO?: string;
     capasBisnietos?: CapasTematicas[];
@@ -110,6 +102,28 @@ export interface CapasTematicas {
     URLSERVICIOWFS?: string;
     VISIBLE?: boolean;
 }
+
+export interface interfaceCapasNietos {
+    capas: interfCapa[];
+    tematicasNietas: {
+        capasBisnietos: TablaDeContenidoInterface[];
+        IDTEMATICAPADRE: number;
+        IDTEMATICA: number;
+        NOMBRETEMATICA: string;
+        TITULOCAPA?: string;
+
+    }[];
+}
+
+export interface interfCapa {
+    IDCAPA: number;
+    IDTEMATICA: number;
+    capasNietas: any[];
+}
+
+
+/* import Layer from "@arcgis/core/layers/Layer";
+
 
 export interface InterfaceContextMenu {
     mouseX: number;
@@ -179,4 +193,4 @@ export interface Symbol {
 export interface InterfaceFeaturesLayersDeployed {
     capa:  ItemResponseTablaContenido;
     layer: Layer;
-}
+} */
