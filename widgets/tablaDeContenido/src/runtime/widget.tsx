@@ -26,155 +26,17 @@ const Widget = (props: AllWidgetProps<any>) => {
     }
   };
 
-  /**
-   * Metodo que crea un objeto nuevo de capas y tematicas nietas
-   * @param capasNietos 
-   * @param ItemResponseTablaContenido 
-   * @param datosBasicos 
-   * @returns 
-   */
-  const agregarTematicaNietaNueva = (capasNietos, ItemResponseTablaContenido: ItemResponseTablaContenido, datosBasicos:datosBasicosInterface) => {
-
-    //Define una nueva capa basada en ItemResponseTablaContenido.
-    const nuevaCapa = {
-      IDCAPA: ItemResponseTablaContenido.IDCAPA,
-      IDTEMATICA: ItemResponseTablaContenido.IDTEMATICA,
-    };
-
-    //Define una nueva temática nieta basada en datosBasicos y agrega capasBisnietos.
-    const nuevaTematicaNieta = {
-      ...datosBasicos,
-      capasBisnietos: ItemResponseTablaContenido.URL ? [ItemResponseTablaContenido] : ['']
-    };
-
-    return {
-      capas: [...capasNietos.capas, nuevaCapa],
-      tematicasNietas: [...capasNietos.tematicasNietas, nuevaTematicaNieta]
-    };
-  }
-
-  /**
-   * Metodo para validar si existe capa nieto
-   * @param capasNietos 
-   * @param ItemResponseTablaContenido 
-   * @returns 
-   */
-  const validaSiExisteCApaNieto = (capasNietos: interfaceCapasNietos, ItemResponseTablaContenido:ItemResponseTablaContenido) => {
-    return !capasNietos.capas.some(capaNieta =>
-      capaNieta.IDCAPA === ItemResponseTablaContenido.IDCAPA &&
-      capaNieta.IDTEMATICA === ItemResponseTablaContenido.IDTEMATICA
-    );
-  }
-
-  /**
-   * En este metodo se separa las capas padres, hijas, nietas y bisnietas.
-   * @param responseTablaDeContenido 
-   */
-  const ordenarDataTablaContenido = (responseTablaDeContenido: any[] | TablaDeContenidoInterface) => {
-    const tematicas:CapasTematicas[] = [];
-    let capasNietos: interfaceCapasNietos = { capas: [], tematicasNietas: [] };
-
-    const addTematica = (tematicas:CapasTematicas[], datosBasicos: datosBasicosInterface, itemResponseTablaContenido: ItemResponseTablaContenido) => {
-      if (!itemResponseTablaContenido.URL) {
-        tematicas.push({ ...datosBasicos, capasHijas: [] });
-      } else {
-        tematicas.push({
-          ...datosBasicos,
-          capasHijas: [{ ...datosBasicos, capasNietas: itemResponseTablaContenido.NOMBRECAPA ? [itemResponseTablaContenido] : [] }],
-        });
-      }
-    };
-
-    /**
-     * Con este for se separa las capas padre con IDTEMATICAPADRE === 0
-     */
-    responseTablaDeContenido.forEach((itemResponseTablaContenido: ItemResponseTablaContenido) => {
-      const datosBasicos:datosBasicosInterface = {
-        IDTEMATICAPADRE: itemResponseTablaContenido.IDTEMATICAPADRE,
-        IDTEMATICA: itemResponseTablaContenido.IDTEMATICA,
-        NOMBRETEMATICA: itemResponseTablaContenido.NOMBRETEMATICA,
-        TITULOCAPA: itemResponseTablaContenido.TITULOCAPA,
-      };
-
-      if (itemResponseTablaContenido.IDTEMATICAPADRE === 0 && itemResponseTablaContenido.NOMBRETEMATICA) {
-        const tematicaExistente = tematicas.find(t => t.IDTEMATICA === itemResponseTablaContenido.IDTEMATICA);
-        if (!tematicaExistente) {
-          addTematica(tematicas, datosBasicos, itemResponseTablaContenido);
-        } else if (itemResponseTablaContenido.NOMBRECAPA) {
-          tematicaExistente.capasHijas.push({ ...datosBasicos, capasNietas: [itemResponseTablaContenido] });
-        }
-      }
-    });
-
-    /**
-     * En este for se separa las capas nietas, capasBisnietos, y las hijas se agregan directamente al padre
-     */
-    responseTablaDeContenido.forEach((itemResponseTablaContenido: ItemResponseTablaContenido) => {
-      const datosBasicos:datosBasicosInterface = {
-        IDTEMATICAPADRE: itemResponseTablaContenido.IDTEMATICAPADRE,
-        IDTEMATICA: itemResponseTablaContenido.IDTEMATICA,
-        NOMBRETEMATICA: itemResponseTablaContenido.NOMBRETEMATICA,
-        TITULOCAPA: itemResponseTablaContenido.TITULOCAPA,
-      };
-
-      if (itemResponseTablaContenido.IDTEMATICAPADRE > 1) {
-        const tematicaPadre = tematicas.find(tematica => tematica.IDTEMATICA === itemResponseTablaContenido.IDTEMATICAPADRE);
-        if (tematicaPadre) {
-          let capaHija = tematicaPadre.capasHijas.find((capaHija: { IDTEMATICA: number; }) => capaHija.IDTEMATICA === itemResponseTablaContenido.IDTEMATICA);
-          if (!capaHija) {
-            tematicaPadre.capasHijas.push({ ...datosBasicos, capasNietas: itemResponseTablaContenido.URL ? [itemResponseTablaContenido] : [] });
-          } else {
-            capaHija.capasNietas.push(itemResponseTablaContenido);
-          }
-        } else if (validaSiExisteCApaNieto(capasNietos, itemResponseTablaContenido)) {
-          const tematicaNieta = capasNietos.tematicasNietas.find(tn => tn.IDTEMATICA === itemResponseTablaContenido.IDTEMATICA);
-          if (tematicaNieta) {
-            tematicaNieta.capasBisnietos.push(itemResponseTablaContenido);
-          } else {
-            capasNietos = agregarTematicaNietaNueva(capasNietos, itemResponseTablaContenido, datosBasicos);
-          }
-        }
-      }
-    });
-
-    /**
-     * En este for se asignan las capas hijas pendientes
-     */
-    capasNietos.tematicasNietas.forEach(itemCapaNieta => {
-      tematicas.forEach(itemTematica => {
-        itemTematica.capasHijas.forEach(capaHija => {
-          if (itemCapaNieta.IDTEMATICAPADRE === capaHija.IDTEMATICA) {
-            capaHija.capasNietas.push(itemCapaNieta);
-          }
-        });
-      });
-    });
-
+  const TraerDataTablaContenido = async () => {
+    
+    const tematicas = await getDataTablaContenido();
     setGroupedLayers(tematicas);
   }
-
-  /**
-   * En este meto se realiza la consulta del jeison de la tabla de contenido
-   */
-  const fetchLayers = async () => {
-    const url = 'https://sigquindio.gov.co:8443/ADMINSERV/AdminGeoApplication/AdminGeoWebServices/getTablaContenidoJsTree/public';
-    try {
-      const response = await fetch(url);
-      if (!response.ok) {
-        throw new Error(`HTTP error! Status: ${response.status}`);
-      }
-      const responseTablaDeContenido: TablaDeContenidoInterface[] = await response.json();
-      ordenarDataTablaContenido(responseTablaDeContenido);
-    } catch (error) {
-      console.error('Error fetching layers:', error);
-    }
-  };
 
   /**
    * realiza la consulta de la data tabla de contenido la primera vez que se renderiza el componente
    */
   useEffect(() => {
-    fetchLayers();
+    TraerDataTablaContenido();
   }, []);
 
   return (
@@ -192,6 +54,152 @@ const Widget = (props: AllWidgetProps<any>) => {
 };
 
 export default Widget;
+
+/**
+   * En este meto se realiza la consulta del jeison de la tabla de contenido
+   */
+export const getDataTablaContenido = async () => {
+  const url = 'https://sigquindio.gov.co:8443/ADMINSERV/AdminGeoApplication/AdminGeoWebServices/getTablaContenidoJsTree/public';
+  try {
+    const response = await fetch(url);
+    if (!response.ok) {
+      throw new Error(`HTTP error! Status: ${response.status}`);
+    }
+    const responseTablaDeContenido: TablaDeContenidoInterface[] = await response.json();
+    const tematicas = ordenarDataTablaContenido(responseTablaDeContenido);
+    return tematicas;
+  } catch (error) {
+    console.error('Error fetching layers:', error);
+  }
+};
+
+/**
+   * En este metodo se separa las capas padres, hijas, nietas y bisnietas.
+   * @param responseTablaDeContenido 
+   */
+const ordenarDataTablaContenido = (responseTablaDeContenido: any[] | TablaDeContenidoInterface) => {
+  const tematicas:CapasTematicas[] = [];
+  let capasNietos: interfaceCapasNietos = { capas: [], tematicasNietas: [] };
+
+  const addTematica = (tematicas:CapasTematicas[], datosBasicos: datosBasicosInterface, itemResponseTablaContenido: ItemResponseTablaContenido) => {
+    if (!itemResponseTablaContenido.URL) {
+      tematicas.push({ ...datosBasicos, capasHijas: [] });
+    } else {
+      tematicas.push({
+        ...datosBasicos,
+        capasHijas: [{ ...datosBasicos, capasNietas: itemResponseTablaContenido.NOMBRECAPA ? [itemResponseTablaContenido] : [] }],
+      });
+    }
+  };
+
+  /**
+   * Con este for se separa las capas padre con IDTEMATICAPADRE === 0
+   */
+  responseTablaDeContenido.forEach((itemResponseTablaContenido: ItemResponseTablaContenido) => {
+    const datosBasicos:datosBasicosInterface = {
+      IDTEMATICAPADRE: itemResponseTablaContenido.IDTEMATICAPADRE,
+      IDTEMATICA: itemResponseTablaContenido.IDTEMATICA,
+      NOMBRETEMATICA: itemResponseTablaContenido.NOMBRETEMATICA,
+      TITULOCAPA: itemResponseTablaContenido.TITULOCAPA,
+    };
+
+    if (itemResponseTablaContenido.IDTEMATICAPADRE === 0 && itemResponseTablaContenido.NOMBRETEMATICA) {
+      const tematicaExistente = tematicas.find(t => t.IDTEMATICA === itemResponseTablaContenido.IDTEMATICA);
+      if (!tematicaExistente) {
+        addTematica(tematicas, datosBasicos, itemResponseTablaContenido);
+      } else if (itemResponseTablaContenido.NOMBRECAPA) {
+        tematicaExistente.capasHijas.push({ ...datosBasicos, capasNietas: [itemResponseTablaContenido] });
+      }
+    }
+  });
+
+  /**
+   * En este for se separa las capas nietas, capasBisnietos, y las hijas se agregan directamente al padre
+   */
+  responseTablaDeContenido.forEach((itemResponseTablaContenido: ItemResponseTablaContenido) => {
+    const datosBasicos:datosBasicosInterface = {
+      IDTEMATICAPADRE: itemResponseTablaContenido.IDTEMATICAPADRE,
+      IDTEMATICA: itemResponseTablaContenido.IDTEMATICA,
+      NOMBRETEMATICA: itemResponseTablaContenido.NOMBRETEMATICA,
+      TITULOCAPA: itemResponseTablaContenido.TITULOCAPA,
+    };
+
+    if (itemResponseTablaContenido.IDTEMATICAPADRE > 1) {
+      const tematicaPadre = tematicas.find(tematica => tematica.IDTEMATICA === itemResponseTablaContenido.IDTEMATICAPADRE);
+      if (tematicaPadre) {
+        let capaHija = tematicaPadre.capasHijas.find((capaHija: { IDTEMATICA: number; }) => capaHija.IDTEMATICA === itemResponseTablaContenido.IDTEMATICA);
+        if (!capaHija) {
+          tematicaPadre.capasHijas.push({ ...datosBasicos, capasNietas: itemResponseTablaContenido.URL ? [itemResponseTablaContenido] : [] });
+        } else {
+          capaHija.capasNietas.push(itemResponseTablaContenido);
+        }
+      } else if (validaSiExisteCApaNieto(capasNietos, itemResponseTablaContenido)) {
+        const tematicaNieta = capasNietos.tematicasNietas.find(tn => tn.IDTEMATICA === itemResponseTablaContenido.IDTEMATICA);
+        if (tematicaNieta) {
+          tematicaNieta.capasBisnietos.push(itemResponseTablaContenido);
+        } else {
+          capasNietos = agregarTematicaNietaNueva(capasNietos, itemResponseTablaContenido, datosBasicos);
+        }
+      }
+    }
+  });
+
+  /**
+   * En este for se asignan las capas hijas pendientes
+   */
+  capasNietos.tematicasNietas.forEach(itemCapaNieta => {
+    tematicas.forEach(itemTematica => {
+      itemTematica.capasHijas.forEach(capaHija => {
+        if (itemCapaNieta.IDTEMATICAPADRE === capaHija.IDTEMATICA) {
+          capaHija.capasNietas.push(itemCapaNieta);
+        }
+      });
+    });
+  });
+
+  // setGroupedLayers(tematicas);
+  return tematicas;
+}
+
+/**
+ * Metodo que crea un objeto nuevo de capas y tematicas nietas
+ * @param capasNietos 
+ * @param ItemResponseTablaContenido 
+ * @param datosBasicos 
+ * @returns 
+ */
+const agregarTematicaNietaNueva = (capasNietos, ItemResponseTablaContenido: ItemResponseTablaContenido, datosBasicos:datosBasicosInterface) => {
+
+  //Define una nueva capa basada en ItemResponseTablaContenido.
+  const nuevaCapa = {
+    IDCAPA: ItemResponseTablaContenido.IDCAPA,
+    IDTEMATICA: ItemResponseTablaContenido.IDTEMATICA,
+  };
+
+  //Define una nueva temática nieta basada en datosBasicos y agrega capasBisnietos.
+  const nuevaTematicaNieta = {
+    ...datosBasicos,
+    capasBisnietos: ItemResponseTablaContenido.URL ? [ItemResponseTablaContenido] : ['']
+  };
+
+  return {
+    capas: [...capasNietos.capas, nuevaCapa],
+    tematicasNietas: [...capasNietos.tematicasNietas, nuevaTematicaNieta]
+  };
+}
+
+/**
+ * Metodo para validar si existe capa nieto
+ * @param capasNietos 
+ * @param ItemResponseTablaContenido 
+ * @returns 
+ */
+const validaSiExisteCApaNieto = (capasNietos: interfaceCapasNietos, ItemResponseTablaContenido:ItemResponseTablaContenido) => {
+  return !capasNietos.capas.some(capaNieta =>
+    capaNieta.IDCAPA === ItemResponseTablaContenido.IDCAPA &&
+    capaNieta.IDTEMATICA === ItemResponseTablaContenido.IDTEMATICA
+  );
+}
 
 
 

@@ -216,6 +216,7 @@ const Widget_Tree: React.FC<Widget_Tree_Props> = ({ dataTablaContenido, varJimuM
             });
             varJimuMapView.view.map.add(layer);
             setFeaturesLayersDeployed(features => [...features,{capa: capa.IDCAPA ? capa : capa.capasNietas[0], layer}]);
+            // const testLayer = varJimuMapView.view.map.layers.getItemAt(0) 
         });
     }
 
