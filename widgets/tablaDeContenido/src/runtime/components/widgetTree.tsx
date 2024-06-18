@@ -184,7 +184,7 @@ const Widget_Tree: React.FC<Widget_Tree_Props> = ({ dataTablaContenido, varJimuM
       
         filtroRecursivo(dataTablaContenido, searchQuery);
         filtereddataTablaContenido[0].capasHijas = capasHijas;
-      
+        console.log(filtereddataTablaContenido)
         return filtereddataTablaContenido;
       };
       

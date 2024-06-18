@@ -29,6 +29,7 @@ const Widget = (props: AllWidgetProps<any>) => {
   const TraerDataTablaContenido = async () => {
     
     const tematicas = await getDataTablaContenido();
+    console.log(tematicas)
     setGroupedLayers(tematicas);
   }
 
