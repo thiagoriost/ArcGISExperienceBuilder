@@ -937,28 +937,13 @@ const removeLayerDeployed = (featureLayer) => {
     });
     
     const graphicsLayer = new GraphicsLayer();
-    /* const highlightSymbol = new SimpleFillSymbol({
-      color: [255, 255, 0, 0.25], // Amarillo con transparencia
-      outline: new SimpleLineSymbol({
-        color: [255, 0, 0], // Rojo
-        width: 2
-      })
-    });
-    const polygon = new Polygon({
-      rings: row.row.geometry.rings,
-      spatialReference: jimuMapView.view.spatialReference
-    }); */
-    /* graphic = new Graphic({
-      geometry: polygon,
-      symbol: highlightSymbol
-    }); */
     
     graphicsLayer.add(graphic);
     jimuMapView.view.map.add(graphicsLayer);
     if (geometryType == 'point') {
       const EXTEND = calculateExtent(row.row.geometry, LayerSelectedDeployed);
-      // const EXTEND = geometria.extent.expand(1.5);
-      jimuMapView.view.goTo(EXTEND, { duration: 1000 });
+      const EXTENDend = new Extent(EXTEND);
+      jimuMapView.view.goTo(EXTENDend, { duration: 1000 });
     } else {
       jimuMapView.view.goTo(graphic.geometry.extent.expand(1.5), { duration: 1000 });
     }
