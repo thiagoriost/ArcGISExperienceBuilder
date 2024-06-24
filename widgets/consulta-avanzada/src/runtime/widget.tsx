@@ -1,27 +1,21 @@
 
-import { React, AllWidgetProps, esri } from "jimu-core";
+import { React, AllWidgetProps} from "jimu-core";
 import { JimuMapViewComponent, JimuMapView } from 'jimu-arcgis'; // The map object can be accessed using the JimuMapViewComponent
-import { Button, Label, Select, TextArea } from 'jimu-ui'; // import components
+import { Button, Label, Loading, Select, TextArea } from 'jimu-ui'; // import components
 import { useEffect, useState } from "react";
 import 'react-data-grid/lib/styles.css';
-import DataGrid, { CellClickArgs } from 'react-data-grid';
 
-import Graphic from '@arcgis/core/Graphic';
-import GraphicsLayer from "@arcgis/core/layers/GraphicsLayer";
-// import PopupTemplate from "@arcgis/core/layers/PopupTemplate";
-
-// import './style.css';
 import { Polygon } from "@arcgis/core/geometry";
-import { loadModules } from 'esri-loader';
 import { InterfaceResponseConsulta, interfaceFeature } from "../types/interfaceResponseConsultaSimple";
 import '../styles/style.css'
 import FeatureLayer from "@arcgis/core/layers/FeatureLayer";
-import { InterfaceColumns, Row } from "../types/interfaces";
-import Extent from "@arcgis/core/geometry/Extent";
+import { InterfaceColumns, Row, interfaceMensajeModal, typeMSM } from "../types/interfaces";
+// import ModalComponent from "./components/ModalComponent";
+// import { loadEsriModules } from "./components/TablaResultados";
+// import InputSelect from "./components/InputSelect";
 
 const Consulta_Avanzada = (props: AllWidgetProps<any>) => {
 
-  console.log("Iniciando Widget...");
   const [jsonSERV, setJsonSERV] = useState([]);
   const [temas, setTemas] = useState([]);
   const [subtemas, setSubtemas] = useState([]);
@@ -30,10 +24,7 @@ const Consulta_Avanzada = (props: AllWidgetProps<any>) => {
   const [capaselected, setCapaselected] = useState();
   const [grupos, setGrupos] = useState([]);
   const [capasAttr, setCapasAttr] = useState([]);
-  // const [txtValorState, setValorState] = useState(true);
-  // const [txtValor, setValor] = useState("");
   const [selTema, setselTema] = useState(undefined);
-  const [selSubtema, setselSubtema] = useState(undefined);
   const [subtemaselected, setSubtemaselected] = useState();
   const [selGrupo, setselGrupo] = useState(undefined);
   const [campo, setCampo] = useState(undefined);
@@ -47,9 +38,19 @@ const Consulta_Avanzada = (props: AllWidgetProps<any>) => {
   const [rows, setRows] = useState<Row[]>([])
   const [columns, setColumns] = useState<InterfaceColumns[]>([]);
   const [LayerSelectedDeployed, setLayerSelectedDeployed] = useState(null);
-  const [lastGeometriDeployed, setLastGeometriDeployed] = useState()
-
-
+  const [lastGeometriDeployed, setLastGeometriDeployed] = useState();
+  const [isLoading, setIsLoading] = useState(false);
+  const [initialExtent, setInitialExtent] = useState(null);
+  const [mensajeModal, setMensajeModal] = useState<interfaceMensajeModal>({
+    deployed:false,
+    type:typeMSM.info,
+    tittle:'',
+    body:'',
+    subBody:''
+  })
+  const [widgetModules, setWidgetModules] = useState(null);
+  const [utilsModule, setUtilsModule] = useState(null);
+  const [servicios, setServicios] = useState(null);
 
   //To add the layer to the Map, a reference to the Map must be saved into the component state.
   const [jimuMapView, setJimuMapView] = useState<JimuMapView>();
@@ -64,7 +65,7 @@ const Consulta_Avanzada = (props: AllWidgetProps<any>) => {
     @remarks FUENTE: https://www.freecodecamp.org/news/how-to-fetch-api-data-in-react/
   */
   const getJSONContenido = async (jsonSERV) => {
-    const urlServicioTOC = "https://sigquindio.gov.co:8443/ADMINSERV/AdminGeoApplication/AdminGeoWebServices/getTablaContenidoJsTree/public";
+    const urlServicioTOC = servicios.urls.tablaContenido;
     var nombreServicio, idTematica, idCapaMapa, idCapaDeServicio, nombreTematica, tituloCapa, urlMetadatoCapa, url: string;
     var idTematicaPadre: any;
     var visible: Boolean;
@@ -142,7 +143,7 @@ const Consulta_Avanzada = (props: AllWidgetProps<any>) => {
     @return (Object) setTemas: Estructura de datos correspondiente a los temas desde el arreglo opcArr
   */
 
-  function getTemas(jsonData) {
+  const getTemas = (jsonData) =>{
     var opcArr = [];
     var tipoRegistro, nodoPadre, urlServ, descrip: string;
     var idTema = -1;
@@ -178,7 +179,7 @@ const Consulta_Avanzada = (props: AllWidgetProps<any>) => {
     @changes Fix selección items campo Capa
     @return (Object) setSubtemas: Estructura de datos correspondiente a los subtemas
   */
-  function getSubtemas(temas) {
+  const getSubtemas = (temas) =>{
     var idParent: number = -1;
     var type: string = "";
     var jsonSubtemas: any = "";
@@ -192,13 +193,16 @@ const Consulta_Avanzada = (props: AllWidgetProps<any>) => {
 
     //Inicialización de controles
     setselTema(temas.target.value); //Tema: Seleccionando el item del control
-
     setSubtemas([]);  //Subtema
     setGrupos([]);    //Grupo
-    setCapas([]);     //Capa
+    setCapas([]);     //Capas
     setCapasAttr([]); //Atributo
-    // setValor("");     //Valor
-    // setValorState(true);//Valor al actualizarlo el usuario            
+    setCapaselected(null);
+    setSubtemaselected(null);
+    setCondicionBusqueda('');
+    setValorSelected(null);
+    setValores([]);
+
 
     for (var cont = 0; cont < jsonSERV.length; cont++) {
       idParent = parseInt(jsonSERV[cont].parent);
@@ -206,16 +210,20 @@ const Consulta_Avanzada = (props: AllWidgetProps<any>) => {
       //Búsqueda de subtemas
       if (idParent == idPRoc && type == 'tematica') {
         jsonSubtemas = {
-          "idTematica": parseInt(jsonSERV[cont].id),
-          "nombreTematica": jsonSERV[cont].text
+          // "idTematica": parseInt(jsonSERV[cont].id),
+          "value": parseInt(jsonSERV[cont].id),
+          // "nombreTematica": jsonSERV[cont].text
+          "label": jsonSERV[cont].text
         };
         subtemasArr.push(jsonSubtemas);
       }
       //Búsqueda de capas
       else if (idParent == idPRoc && type == 'capa' && parseInt(jsonSERV[cont].id) !== 0) {
         jsonCapas = {
-          "idCapa": parseInt(jsonSERV[cont].id),
-          "nombreCapa": jsonSERV[cont].text,
+          // "idCapa": parseInt(jsonSERV[cont].id),
+          "value": parseInt(jsonSERV[cont].id),
+          // "nombreCapa": jsonSERV[cont].text,
+          "label": jsonSERV[cont].text,
           "urlCapa": jsonSERV[cont].url
         };
         capasArr.push(jsonCapas);
@@ -225,7 +233,6 @@ const Consulta_Avanzada = (props: AllWidgetProps<any>) => {
     //Cargue de subtemas, cuando se conoce tema
     if (subtemasArr.length >= 0) {
       console.log("Subtemas Array=>", subtemasArr);
-      setselSubtema(undefined);
       setSubtemas(subtemasArr);
     }
     //Cargue de capas de un tema, cuando éste no tiene subtemas
@@ -258,12 +265,12 @@ const Consulta_Avanzada = (props: AllWidgetProps<any>) => {
     
     setSubtemaselected(target.value)
     const idPRoc = parseInt(target.value);
-    console.log("Subtema asociado =>", idPRoc);
 
     limpiaCampoCapas();
-
     setCapasAttr([]);
+    setValorSelected(null);
     setValores([])
+    setCondicionBusqueda('')
 
     for (var cont = 0; cont < jsonSERV.length; cont++) {
       idParent = parseInt(jsonSERV[cont].parent);
@@ -271,16 +278,18 @@ const Consulta_Avanzada = (props: AllWidgetProps<any>) => {
       //Búsqueda de subtemas
       if (idParent == idPRoc && type == 'tematica') {
         jsonSubtemas = {
-          "idTematica": parseInt(jsonSERV[cont].id),
-          "nombreTematica": jsonSERV[cont].text
+          // "idTematica": parseInt(jsonSERV[cont].id),
+          "value": parseInt(jsonSERV[cont].id),
+          // "nombreTematica": jsonSERV[cont].text
+          "label": jsonSERV[cont].text
         };
         subtemasArr.push(jsonSubtemas);
       }
       //Búsqueda de capas
       else if (idParent == idPRoc && type == 'capa' && parseInt(jsonSERV[cont].id) !== 0) {
         jsonCapas = {
-          "idCapa": parseInt(jsonSERV[cont].id),
-          "nombreCapa": jsonSERV[cont].text,
+          "value": parseInt(jsonSERV[cont].id),
+          "label": jsonSERV[cont].text,
           "urlCapa": jsonSERV[cont].url
         };
         capasArr.push(jsonCapas);
@@ -324,13 +333,10 @@ const Consulta_Avanzada = (props: AllWidgetProps<any>) => {
     var capasArr: Array<string> = [];
     const idPRoc = parseInt(grupos.target.value);
 
-    console.log("Grupo asociado =>", idPRoc);
-
+    setValorSelected(null);
     setselGrupo(grupos.target.value);
 
     setCapasAttr([]);
-    // setValor("");
-    // setValorState(true);
 
     for (var cont = 0; cont < jsonSERV.length; cont++) {
       idParent = parseInt(jsonSERV[cont].parent);
@@ -338,16 +344,20 @@ const Consulta_Avanzada = (props: AllWidgetProps<any>) => {
       //Búsqueda de subtemas
       if (idParent == idPRoc && type == 'tematica') {
         jsonSubtemas = {
-          "idTematica": parseInt(jsonSERV[cont].id),
-          "nombreTematica": jsonSERV[cont].text
+          // "idTematica": parseInt(jsonSERV[cont].id),
+          "value": parseInt(jsonSERV[cont].id),
+          // "nombreTematica": jsonSERV[cont].text
+          "label": jsonSERV[cont].text
         };
         subtemasArr.push(jsonSubtemas);
       }
       //Búsqueda de capas
       else if (idParent == idPRoc && type == 'capa' && parseInt(jsonSERV[cont].id) !== 0) {
         jsonCapas = {
-          "idCapa": parseInt(jsonSERV[cont].id),
-          "nombreCapa": jsonSERV[cont].text,
+          // "idCapa": parseInt(jsonSERV[cont].id),
+          "value": parseInt(jsonSERV[cont].id),
+          // "nombreCapa": jsonSERV[cont].text,
+          "label": jsonSERV[cont].text,
           "urlCapa": jsonSERV[cont].url
         };
         capasArr.push(jsonCapas);
@@ -361,38 +371,6 @@ const Consulta_Avanzada = (props: AllWidgetProps<any>) => {
       setselCapas(undefined);
     }
   }
-  //Por revisar - Optimización
-  //@date 2024-05-23
-  const procesaData = (idPRoc) => {
-    var idParent: number = -1;
-    var type: string = "";
-    var jsonSubtemas: any = "";
-    var jsonCapas: any = "";
-    var subtemasArr: Array<string> = [];
-    var capasArr: Array<string> = [];
-    for (var cont = 0; cont < jsonSERV.length; cont++) {
-      idParent = parseInt(jsonSERV[cont].parent);
-      type = jsonSERV[cont].type;
-      //Búsqueda de subtemas
-      if (idParent == idPRoc && type == 'tematica') {
-        jsonSubtemas = {
-          "idTematica": parseInt(jsonSERV[cont].id),
-          "nombreTematica": jsonSERV[cont].text
-        };
-        subtemasArr.push(jsonSubtemas);
-      }
-      //Búsqueda de capas
-      else if (idParent == idPRoc && type == 'capa' && parseInt(jsonSERV[cont].id) !== 0) {
-        jsonCapas = {
-          "idCapa": parseInt(jsonSERV[cont].id),
-          "nombreCapa": jsonSERV[cont].text,
-          "urlCapa": jsonSERV[cont].url
-        };
-        capasArr.push(jsonCapas);
-      }
-    }
-  }
-
   /*
     getAtributosCapa => Método para obtener los atributos de una capa conocida y renderizarla en el campo Atributo
     @date 2024-05-24
@@ -404,23 +382,25 @@ const Consulta_Avanzada = (props: AllWidgetProps<any>) => {
     @changes Seteo de la URL asociado al control Capa
     @returns (Array) AtrCapaArr => Arreglo con atributos (name, alias)
   */
-  const getAtributosCapa = (capa: { target: { value: string; }; }) => {
+  const getAtributosCapa = (target) => {
     let urlCapa: string;
     let JsonAtrCapa: any = "";
     let AtrCapaArr: any = [];
     let urlCapaJson: string;
 
     //Construcción de la URL del servicio, a partir del identificador de capa traido desde el campo Capa
-    urlCapa = getUrlFromCapa(capa.target.value, capas);
+    // urlCapa = getUrlFromCapa(target.value, capas);
+    urlCapa = capas.find(capa => capa.value == target.value)?.urlCapa;
+    if (!urlCapa){
+      console.error("Url no encontrada");
+      return
+    } 
     removeLayerDeployed(LayerSelectedDeployed);
     dibujaCapasSeleccionadas(urlCapa);
     urlCapaJson = urlCapa + "?f=json";
     console.log("URL capa =>", urlCapaJson);
 
     setCapasAttr([]);
-    // setValor("");
-    // setValorState(true);
-
     setselCapas(urlCapaJson);
 
     //Realización del consumo remoto, a través de la URL del servicio dado por el atributo urlCapaJson
@@ -432,34 +412,18 @@ const Consulta_Avanzada = (props: AllWidgetProps<any>) => {
         //Rearmado estructura datos de atributos: name, alias          
         for (var cont = 0; cont < data.fields.length; cont++) {
           JsonAtrCapa = {
-            "name": data.fields[cont].name,
-            "alias": data.fields[cont].alias,
+            "value": data.fields[cont].name,
+            "label": data.fields[cont].alias,
             "allData": data
           };
           AtrCapaArr.push(JsonAtrCapa);
         }
         console.log("Obj Attr Capas =>", AtrCapaArr);
         setCapasAttr(AtrCapaArr);
+        setTimeout(() => { // para esperar que la capacargue
+          setIsLoading(false);          
+        }, 6000);
       });
-  }
-
-  /**
-   * método getUrlFromCapa => Obtener la URL desde  una capa especificada en el campo Capa
-   * @author IGAC - DIP
-   * @date 2024-05-24
-   * @param idCapa => Identificador capa 
-   * @param capasArr => Arreglo de capas en formato JSON, con atributos {idCapa, nombreCapa, urlCapa}
-   * @returns (String) urlCapa => Url asociada a la capa
-   */
-
-  const getUrlFromCapa =(idCapa, capasArr) =>{
-    //Recorrido por el array
-    for (var cont = 0; cont < capasArr.length; cont++) {
-      if (parseInt(capasArr[cont].idCapa) == parseInt(idCapa)) {
-        return capasArr[cont].urlCapa;
-      }
-    }
-    return -1;
   }
 
   /*
@@ -474,7 +438,6 @@ const Consulta_Avanzada = (props: AllWidgetProps<any>) => {
     setCapas([]);
     setCondicionBusqueda('');
     setValores([]);
-    setselSubtema(undefined)
     setCapaselected(null)
     setselTema(undefined);
     setSubtemas([]);
@@ -485,11 +448,13 @@ const Consulta_Avanzada = (props: AllWidgetProps<any>) => {
     console.log(graphicsLayerDeployed)
     console.log(featuresLayersDeployed)
     removeLayer(LayerSelectedDeployed);
-    setLayerSelectedDeployed(null);
+    setLayerSelectedDeployed(null);    
+    jimuMapView.view.map.removeAll()
+    goToInitialExtent(jimuMapView, initialExtent)
 
   }
 
-  const removeLayer = (layer) => {
+  const removeLayer = (layer: __esri.Layer) => {
     jimuMapView.view.map.remove(layer);
     jimuMapView.view.zoom = jimuMapView.view.zoom -0.00000001;
   }
@@ -499,6 +464,7 @@ const Consulta_Avanzada = (props: AllWidgetProps<any>) => {
     console.log("Ingresando al evento objeto JimuMapView...");
     if (jmv) {
       setJimuMapView(jmv);
+      setInitialExtent(jmv.view.extent); // Guarda el extent inicial
     }
   };
 
@@ -508,8 +474,9 @@ const Consulta_Avanzada = (props: AllWidgetProps<any>) => {
     if (!jimuMapView || features.length === 0 || !response) return;
 
 
-    const [PopupTemplate,SimpleLineSymbol,SimpleFillSymbol] = await loadModules([
-      'esri/PopupTemplate','esri/symbols/SimpleLineSymbol','esri/symbols/SimpleFillSymbol']);
+    const [
+      Graphic, GraphicsLayer, SimpleFillSymbol, SimpleLineSymbol, SimpleMarkerSymbol, Point, Extent, PopupTemplate
+    ] = await utilsModule.loadEsriModules();
 
     const graphicsLayer = new GraphicsLayer();
 
@@ -558,11 +525,11 @@ const Consulta_Avanzada = (props: AllWidgetProps<any>) => {
     jimuMapView.view.map.add(graphicsLayer);
     setGraphicsLayerDeployed(graphicsLayer);
     
-    // jimuMapView.view.zoom = jimuMapView.view.zoom -0.0001;
     jimuMapView.view.goTo({
       target: graphicsLayer.graphics.items[0].geometry,
       zoom: 10 
     });
+    setIsLoading(false);
   };
 
   /**
@@ -583,38 +550,50 @@ const Consulta_Avanzada = (props: AllWidgetProps<any>) => {
       }).catch(error => {
         console.error("Error loading the feature layer:", error);
       });
-}
-
-const removeLayerDeployed = (featureLayer) => {
-  if (featureLayer && jimuMapView) {
-    jimuMapView.view.map.remove(featureLayer);
-  } else {
-    console.error("FeatureLayer no encontrado.");
   }
-}
+
+  const removeLayerDeployed = (featureLayer) => {
+    if (featureLayer && jimuMapView) {
+      jimuMapView.view.map.remove(featureLayer);
+    } else {
+      console.error("FeatureLayer no encontrado.");
+    }
+  }
 
   const consultarValores = async () => {
     console.log("consultarValores")
+    setIsLoading(true);
     const url = selCapas.replace("?f=json", "") + "/query"
-    let where = "1=1", getGeometry = false;
+    let where = "1=1", getGeometry = false;    
     const response = await realizarConsulta(campo, url, getGeometry, where);
     console.log(response)
     if (response) {
       if (response.error) {
         console.error(`${response.error.code} - ${response.error.message}`);
+        setMensajeModal({
+          deployed:true,
+          type: typeMSM.error,
+          tittle:'Sin valores',
+          body: `${response.error.code} - ${response.error.message}`
+        });
       }else{
-      const ordenarDatos: string[] = getOrdenarDatos(response, campo);
-      if (ordenarDatos[0]==null) {
-        setValores([])
-        alert(`El campo ${campo} no tiene valores para mostrar, intenta con un campo diferente`)
-        return
-      }
-      setValores(ordenarDatos)
-    }
-    } else {
-      console.error(response);
-    }
+        const ordenarDatos: string[] = getOrdenarDatos(response, campo);
+        if (ordenarDatos[0]==null) {
+          setValores([])
 
+          setMensajeModal({
+            deployed:true,
+            type: typeMSM.info,
+            tittle:'Sin valores',
+            body: `El campo ${campo} no tiene valores para mostrar, intenta con un campo diferente`}
+          )
+          setIsLoading(false);
+          return
+        }
+        setValores(ordenarDatos)
+      }
+    }
+    setIsLoading(false);
   }
 
   const handleCampos = ({ target }): void => {
@@ -625,7 +604,7 @@ const removeLayerDeployed = (featureLayer) => {
     setCampo(campo);
     const adicionSimbolo = `${condicionBusqueda} ${campo}`
     setCondicionBusqueda(adicionSimbolo);
-    consultarValores();
+    setValorSelected(null);
   }
 
   const asignarSimbolCondicionBusqueda = (simbolo: string): void => {
@@ -639,14 +618,9 @@ const removeLayerDeployed = (featureLayer) => {
     setCondicionBusqueda(adicionValor);
   }
 
-  const resetCondicionBusqueda = () => {
-    setCondicionBusqueda('');
-    // setCampo(undefined);
-    // setValores([])
-  }
-
   const RealizarConsulta = async() => {
     console.log("RealizarConsulta");
+    setIsLoading(true);
     console.log(condicionBusqueda)
     const where = condicionBusqueda;
     const url = selCapas.replace("?f=json", "") + "/query"
@@ -654,12 +628,26 @@ const removeLayerDeployed = (featureLayer) => {
     console.log(response)
     if (response.error) {
       console.error(`${response.error.code} - ${response.error.message}`);
+      setMensajeModal({
+        deployed:true,
+        type: typeMSM.error,
+        tittle:'Error en la consulta',
+        body: `${response.error.code} - ${response.error.message}`,
+        subBody:`Puede ser que la condición de busqueda no quedó bien estructurada`
+      });
+      setIsLoading(false);
     }else{
       if (response.features.length>0) {      
         setResponseConsulta(response);
         drawFeaturesOnMap(response);
       } else {
-        alert("La consulta no retorno resultados")
+        setMensajeModal({
+          deployed:true,
+          type: typeMSM.error,
+          tittle:'Sin resultados para esta consulta',
+          body: "Intenta con otros parámetros"
+        });
+        setIsLoading(false);
       }
     }
   }
@@ -670,353 +658,183 @@ const removeLayerDeployed = (featureLayer) => {
     setCampo(null)
   }
 
+  const onChangeCapa = ({target}) => {    
+    console.log(target.value)
+    setIsLoading(true);
+    if(graphicsLayerDeployed?.graphics.items.length > 0){
+      jimuMapView.view.map.removeAll()
+    }
+    getAtributosCapa(target);
+    setCapaselected(target.value);
+    limpiarCamposValores()
+    setCondicionBusqueda('');
+
+  }
+
+  const handleChangeTextArea = ({target}) =>  setCondicionBusqueda(target.value);
+  
+
   const formularioConsulta = () => {
     return (
-      <>
-          <div className="mb-1">
-            <Label size="default"> Tema </Label>
-            <Select
-              onChange={(e) => {
-                console.log(e)
-                getSubtemas(e)
-              }}
-              placeholder="Seleccione tema..."
-              value={selTema}
-            >
-              {temas.map(
-                (option) => (
-                  <option value={option.value}>{option.label}</option>
-                )
-              )}
-            </Select>
+      <div className="overflow-auto">          
+          
+        {
+          widgetModules?.INPUTSELECT(temas, getSubtemas, selTema, "Tema")
+        }
+        {
+          subtemas.length > 0 &&  
+            widgetModules?.INPUTSELECT(subtemas, getGrupoOrCapa, subtemaselected, "Subtema")          
+        }
+        {
+          grupos.length > 0 &&
+            widgetModules?.INPUTSELECT(grupos, getCapaByGrupo, selGrupo, "Grupo")
+        }
+        {
+          capas.length > 0 &&
+            widgetModules?.INPUTSELECT(capas, onChangeCapa, capaselected, "Capa")
+        }
+        {
+          capasAttr.length > 0 &&
+            widgetModules?.INPUTSELECT(capasAttr, handleCampos, campo, "Campos")
+        }
+         
+        {
+          (valores.length > 0) &&
+            widgetModules?.INPUTSELECT(valores, handleValor, valorSelected, "Valores")
+        }
+        {
+          campo &&
+          <div className="align-items-center mt-1">            
+            {widgetModules?.INPUT_TEXTAREA(condicionBusqueda, handleChangeTextArea, "Condición de búsqueda")}
+            <div className="w-100 text-center">
+              <Button
+                // size="sm"
+                type="primary"
+                onClick={() => setCondicionBusqueda('')}
+                className="mb-4"
+              >
+                Borrar condición de busqueda
+              </Button>
+            </div>
           </div>
-          {
-            subtemas.length > 0 &&
-            <div className="mb-1">
-              <Label size="default"> Subtema </Label>
-              <Select
-                onChange={getGrupoOrCapa}
-                placeholder="Seleccione subtema..."
-                value={subtemaselected}
-              >
-                {
-                  subtemas.map(
-                    (option) => (
-                      <option value={option.idTematica}>{option.nombreTematica}</option>
-                    )
-                  )
-                }
 
-              </Select>
-            </div>
-          }
-          {
-            grupos.length > 0 &&
-            <div className="mb-1">
-              <Label size="default"> Grupo </Label>
-              <Select
-                onChange={getCapaByGrupo}
-                placeholder="Seleccione grupo..."
-                value={selGrupo}
-              >
-                {
-                  grupos.map(
-                    (option) =>
-                      <option value={option.idTematica}>{option.nombreTematica}</option>
-                  )
-                }
-              </Select>
-            </div>
+        }
+        {
+          campo &&
+          <div className="condition-buttons text-center">
+            <Button type="primary" size="sm" className="mr-1 mb-1" onClick={() => asignarSimbolCondicionBusqueda('=')}>=</Button>
+            <Button type="primary" size="sm" className="mr-1 mb-1" onClick={() => asignarSimbolCondicionBusqueda('BETWEEN')}>{"<>"}</Button>
+            <Button type="primary" size="sm" className="mr-1 mb-1" onClick={() => asignarSimbolCondicionBusqueda('>')}>&gt;</Button>
+            <Button type="primary" size="sm" className="mr-1 mb-1" onClick={() => asignarSimbolCondicionBusqueda('<')}>&lt;</Button>
+            <Button type="primary" size="sm" className="mr-1 mb-1" onClick={() => asignarSimbolCondicionBusqueda('>=')}>&gt;=</Button>
+            <Button type="primary" size="sm" className="mr-1 mb-1" onClick={() => asignarSimbolCondicionBusqueda('<=')}>&lt;=</Button>
+            <Button type="primary" size="sm" className="mr-1 mb-1" onClick={() => asignarSimbolCondicionBusqueda('LIKE')}>LIKE</Button>
+            <Button type="primary" size="sm" className="mr-1 mb-1" onClick={() => asignarSimbolCondicionBusqueda('AND')}>AND</Button>
+            <Button type="primary" size="sm" className="mr-1 mb-1" onClick={() => asignarSimbolCondicionBusqueda('OR')}>OR</Button>
+            <Button type="primary" size="sm" className="mr-1 mb-1" onClick={() => asignarSimbolCondicionBusqueda('NOT')}>NOT</Button>
+            <Button type="primary" size="sm" className="mr-1 mb-1" onClick={() => asignarSimbolCondicionBusqueda('IS')}>IS</Button>
+            <Button type="primary" size="sm" className="mr-1 mb-1" onClick={() => asignarSimbolCondicionBusqueda('NULL')}>NULL</Button>
+          </div>
 
-          }
-          {
-            capas.length > 0 &&
-            <div className="mb-1">
-              <Label size="default"> Capa </Label>
-              <Select
-                onChange={(e)=>{
-                  getAtributosCapa(e);
-                  console.log(e.target.value)
-                  setCapaselected(e.target.value);
-                  limpiarCamposValores()
-                }}
-                placeholder="Seleccione una capa:"
-                value={capaselected}
-              >
-                {
-                  capas.map(
-                    (option) =>
-                      <option value={option.idCapa}>{option.nombreCapa}</option>
-                  )
-                }
-              </Select>
-            </div>
-          }
-          {
-            capasAttr.length > 0 &&
-            <div className="mb-1">
-              <Label size="default"> Campos </Label>
-              <Select
-                onChange={handleCampos}
-                placeholder="Seleccione un atributo:"
-                value={campo}
-              >
-                {
-                  capasAttr.map(
-                    (option) =>
-                      <option value={option.name}>{option.name}</option>
-                  )
-                }
-              </Select>
-            </div>
-
-          }
-          {
-            (valores.length > 0) &&
-            <div className="fila">
-              <div className="mb-1 w-100">
-                <label style={{marginRight:'10px'}}> Valores: </label>
-               {/*  <Button
-                  size="sm"
-                  type="primary"
-                  onClick={consultarValores}
-                >
-                  Obtener valores
-                </Button> */}
-                <Select
-                  onChange={handleValor}
-                  placeholder="Seleccione un valor:"
-                  value={valorSelected}
-                >
-                  {
-                    valores.map(
-                      (valor) =>
-                        <option value={valor}>{valor}</option>
-                    )
-                  }
-                </Select>
-              </div>
-
-            </div>
-          }
-          {
-            campo &&
-            <div className="d-flex align-items-center mt-1">
-              {/* <label style={{marginRight:'10px'}}>  Condición de búsqueda: </label> */}
-              <Label size="default"> Condición de búsqueda</Label>
-              <div className="overflow-hidden flex-grow-1   mr-1">                
-                <TextArea
-                  className="mb-4"
-                  required
-                  onChange={({ target }) => { setCondicionBusqueda(target.value) }}
-                  value={condicionBusqueda}
-                />
-                {/* </label> */}
-              </div>
-              <Button
-                size="sm"
-                type="primary"
-                onClick={() => resetCondicionBusqueda()}
-              >
-                Borrar
-              </Button>
-            </div>
-
-          }
-          {
-            campo &&
-            <div className="condition-buttons text-center">
-              <Button type="primary" size="sm" className="mr-1 mb-1" onClick={() => asignarSimbolCondicionBusqueda('=')}>=</Button>
-              <Button type="primary" size="sm" className="mr-1 mb-1" onClick={() => asignarSimbolCondicionBusqueda('BETWEEN')}>{"<>"}</Button>
-              <Button type="primary" size="sm" className="mr-1 mb-1" onClick={() => asignarSimbolCondicionBusqueda('>')}>&gt;</Button>
-              <Button type="primary" size="sm" className="mr-1 mb-1" onClick={() => asignarSimbolCondicionBusqueda('<')}>&lt;</Button>
-              <Button type="primary" size="sm" className="mr-1 mb-1" onClick={() => asignarSimbolCondicionBusqueda('>=')}>&gt;=</Button>
-              <Button type="primary" size="sm" className="mr-1 mb-1" onClick={() => asignarSimbolCondicionBusqueda('<=')}>&lt;=</Button>
-              <Button type="primary" size="sm" className="mr-1 mb-1" onClick={() => asignarSimbolCondicionBusqueda('LIKE')}>LIKE</Button>
-              <Button type="primary" size="sm" className="mr-1 mb-1" onClick={() => asignarSimbolCondicionBusqueda('AND')}>AND</Button>
-              <Button type="primary" size="sm" className="mr-1 mb-1" onClick={() => asignarSimbolCondicionBusqueda('OR')}>OR</Button>
-              <Button type="primary" size="sm" className="mr-1 mb-1" onClick={() => asignarSimbolCondicionBusqueda('NOT')}>NOT</Button>
-              <Button type="primary" size="sm" className="mr-1 mb-1" onClick={() => asignarSimbolCondicionBusqueda('IS')}>IS</Button>
-              <Button type="primary" size="sm" className="mr-1 mb-1" onClick={() => asignarSimbolCondicionBusqueda('NULL')}>NULL</Button>
-            </div>
-
-          }
-          {
-            (condicionBusqueda && valores.length > 0) &&
-            <div className="fila">
-              <Button
-                htmlType="button"
-                size="sm"
-                type="primary"
-                onClick={RealizarConsulta}
-              >
-                Consultar
-              </Button>
-              <Button
-                htmlType="button"
-                onClick={limpiarFormulario}
-                size="sm"
-                type="primary"
-              >
-                Limpiar
-              </Button>
-            </div>
-          }
-      </>
+        }
+        {
+          (condicionBusqueda && valores.length > 0) &&
+          <div className="fila">
+            <Button
+              htmlType="button"
+              size="sm"
+              type="primary"
+              onClick={RealizarConsulta}
+            >
+              Consultar
+            </Button>
+            <Button
+              htmlType="button"
+              onClick={limpiarFormulario}
+              size="sm"
+              type="primary"
+            >
+              Limpiar
+            </Button>
+          </div>
+        }
+      </div>
     )
   }
-
-  const zoomToFeatureSelected = async (row): Promise<void> =>{
-    console.log(row);
-    console.log(lastGeometriDeployed);
-    if(lastGeometriDeployed)jimuMapView.view.map.remove(lastGeometriDeployed)
-    const [Graphic, GraphicsLayer, SimpleFillSymbol, SimpleLineSymbol, SimpleMarkerSymbol,Point] = await loadModules([
-      'esri/Graphic', 'esri/layers/GraphicsLayer', 'esri/symbols/SimpleFillSymbol', 'esri/symbols/SimpleLineSymbol',
-      'esri/symbols/SimpleMarkerSymbol', 'esri/geometry/Point',
-    ]);
-    
-    const geometryType = LayerSelectedDeployed.geometryType;
-    let simbolo, geometria;
-    const SR = graphicsLayerDeployed.graphics.items.find(e => e.attributes.OBJECTID == row.row.OBJECTID).geometry.spatialReference;
-    switch (geometryType) {
-      case 'polygon':
-        // Crear un símbolo de relleno simple para resaltar la geometría de polígono        
-        simbolo = new SimpleFillSymbol({
-          color: [255, 255, 0, 0.25], // Amarillo con transparencia
-          outline: new SimpleLineSymbol({
-            color: [255, 0, 0], // Rojo
-            width: 2
-          })
-        });
-        geometria = {
-          type: geometryType,
-          rings: row.row.geometry.rings,
-          spatialReference: SR
-        };
-        break;
-      
-      case 'polyline':
-        // Crear un símbolo de línea simple para resaltar la geometría de polilínea
-        simbolo = new SimpleLineSymbol({
-          color: [255, 0, 0], // Rojo
-          width: 2
-        });
-        geometria = {
-          type: geometryType,
-          paths: row.row.geometry.paths,
-          spatialReference: SR
-        };
-        break;
   
-      case 'point':
-        // Crear un símbolo de marcador simple para resaltar la geometría de punto
-        simbolo = new SimpleMarkerSymbol({
-          color: [255, 0, 0], // Rojo
-          outline: new SimpleLineSymbol({
-            color: [255, 255, 0], // Amarillo
-            width: 1
-          }),
-          size: '8px'
-        });   
-        geometria = new Point({
-          type: geometryType,
-          x: row.row.geometry.x,
-          y: row.row.geometry.y,
-          spatialReference: SR
-        });    
-        break;
-  
-      default:
-        console.error('Tipo de geometría no soportado');
-        return;
-    }
-
-    const graphic = new Graphic({
-      geometry: geometria,
-      symbol: simbolo
-    });
-    
-    const graphicsLayer = new GraphicsLayer();
-    
-    graphicsLayer.add(graphic);
-    jimuMapView.view.map.add(graphicsLayer);
-    if (geometryType == 'point') {
-      const EXTEND = calculateExtent(row.row.geometry, LayerSelectedDeployed);
-      const EXTENDend = new Extent(EXTEND);
-      jimuMapView.view.goTo(EXTENDend, { duration: 1000 });
-    } else {
-      jimuMapView.view.goTo(graphic.geometry.extent.expand(1.5), { duration: 1000 });
-    }
-    setLastGeometriDeployed(graphicsLayer)
-  }
-
-  const retornarFormulario = () => {
-    if(lastGeometriDeployed){
-      jimuMapView.view.map.remove(lastGeometriDeployed)
-      setLastGeometriDeployed(null);
-      jimuMapView.view.goTo({
-        target: graphicsLayerDeployed.graphics.items[0].geometry,
-        zoom: 10 
-      });
-    }
-
-    setMostrarResultadoFeaturesConsulta(false)
-  }
-
-  const tablaResultadoConsulta = () => {
-    return (
-      <>
-        <Button size="sm" className="mb-1" type="primary" onClick={retornarFormulario}>
-          Parámetros consulta
-        </Button>
-        <DataGrid columns={columns} rows={rows} onCellClick={zoomToFeatureSelected}/>
-      </>
-    )
-  }
-
+  /**
+   * Toma la respuesta de la consulta y ajusta la data para poder ser renderizada la tabla de resultados.
+   * Forma el objeto de columnas y filas
+   */
   useEffect(() => {    
     console.log("effect responseConsulta")
     if(!responseConsulta)return
     const {features} = responseConsulta;
     const dataGridColumns = Object.keys(features[0].attributes).map(key => ({ key: key, name: key }));
-    const filas = features.map(({ attributes, geometry }) => ({ ...attributes, geometry }));
-    /* const filas = [];
-    features.forEach(({attributes, geometry}) =>  filas.push({ ...attributes, geometry })); */
+    const filas = features.map(({ attributes, geometry }) => ({ ...attributes, geometry }));    
     console.log(dataGridColumns)
     console.log(filas)
     setColumns(dataGridColumns)
-    setMostrarResultadoFeaturesConsulta(true)      
-    setRows(filas);
+    setRows(filas);    
     setTimeout(() => {
       setMostrarResultadoFeaturesConsulta(true)      
     }, 10);
   }, [responseConsulta])
   
+  /**
+   * Despues de modificar el valor del campo, realiza la consulta
+   */
+  useEffect(() => {
+    if(campo)consultarValores();
+    return () => {}
+  }, [campo])
+
+  /**
+   * cuando "servicios" ya tiene data, realiza la consulta de la tabla de contenido y con esto
+   * llena los campos select
+   */
+  useEffect(() => {
+    servicios && getJSONContenido(jsonSERV);  
+    return () => {}
+  }, [servicios])
+  
 
   useEffect(() => {
-    getJSONContenido(jsonSERV);
-    // setResponseConsulta(dataPruebaResponse);
-    /* alert(`
-      ToDO:
-        - revisar extend ambiental, cuenca rio la vieja, clima, mapa de lluvias, objectID, 7
-        - Construir mensaje tipo toast
-        - ajustar tamnio widget
-        - ajustar overflow widget
-        - Ejecutar Limpiar
-        - limpiar campo valores cuando se cambia el campos y temas
-        -  limpiar condicion de busqueda al cambiar los campos superiores
-      `) */
+    // setResponseConsulta(dataPruebaResponse);    
+      import('../../../commonWidgets/widgetsModule').then(modulo => setWidgetModules(modulo));
+      import('../../../utils/module').then(modulo => setUtilsModule(modulo));
+      import('../../../api/servicios').then(modulo => setServicios(modulo));   
+      return () => {
+        // Acción a realizar cuando el widget se cierra.
+        console.log('El widget se cerrará');
+      };
   }, []);
 
   return (
-    <div className="w-100 p-3 bg-primary text-white">
+    <div className="w-100 p-3 bg-primary">
       {props.useMapWidgetIds && props.useMapWidgetIds.length === 1 && (
         <JimuMapViewComponent useMapWidgetId={props.useMapWidgetIds?.[0]} onActiveViewChange={activeViewChangeHandler} />
       )}
-        { mostrarResultadoFeaturesConsulta
-        ? tablaResultadoConsulta()
-        : formularioConsulta()}      
-
+      {
+        mostrarResultadoFeaturesConsulta
+        ? widgetModules.TABLARESULTADOS({
+          rows,
+          columns,
+          jimuMapView,
+          lastGeometriDeployed,
+          LayerSelectedDeployed,
+          graphicsLayerDeployed,
+          setLastGeometriDeployed,
+          setMostrarResultadoFeaturesConsulta
+        })
+        : formularioConsulta()
+      }
+        {
+          isLoading && <Loading />
+        }
+        {
+          widgetModules?.MODAL(mensajeModal, setMensajeModal)
+        }        
     </div>
   );
 };
@@ -1071,49 +889,11 @@ const getOrdenarDatos = (response: InterfaceResponseConsulta, campo: string) => 
   }
 });
 console.log(sortedArray)
-return sortedArray;
+const sortedArrayObjet = []
+sortedArray.forEach(e => sortedArrayObjet.push({value:e,label:e}))
+return sortedArrayObjet;
 
 }
-
-
-// Función para calcular el Extent del polígono
-const calculateExtent = (geometry, LayerSelectedDeployed) => {
-  const {fullExtent, geometryType}=LayerSelectedDeployed
-  
-  let xmin = Infinity; let ymin = Infinity; let xmax = -Infinity; let ymax = -Infinity;
-
-  if (geometryType == 'point') {
-    const buffer = 100; // Tamaño del buffer alrededor del punto
-    return {
-      xmin: geometry.x - buffer,
-      ymin: geometry.y - buffer,
-      xmax: geometry.x + buffer,
-      ymax: geometry.y + buffer,
-      spatialReference:fullExtent.spatialReference
-    };
-  } else if(geometryType == 'polygon' || geometryType == 'polyline'){
-    const geometries = geometryType == 'polygon' ? geometry.rings : geometry.paths;
-    geometries.forEach(ring => {
-      ring.forEach(([x, y]) => {
-        if (x < xmin) xmin = x;
-        if (y < ymin) ymin = y;
-        if (x > xmax) xmax = x;
-        if (y > ymax) ymax = y;
-      });
-    });
-  
-    return {
-      xmin,
-      ymin,
-      xmax,
-      ymax,
-      spatialReference:fullExtent.spatialReference
-    };    
-  }else {
-    return null
-  }
-
-};
 
 /* Implementación de la función alterna _.where
   @date 2024-05-22
@@ -1127,3 +907,10 @@ const where = (array, object) => {
   let keys = Object.keys(object);
   return array.filter(item => keys.every(key => item[key] === object[key]));
 }
+
+const goToInitialExtent = (jimuMapView: JimuMapView, initialExtent: any) => {
+  if (jimuMapView && initialExtent) {
+    jimuMapView.view.goTo(initialExtent, { duration: 1000 });
+  }
+};
+
