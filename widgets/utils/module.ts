@@ -1,5 +1,7 @@
 import { loadModules } from "esri-loader";
 import { exportToCSV } from "./exportToCSV";
+import FeatureLayer from "@arcgis/core/layers/FeatureLayer";
+import { JimuMapView, loadArcGISJSAPIModules } from "jimu-arcgis";
 
 
 
@@ -8,16 +10,17 @@ const moduleExportToCSV = (rows, fileName) => {
 }
 
 const loadEsriModules = async () => {
-    return await loadModules([
-      'esri/Graphic',
-      'esri/layers/GraphicsLayer',
-      'esri/symbols/SimpleFillSymbol',
-      'esri/symbols/SimpleLineSymbol',
-      'esri/symbols/SimpleMarkerSymbol',
-      'esri/geometry/Point',
-      'esri/geometry/Extent',
-      'esri/PopupTemplate'
-    ]);
+  return await loadModules([
+    'esri/Graphic',
+    'esri/layers/GraphicsLayer',
+    'esri/symbols/SimpleFillSymbol',
+    'esri/symbols/SimpleLineSymbol',
+    'esri/symbols/SimpleMarkerSymbol',
+    'esri/geometry/Point',
+    'esri/geometry/Extent',
+    'esri/PopupTemplate',
+    'esri/tasks/Query', 'esri/tasks/QueryTask'
+  ]);
 };
 
 // Función para calcular el Extent del polígono
@@ -97,11 +100,31 @@ const createGeometry = ({ Point }, geometryType, geometryData, spatialReference)
   }
 };
 
+/**
+ * Apartir de una url "https://sigquindio.gov.co/arcgis/rest/services/QUINDIO_III/Ambiental_T_Ajustado/MapServer/14"
+ * renderiza en el mapa el layer
+ * @param url 
+ */
+const renderLayer = async (url: string, jimuMapView: JimuMapView) => {
+  try {
+    const [FeatureLayer, SpatialReference] = await loadArcGISJSAPIModules([
+      'esri/layers/FeatureLayer',
+      'esri/geometry/SpatialReference'
+    ]);
+    const layer = await new FeatureLayer({url});
+    jimuMapView.view.map.add(layer);    
+    return {layer,SpatialReference};
+  } catch (error) {
+    console.error(error);    
+  }
+}
+
 
 export {
-    moduleExportToCSV,
-    loadEsriModules,
-    calculateExtent,
-    createSymbol,
-    createGeometry
+  moduleExportToCSV,
+  loadEsriModules,
+  calculateExtent,
+  createSymbol,
+  createGeometry,
+  renderLayer
 }
