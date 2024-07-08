@@ -1,4 +1,10 @@
 
+
+.contenedorTablaContenido{
+  overflow-y: scroll;
+  height: inherit;
+}
+
 .btns{
     display: flex;
     justify-content: space-around;
@@ -16,13 +22,13 @@
   }
   
   .tree-container div {
-    padding: 5px;
+    padding: 3px;
   }
   
-  .tree-container div:hover {
+  /* .tree-container div:hover {
     background-color: #FFEEA9;
     color: #FF7D29;
-  }
+  } */
   
   .search-bar input {
     width: calc(100% - 30px);
@@ -55,4 +61,11 @@
 
   .pointer{
     cursor: pointer;
+  }
+
+  .react-tabs {
+    height: inherit !important;
+  }
+  .react-tabs__tab-panel--selected{
+    height: inherit !important;
   }
