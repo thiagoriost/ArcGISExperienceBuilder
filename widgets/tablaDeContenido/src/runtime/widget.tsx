@@ -29,6 +29,7 @@ const Widget = (props: AllWidgetProps<any>) => {
   const TraerDataTablaContenido = async () => {
     
     const tematicas = await getDataTablaContenido();
+    console.log(tematicas)
     setGroupedLayers(tematicas);
   }
 
@@ -40,14 +41,14 @@ const Widget = (props: AllWidgetProps<any>) => {
   }, []);
 
   return (
-    <div className="w-100 p-3 bg-primary text-white" style={{overflowY:'scroll'}}>
+    <div className="w-100 p-3 bg-primary text-white contenedorTablaContenido">
       {props.useMapWidgetIds && props.useMapWidgetIds.length === 1 && (
         <JimuMapViewComponent useMapWidgetId={props.useMapWidgetIds?.[0]} onActiveViewChange={activeViewChangeHandler} />
       )}
 
-      <div >        
-        <Widget_Tree dataTablaContenido={groupedLayers} setDataTablaContenido={setGroupedLayers} varJimuMapView={varJimuMapView}/>
-      </div>
+      {
+        varJimuMapView && <Widget_Tree dataTablaContenido={groupedLayers} setDataTablaContenido={setGroupedLayers} varJimuMapView={varJimuMapView}/>
+      }
 
     </div>
   );

@@ -184,7 +184,7 @@ const Widget_Tree: React.FC<Widget_Tree_Props> = ({ dataTablaContenido, varJimuM
       
         filtroRecursivo(dataTablaContenido, searchQuery);
         filtereddataTablaContenido[0].capasHijas = capasHijas;
-      
+        console.log(filtereddataTablaContenido)
         return filtereddataTablaContenido;
       };
       
@@ -314,7 +314,7 @@ const Widget_Tree: React.FC<Widget_Tree_Props> = ({ dataTablaContenido, varJimuM
     }, [banderaRefreshCapas])
     
     return (
-        <>
+        <div style={{height:'inherit'}}>
             <Tabs>
                 <TabList>
                     <Tab>Tabla de contenido</Tab>
@@ -326,7 +326,7 @@ const Widget_Tree: React.FC<Widget_Tree_Props> = ({ dataTablaContenido, varJimuM
                 <TabPanel>
                     <div className="tree-container" onClick={()=>setContextMenu(null)}>
                         <div className="search-bar">
-                            <WidgetQueryOutlined size={'l'}/>
+                            
                             <input
                                 type="text"
                                 placeholder="Buscar capas..."
@@ -334,15 +334,18 @@ const Widget_Tree: React.FC<Widget_Tree_Props> = ({ dataTablaContenido, varJimuM
                                 onChange={(e) => setSearchQuery(e.target.value)}
                                 className='input-search'
                             />                            
-                            <Button onClick={()=>setSearchQuery('')} size="sm" type="secondary" >
-                                    <ClearOutlined />
-                            </Button>
-                            {
-                                capasSelectd.length>0 &&
-                                    <Button onClick={()=>removeAllLayers()} size="sm" type="secondary" >
-                                        <WrongOutlined />
-                                    </Button>                                
-                            }
+                            <div className='btnsSearch'>
+                                <Button onClick={()=>setSearchQuery('')} size="sm" type="secondary" >
+                                        <ClearOutlined />
+                                </Button>
+                                {
+                                    capasSelectd.length>0 &&
+                                        <Button onClick={()=>removeAllLayers()} size="sm" type="secondary" >
+                                            <WrongOutlined />
+                                        </Button>                                
+                                }
+
+                            </div>
                         </div>
                         <div >
                             { renderTree(dataTablaContenido)}
@@ -359,7 +362,7 @@ const Widget_Tree: React.FC<Widget_Tree_Props> = ({ dataTablaContenido, varJimuM
                 }
             </Tabs>            
             <ContexMenu contextMenu={contextMenu} setContextMenu={setContextMenu} varJimuMapView={varJimuMapView}/>
-        </>
+        </div>
     );
 };
 export default Widget_Tree;

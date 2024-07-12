@@ -1,3 +1,12 @@
+/** 
+** Interface InterfaceResponseConsultaSimple
+** @date 2024-06-11
+** @author IGAC - DIP
+** @dateUpdated 2024-06-20
+** @changes Incluir interfaz interfaceMensajeModal
+** @changes Incluir tipo dato enum typeMSM  
+** @remarks interfaz interfaceMensajeModal obtenido del widget consulta Avanzada
+*/
 export interface InterfaceResponseConsultaSimple {
     displayFieldName: string;
     fieldAliases:     FieldAliases;
@@ -68,3 +77,18 @@ export interface SpatialReference {
     wkid:       number;
     latestWkid: number;
 }
+
+export interface InterfaceMensajeModal{
+    deployed: boolean;
+    type: typeMSM;
+    tittle: string;
+    body: string;
+    subBody?: string;
+  }
+
+export enum typeMSM {
+    success = "success",
+    info    = "info",
+    error   = "error",
+    warning = "warning",
+  }
