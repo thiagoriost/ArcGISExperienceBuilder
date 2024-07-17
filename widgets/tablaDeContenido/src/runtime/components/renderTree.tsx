@@ -1,7 +1,7 @@
 import { React, AllWidgetProps } from "jimu-core";
 import { useState } from "react";
 import { FaChevronRight, FaChevronDown } from 'react-icons/fa';
-import { interfCapa } from "../types/interfaces";
+import { interfCapa } from "../../types/interfaces";
 
 import './style.css';
 

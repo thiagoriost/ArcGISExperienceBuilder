@@ -10,17 +10,23 @@ const moduleExportToCSV = (rows, fileName) => {
 }
 
 const loadEsriModules = async () => {
-  return await loadModules([
-    'esri/Graphic',
-    'esri/layers/GraphicsLayer',
-    'esri/symbols/SimpleFillSymbol',
-    'esri/symbols/SimpleLineSymbol',
-    'esri/symbols/SimpleMarkerSymbol',
-    'esri/geometry/Point',
-    'esri/geometry/Extent',
-    'esri/PopupTemplate',
-    'esri/tasks/Query', 'esri/tasks/QueryTask'
-  ]);
+  console.log(11111111111111);
+  try {
+    return await loadModules([
+      'esri/Graphic',
+      'esri/layers/GraphicsLayer',
+      'esri/symbols/SimpleFillSymbol',
+      'esri/symbols/SimpleLineSymbol',
+      'esri/symbols/SimpleMarkerSymbol',
+      'esri/geometry/Point',
+      'esri/geometry/Extent',
+      'esri/PopupTemplate',
+      'esri/tasks/Query', 'esri/tasks/QueryTask'
+    ]);
+    
+  } catch (error) {
+    console.error('Error fetching data: ', error);
+  }
 };
 
 // Función para calcular el Extent del polígono

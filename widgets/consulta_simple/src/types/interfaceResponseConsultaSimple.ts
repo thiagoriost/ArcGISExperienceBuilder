@@ -49,6 +49,7 @@ export enum Pcc {
 }
 
 export interface Geometry {
+    [x: string]: any;
     rings: Array<Array<number[]>>;
 }
 
