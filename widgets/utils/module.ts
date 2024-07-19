@@ -10,7 +10,6 @@ const moduleExportToCSV = (rows, fileName) => {
 }
 
 const loadEsriModules = async () => {
-  console.log(11111111111111);
   try {
     return await loadModules([
       'esri/Graphic',
@@ -34,9 +33,9 @@ const calculateExtent = (geometry, LayerSelectedDeployed) => {
     const {fullExtent, geometryType}=LayerSelectedDeployed
     
     let xmin = Infinity; let ymin = Infinity; let xmax = -Infinity; let ymax = -Infinity;
-  
-    if (geometryType == 'point') {
-      const buffer = 100; // Tamaño del buffer alrededor del punto
+  const tipoGeometria = geometryType?geometryType:geometry.type
+    if (tipoGeometria == 'point') {
+      const buffer = 10; // Tamaño del buffer alrededor del punto
       return {
         xmin: geometry.x - buffer,
         ymin: geometry.y - buffer,
@@ -44,8 +43,8 @@ const calculateExtent = (geometry, LayerSelectedDeployed) => {
         ymax: geometry.y + buffer,
         spatialReference:fullExtent.spatialReference
       };
-    } else if(geometryType == 'polygon' || geometryType == 'polyline'){
-      const geometries = geometryType == 'polygon' ? geometry.rings : geometry.paths;
+    } else if(tipoGeometria == 'polygon' || tipoGeometria == 'polyline'){
+      const geometries = tipoGeometria == 'polygon' ? geometry.rings : geometry.paths;
       geometries.forEach(ring => {
         ring.forEach(([x, y]) => {
           if (x < xmin) xmin = x;

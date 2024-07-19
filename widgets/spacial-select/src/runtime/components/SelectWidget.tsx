@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { loadModules } from 'esri-loader';
 import { Point, Polygon, Polyline } from '@arcgis/core/geometry';
+import { Loading } from 'jimu-ui';
 
 let idLastGraphicDeployedTest = '';
 let clickHandler = null;
@@ -10,7 +11,7 @@ let clickHandler = null;
  * @param {Object} props - Propiedades del componente
  */
 const SelectWidget = ({ props }) => {
-  const [drawing, setDrawing] = useState(true);
+  const [drawing, setDrawing] = useState(false);
   const [mostrarResultadoFeaturesConsulta, setMostrarResultadoFeaturesConsulta] = useState(false);
   const [widgetModules, setWidgetModules] = useState(null);
   const [rows, setRows] = useState<Row[]>([])
@@ -18,10 +19,16 @@ const SelectWidget = ({ props }) => {
   const [lastGeometriDeployed, setLastGeometriDeployed] = useState();
   const [LayerSelectedDeployed, setLayerSelectedDeployed] = useState(null);
   const [graphicsLayerDeployed, setGraphicsLayerDeployed] = useState(null);
-
-
-
-
+  const [selectedLayerId, setSelectedLayerId] = useState(null);
+  const [layers, setLayers] = useState([]);
+  const [mensajeModal, setMensajeModal] = useState<interfaceMensajeModal>({
+    deployed:false,
+    type:typeMSM.info,
+    tittle:'',
+    body:'',
+    subBody:''
+  })
+  const [isLoading, setIsLoading] = useState(false);
 
 
   const startPointRef = useRef(null);
@@ -35,16 +42,19 @@ const SelectWidget = ({ props }) => {
    * @param {Object} Extent - Módulo Extent de ArcGIS
    */
   const handleMapClick = (Graphic, event, Extent) => {
-    if (!drawing) return;
+    if (!drawing || !selectedLayerId) return;
+    console.log("click to start")
     if (!startPointRef.current) {
       startPointRef.current = event.mapPoint;
     } else {
+      setIsLoading(true);
       endPointRef.current = event.mapPoint;
       drawRectangle(Graphic);
       queryFeatures(Extent);
       clickHandler.remove();
       startPointRef.current = null;
       props.jimuMapView.view.container.style.cursor = 'default';
+
     }
   };
 
@@ -85,6 +95,7 @@ const SelectWidget = ({ props }) => {
    * @param {Object} Extent - Módulo Extent de ArcGIS
    */
   const queryFeatures = async (Extent) => {
+    console.log("queryFeatures")
     const startPoint = startPointRef.current;
     const endPoint = endPointRef.current;
     const extent = new Extent({
@@ -95,12 +106,13 @@ const SelectWidget = ({ props }) => {
       spatialReference: startPoint.spatialReference,
     });
 
-    const layersMaps = props.jimuMapView.view.layerViews.items.filter(
+    /* const layersMaps = props.jimuMapView.view.layerViews.items.filter(
       (e: { layer: { parsedUrl: string; }; }) => e.layer.parsedUrl && e.layer.parsedUrl !== 'https://sigquindio.gov.co/arcgis/rest/services/QUINDIO_III/CartografiaBasica/MapServer/74'
-    );
+    ); */
 
-    const lastLayer = layersMaps[layersMaps.length - 1];
-    const layer = props.jimuMapView.view.map.findLayerById(lastLayer.layer.id);
+    // const lastLayer = layersMaps[layersMaps.length - 1];
+    // const layer = props.jimuMapView.view.map.findLayerById(lastLayer.layer.id);
+    const layer = props.jimuMapView.view.map.findLayerById(selectedLayerId);
 
     const query = layer.createQuery();
     query.geometry = extent;
@@ -177,12 +189,18 @@ const SelectWidget = ({ props }) => {
     });
 
     setDrawing(false);
+    setTimeout(() => {
+      console.log("out loading")
+      setIsLoading(false);
+    }, 3000);
   };
 
   /**
    * Limpia la capa de gráficos
    */
   const clearGraphicsLayer = () => {
+    console.log("5555")
+    setSelectedLayerId(null);
     if (idLastGraphicDeployedTest) {
       const layer = props.jimuMapView.view.map.findLayerById(idLastGraphicDeployedTest);
       props.jimuMapView.view.map.remove(layer);
@@ -196,9 +214,39 @@ const SelectWidget = ({ props }) => {
    * Alterna el estado de dibujo
    */
   const toggleDrawing = () => {
-    setDrawing(!drawing);
+    if (selectedLayerId) {
+      setDrawing(!drawing);      
+    } else {
+      setMensajeModal({
+        deployed:true,
+        type: typeMSM.info,
+        tittle:'Recuerda',
+        body: "Primero seleccionar la capa sobre la que vas operar"}
+      )
+    }
   };
 
+  /**
+   * capturas las capas que tienen title para ser desplegadas en el select de capas
+   */
+  const seeLayers = () => {
+    console.log(props.jimuMapView.view.layerViews.items)
+    const layerWitTitle = props.jimuMapView.view.map.layers.items.filter(l => l.title);
+    setLayers(layerWitTitle);
+  }
+
+  /**
+   * captura la capa en la cual se va arealizar el select de geometrías
+   * @param event 
+   */
+  const handleLayerChange = (event) => {
+    setSelectedLayerId(event.target.value);
+  };
+
+  /**
+   * Se encarga de activar la función de select iniciando el dibujado del rectangulo,
+   * cambia el tipo del cursor
+   */
   useEffect(() => {
     if (!props.jimuMapView || !drawing) return;
 
@@ -225,9 +273,33 @@ const SelectWidget = ({ props }) => {
     };
   }, [drawing]);
 
+  /**
+   * captura cambios en el mapa para actualizar el listado de capas
+   */
+  useEffect(() => {
+    if (props.jimuMapView) {
+      const updateLayers = () => {
+        console.log("updateLayers", props.jimuMapView.view.map.layers.items);
+        const layerWitTitle = props.jimuMapView.view.map.layers.items.filter(l => l.title);
+        setLayers(layerWitTitle);
+      };
+      updateLayers();
+      const layerWatcher = props.jimuMapView.view.map.layers.watch('change', updateLayers);
+      return () => {
+        layerWatcher.remove();
+      };
+    }
+    
+    return () => {};
+
+  }, [props.jimuMapView]);
+
+  /**
+   * carga el modulo de widgets y refresca las capas a ser desplegadas en el select
+   */
   useEffect(() => {
     import('../../../../commonWidgets/widgetsModule').then(modulo => setWidgetModules(modulo));
-    props.jimuMapView.view.container.style.cursor = 'crosshair';
+    seeLayers();
     return () => {};
   }, []);
 
@@ -247,16 +319,39 @@ const SelectWidget = ({ props }) => {
             setMostrarResultadoFeaturesConsulta
           })
           : <>
-            <p style={{ color: 'black' }}>Haga clic en el mapa para capturar el primer punto y luego haga clic nuevamente para capturar el segundo punto.</p>
-            <div className='fila mt-1'>
-              <button onClick={toggleDrawing}>
-                {drawing ? 'Detener selección' : 'Iniciar selección'}
-              </button>
-              <button onClick={clearGraphicsLayer}>
-                Limpiar selección
-              </button>
-            </div>
-          </>
+              <select onChange={handleLayerChange} value={selectedLayerId || ''} className='w-100'>
+                <option value='' disabled>Seleccione una capa</option>
+                {layers.map(layer => (
+                  <option key={layer.id} value={layer.id}>{layer.title || layer.id}</option>
+                ))}
+              </select>
+              <div className='fila mt-1 mb-1'>
+                {
+                  selectedLayerId &&
+                  <>                    
+                    <button onClick={toggleDrawing}>
+                      {drawing ? 'Detener selección' : 'Iniciar selección'}
+                    </button>
+                    <button onClick={clearGraphicsLayer}>
+                      Limpiar selección
+                    </button>
+                  </>
+                }
+                <button onClick={seeLayers}>
+                 Actualizar Capas
+                </button>
+              </div>
+              {
+                drawing &&
+                <p style={{ color: 'black', fontWeight:'bold', textAlign:'center' }} >Haga clic en el mapa para capturar el primer punto y luego haga clic nuevamente para capturar el segundo punto.</p>
+              }
+            </>
+      }
+      {
+        widgetModules?.MODAL(mensajeModal, setMensajeModal)
+      }   
+      {
+        isLoading && <Loading />
       }
     </div>
   );
@@ -264,6 +359,12 @@ const SelectWidget = ({ props }) => {
 
 export default SelectWidget;
 
+/**
+ * segun los features obtenidos de la consulta, ordena la data para obtener las filas y las columnas del
+ * data grid
+ * @param {features}
+ * @returns {filas, dataGridColumns}
+ */
 const ordenarDataRows = ({features}) => {
   
   const dataGridColumns = Object.keys(features[0].attributes).map(key => ({ key: key, name: key }));
@@ -286,4 +387,19 @@ export interface InterfaceGeometry {
 export interface InterfaceColumns {
   key:  string;
   name: string;
+}
+
+export interface interfaceMensajeModal{
+  deployed: boolean;
+  type: typeMSM;
+  tittle: string;
+  body: string;
+  subBody?: string;
+}
+
+export enum typeMSM {
+  success = "success",
+  info    = "info",
+  error   = "error",
+  warning = "warning",
 }
