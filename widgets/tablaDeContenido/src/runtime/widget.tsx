@@ -15,6 +15,7 @@ const Widget = (props: AllWidgetProps<any>) => {
 
   const [varJimuMapView, setJimuMapView] = useState<JimuMapView>(); // To add the layer to the Map, a reference to the Map must be saved into the component state.
   const [groupedLayers, setGroupedLayers] = useState<CapasTematicas[]>([]); // arreglo donde se almacenara la tabla de contenido ordenada
+  const [servicios, setServicios] = useState(null);
 
   /**
    * En este metodo se referencia el mapa base
@@ -26,9 +27,9 @@ const Widget = (props: AllWidgetProps<any>) => {
     }
   };
 
-  const TraerDataTablaContenido = async () => {
+  const TraerDataTablaContenido = async (modulo: typeof import("../../../api/servicios")) => {
     
-    const tematicas = await getDataTablaContenido();
+    const tematicas = await getDataTablaContenido(modulo);
     console.log(tematicas)
     setGroupedLayers(tematicas);
   }
@@ -37,7 +38,11 @@ const Widget = (props: AllWidgetProps<any>) => {
    * realiza la consulta de la data tabla de contenido la primera vez que se renderiza el componente
    */
   useEffect(() => {
-    TraerDataTablaContenido();
+    import('../../../api/servicios').then(modulo => {
+      setServicios(modulo)
+      TraerDataTablaContenido(modulo);      
+    });  
+    
   }, []);
 
   return (
@@ -59,8 +64,10 @@ export default Widget;
 /**
    * En este meto se realiza la consulta del jeison de la tabla de contenido
    */
-export const getDataTablaContenido = async () => {
-  const url = 'https://sigquindio.gov.co:8443/ADMINSERV/AdminGeoApplication/AdminGeoWebServices/getTablaContenidoJsTree/public';
+export const getDataTablaContenido = async (servicios: { urls: { tablaContenido: string; }; }) => {
+  
+  // const url = 'https://sigquindio.gov.co:8443/ADMINSERV/AdminGeoApplication/AdminGeoWebServices/getTablaContenidoJsTree/public';
+  const url = servicios.urls.tablaContenido;
   try {
     const response = await fetch(url);
     if (!response.ok) {

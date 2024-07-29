@@ -320,9 +320,9 @@ const Widget_Tree: React.FC<Widget_Tree_Props> = ({ dataTablaContenido, varJimuM
         <div style={{height:'inherit'}}>
             <Tabs>
                 <TabList>
-                    <Tab>Tabla de contenido</Tab>
+                    <Tab>Lista de Capas</Tab>
                     {
-                        capasSelectd.length>0 && <Tab>Orden Capas</Tab>
+                        capasSelectd.length>0 && <Tab>Orden de Capas</Tab>
                     }
                 </TabList>
 

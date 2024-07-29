@@ -53,6 +53,7 @@ const Indicadores = (props: AllWidgetProps<any>) => {
   }); */
   const [featureSelected, setFeatureSelected] = useState<InterfaceFeatureSelected>(null);
   const [responseQueryCapa, setResponseQueryCapa] = useState(null)
+  const [contador, setContador] = useState();
 
   const chartRef = useRef(null);
 
@@ -227,10 +228,10 @@ const Indicadores = (props: AllWidgetProps<any>) => {
       jimuMapView.view.map.add(layer);
   
       // Esperar a que la capa esté lista
-      await layer.when();
+      layer.when();
       console.log(layer)
       // Hacer zoom a la extensión completa de la capa
-      await jimuMapView.view.goTo(layer.fullExtent);
+      jimuMapView.view.goTo(layer.fullExtent);
   
       // Crear y ejecutar la consulta
       const query = layer.createQuery();
@@ -386,6 +387,7 @@ const Indicadores = (props: AllWidgetProps<any>) => {
   }, [responseQueryCapa]);
 
   useEffect(() => {
+    console.log(jimuMapView)
     if (!jimuMapView) return
     console.log("effect => jimuMapView")
 
@@ -395,8 +397,22 @@ const Indicadores = (props: AllWidgetProps<any>) => {
   
 
   useEffect(() => {
+    console.log({props})
+    if (props.hasOwnProperty("stateProps")) {
+      setContador(props.stateProps.contador)      
+    }
+  
+    return () => {}
+  }, [props])
+  
+
+  useEffect(() => {
+    console.log(props)
     import('../../../utils/module').then(modulo => setUtilsModule(modulo));
-    import('../../../commonWidgets/widgetsModule').then(modulo => setWidgetModules(modulo));
+    import('../../../commonWidgets/widgetsModule').then(modulo => {
+      console.log({modulo})
+      setWidgetModules(modulo)
+    });
   }, []);
 
   return (
@@ -405,7 +421,7 @@ const Indicadores = (props: AllWidgetProps<any>) => {
         <JimuMapViewComponent useMapWidgetId={props.useMapWidgetIds[0]} onActiveViewChange={activeViewChangeHandler} />
       )}
       <div style={{ padding: '10px' }}>
-        <h3>Indicator Statistics {graficoSeleccionado}</h3>
+        <h3>Indicator Statistics {graficoSeleccionado}{contador}</h3>
         {/* {widgetModules?.INPUTSELECT(tiposGraficos, handleTipoGraficoChanged, graficoSeleccionado, "Tipo graficos")} */}
         {(graficoSeleccionado === 0 || graficoSeleccionado === 1) && (
           <Bar options={options} data={dataGrafico} ref={chartRef} onClick={handleChartClick} />

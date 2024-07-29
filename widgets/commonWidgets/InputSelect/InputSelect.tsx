@@ -8,8 +8,11 @@ const InputSelect = ({
     onChange,
     value=undefined,
     label="Campo",
-    placeHolder=`Seleccione  ${label}...`
+    campo = '',
+    placeHolder=`Seleccione  ${label}...`,
 }) => {
+    console.log({dataArray}, {campo})
+    const data = dataArray.length ? dataArray : dataArray[campo]
   return (
     <div className="mb-1">
         
@@ -19,11 +22,13 @@ const InputSelect = ({
             placeholder={placeHolder}
             value={value}
         >
-            {dataArray.map(
-            (option) => (
-                <option value={option.value}>{option.label}</option>
-            )
-            )}
+            {
+                data && 
+                    data.map(
+                    (option) => (
+                        <option value={option.value}>{option.label}</option>
+                    ))
+            }
         </Select>
     </div>
   )
