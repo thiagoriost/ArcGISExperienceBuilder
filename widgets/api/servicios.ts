@@ -1,21 +1,3 @@
-/* // servicio Madre: https://pruebassig.igac.gov.co/server/rest/services/Indicadores/MapServer
-const urls = {
-    tablaContenido:"https://sigquindio.gov.co:8443/ADMINSERV/AdminGeoApplication/AdminGeoWebServices/getTablaContenidoJsTree/public",
-    Departamentos:"https://pruebassig.igac.gov.co/server/rest/services/Indicadores/MapServer/11",
-    Municipios: "https://pruebassig.igac.gov.co/server/rest/services/Indicadores/MapServer/10",
-    indicadores:{
-        v_predios_fondo_tierras_mun:"https://pruebassig.igac.gov.co/server/rest/services/Indicadores/MapServer/1",
-        v_predios_inventario_baldios_mun: "https://pruebassig.igac.gov.co/server/rest/services/Indicadores/MapServer/2",
-        v_predios_adjudicados_mun:"https://pruebassig.igac.gov.co/server/rest/services/Indicadores/MapServer/3",
-        v_predios_adj_baldios_mun: "https://pruebassig.igac.gov.co/server/rest/services/Indicadores/MapServer/4",
-        v_bienes_fiscales_adj_mun: "https://pruebassig.igac.gov.co/server/rest/services/Indicadores/MapServer/5",
-        v_predios_sub_integrales_mun: "https://pruebassig.igac.gov.co/server/rest/services/Indicadores/MapServer/6",
-        v_predios_entregados_ft_mun: "https://pruebassig.igac.gov.co/server/rest/services/Indicadores/MapServer/7",
-        v_predios_formalizados_mun: "https://pruebassig.igac.gov.co/server/rest/services/Indicadores/MapServer/8",
-        v_predios_formal_mujeres_mun: "https://pruebassig.igac.gov.co/server/rest/services/Indicadores/MapServer/9",        
-    }
-} */
-
 // const servicioMadre = "https://pruebassig.igac.gov.co/server/rest/services/Indicadores/MapServer"
 const servicioMadre = "https://pruebassig.igac.gov.co/server/rest/services/Indicadores_municipios/MapServer"
 /* const urls = {
