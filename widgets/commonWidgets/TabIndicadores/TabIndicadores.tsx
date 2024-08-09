@@ -1,348 +1,32 @@
 import React, { useEffect, useState } from 'react'
-import { Button } from 'jimu-ui'
+import { Button, Loading } from 'jimu-ui'
 import { appActions } from 'jimu-core';
+import './style.css'
+import { DATA_Fuente_Indicadores } from './dataFormularioIndicadores';
 
-const DATA = [
-  {
-    value:1,
-    label: "Adquisición",
-    descricion:"1. De adquisición, adjudicación de tierras y de procesos agrarios para la reforma agraria, y garantía de derechos territoriales de los campesinos, pueblos indígenas y de las comunidades negras, afrocolombianas, raizales, palenqueras y pueblo Rom",
-    APUESTA_ESTRATEGICA:[    
-      {
-        value:1,
-        label:"Estrategia de acceso a la tierra",
-        descricion:"1. Implementar la estretegia de acceso a la tierra por medio del programa especial de adquisición de tierras para la producción de alimentos y otros instrumentos y materializar el Plan Nacional de Formalización Masiva de la Propiedad Rural.",
-        CATEGORIA_TEMATICA:[
-          {
-            value:0,
-            label:"Disposición de predios",
-            descricion:"1.1 Disposición de predios para la Reforma Agraria",
-            INDICADOR:[
-              {
-                value:0,
-                label:"Predios fondo tierras RA",
-                descricion:"Cantidad de predios en el Fondo de Tierras para la Reforma Agraria",
-              },
-              {
-                value:1,
-                label:"Cantidad de área",
-                descricion:"Cantidad de área dispuesta en el Fondo de Tierras para la Reforma Agraria",
-              },
-              {
-                value:2,
-                label:"Predios Inventario Nacional de Baldíos",
-                descricion:"Cantidad de predios en el Inventario Nacional de Baldíos",
-              },
-              {
-                value:3,
-                label:"Årea en el Inventario Nacional de Baldíos",
-                descricion:"Cantidad de área en el Inventario Nacional de Baldíos",
-              }
-            ]
-          },
-          {
-            value:1,
-            label:"Acceso a tierra",
-            descricion:"1.2 Acceso a tierra",
-            INDICADOR:[
-              {
-                value:0,
-                label:"Predios adjudicados",
-                descricion:"Cantidad de predios adjudicados",
-              },
-              {
-                value:1,
-                label:"Årea de predios adjudicados",
-                descricion:"Cantidad de área de predios adjudicados",
-              },
-              {
-                value:2,
-                label:"Predios baldíos adjudicados",
-                descricion:"Cantidad de predios baldíos adjudicados",
-              },
-              {
-                value:3,
-                label:"Årea de predios baldíos adjudicados",
-                descricion:"Cantidad de área de predios baldíos adjudicados",
-              },
-              {
-                value:4,
-                label:"Bienes Fiscales Patrimoniales adjudicados",
-                descricion:"Cantidad de Bienes Fiscales Patrimoniales adjudicados",
-              },
-              {
-                value:5,
-                label:"Årea de Bienes Fiscales Patrimoniales adjudicados",
-                descricion:"Cantidad de área de Bienes Fiscales Patrimoniales adjudicados",
-              },
-              {
-                value:6,
-                label:"Beneficiarios de subsidios integrales para la compra de tierras",
-                descricion:"Cantidad de predios beneficiarios de subsidios integrales para la compra de tierras",
-              },
-              {
-                value:7,
-                label:"Årea de predios beneficiarios de subsidios integrales para la compra de tierras",
-                descricion:"Cantidad de área de predios beneficiarios de subsidios integrales para la compra de tierras",
-              },
-              {
-                value:8,
-                label:"Predios entregados a través del Fondo de Tierras",
-                descricion:"Cantidad de predios entregados a través del Fondo de Tierras",
-              },
-              {
-                value:9,
-                label:"Årea entregada a través del Fondo de Tierras",
-                descricion:"Cantidad de área entregada a través del Fondo de Tierras",
-              }
-            ]
-          },
-          {
-            value:2,
-            label:"Ordenamiento Social de la Propiedad",
-            descricion:"1.3 Ordenamiento Social de la Propiedad",
-            INDICADOR:[
-              {
-                value:0,
-                label:"Porcentaje de predios",
-                descricion:"Porcentaje de predios con área por encima de la UAF mínima municipal",
-              },
-              {
-                value:1,
-                label:"Porcentaje de área",
-                descricion:"Porcentaje de área de predios por encima de la UAF mínima municipal",
-              }
-            ]
-          },
-          {
-            value:3,
-            label:"Formalización",
-            descricion:"1.4 Formalización",
-            INDICADOR:[
-              {
-                value:0,
-                label:"Cantidad de predios",
-                descricion:"Cantidad de predios formalizados",
-              },
-              {
-                value:1,
-                label:"Cantidad de área",
-                descricion:"Cantidad de área de predios formalizados",
-              },
-              {
-                value:2,
-                label:"Cantidad de predios a mujeres",
-                descricion:"Cantidad de predios formalizados a mujeres",
-              },
-              {
-                value:3,
-                label:"Cantidad de área a mujeres",
-                descricion:"Cantidad de área de predios formalizados a mujeres",
-              }
-            ]
-          }
-        ]
-      },
-      {
-        value:2,
-        label:"Ordenar el suelo rural",
-        descricion:"2. Ordenar el suelo rural agropecuario y avanzar en los procesos de actualización catastral con enfoque multipropósito.",
-        CATEGORIA_TEMATICA:[
-          {
-            value:0,
-            label:"Actualización catastral",
-            descricion:"1.5 Actualización catastral",
-            INDICADOR:[
-              {
-                value:0,
-                label:"Porcentaje de predios",
-                descricion:"Porcentaje de predios actualizados",
-              },
-              {
-                value:1,
-                label:"Porcentaje de área",
-                descricion:"Porcentaje de área de predios actualizados",
-              },
-              {
-                value:2,
-                label:"Cantidad de municipios",
-                descricion:"Cantidad de municipios actualizados en cada vigencia",
-              },
-              {
-                value:3,
-                label:"Número de municipios",
-                descricion:"Número de municipios formados en cada vigencia",
-              }
-            ]
-          },
-        ]
-      },
-      {
-        value:3,
-        label:"Ejecutar la política de restitución de tierras",
-        descricion:"3. Ejecutar la política de restitución de tierras.",
-        CATEGORIA_TEMATICA:[
-          {
-            value:0,
-            label:"Restitución de tierras",
-            descricion:"1.7 Restitución de tierras",
-            INDICADOR:[
-              {
-                value:0,
-                label:"Cantidad de predios",
-                descricion:"Cantidad de predios asociados a solicitudes de inscripción al Registro de Tierras Despojadas y Abandonadas Forzosamente",
-              }
-            ]
-          }
-        ]
-      },      
-    ],
-  },
-  {
-    value:2,
-    label:"Delimitación de zonas de reserva",
-    descricion:"2. De delimitación, constitución y consolidación de zonas de reserva campesina, delimitación, uso y manejo de playones y sabanas comunales y de organización y capacitación campesina",
-    APUESTA_ESTRATEGICA:[
-      {
-        value:0,
-        label:"Delimitar, consolidar y constituir las zonas de reserva",
-        descricion:"1. Delimitar, consolidar y constituir las zonas de reserva campesina como territorialidad cuyo ordenamiento territorial se presta para frenar la expansión de la frontera agrícola, servir para la conservación ambiental y potenciar la producción de alimentos ",
-        CATEGORIA_TEMATICA:[
-          {
-            value:0,
-            label:"Constitución de ZRC",
-            descricion:"2.1 Constitución de ZRC",
-            INDICADOR:[
-              {
-                value:0,
-                label:"Porcentaje de predios",
-                descricion:"Porcentaje de predios en Zonas de Reserva Campesina",
-              },
-              {
-                value:1,
-                label:"Porcentaje de área",
-                descricion:"Porcentaje de área de predios en Zonas de Reserva Campesina",
-              }
-            ]
-          }
-        ]
-      }
-    ]
-  },
-  {
-    value:3,
-    label:"Ordenamiento Territorial",
-    descricion:"3. De ordenamiento territorial y solución de conﬂictos socioambientales para la reforma agraria",
-    APUESTA_ESTRATEGICA:[
-      {
-        value:0,
-        label:"Resolución de Conflictos",
-        descricion:"1. Resolución de Conflictos socioambientales en áreas de especial importancia ambiental, mediante la regularización del uso, ocupación y tenencia hacia el uso sostenible y la protección de los recursos naturales",
-        CATEGORIA_TEMATICA:[
-          {
-            value:0,
-            label:"Distribución de la tierra",
-            descricion:"3.1 Distribución de la tierra",
-            INDICADOR:[
-              {
-                value:0,
-                label:"Índice de Gini de la propiedad",
-                descricion:"Índice de Gini de la propiedad",
-              },
-              {
-                value:1,
-                label:"Índice de Disparidad Superior - IDS",
-                descricion:"Índice de Disparidad Superior - IDS",
-              }
-            ]
-          },
-          {
-            value:1,
-            label:"Conflictos de uso",
-            descricion:"3.2 Conflictos de uso",
-            INDICADOR:[
-              {
-                value:0,
-                label:"Porcentaje predios presunta subutilización del uso del suelo",
-                descricion:"Porcentaje de predios con presunta subutilización en el uso del suelo",
-              },
-              {
-                value:1,
-                label:"Porcentaje predios, Territorios ley 2da",
-                descricion:"Porcentaje de predios en Territorios con ley 2da",
-              }
-            ]
-          }
-        ]
-      }
-    ]
-  },
-  {
-    value:5,
-    label:"Investigación",
-    descricion:"5. De investigación, asistencia técnica, capacitación, transferencia de tecnología y diversiﬁcación de cultivos",
-    APUESTA_ESTRATEGICA:[
-      {
-        value:3,
-        label:"Desarrollar instrumentos de innovación",
-        descricion:"3. Desarrollar instrumentos de innovación en extensión agropecuaria hacia el reconocimiento de la diversidad de saberes y conocimientos.",
-        CATEGORIA_TEMATICA:[
-          {
-            value:5,
-            label:"Asistencia técnica",
-            descricion:"5.1 Asistencia técnica",
-            INDICADOR:[
-              {
-                value:0,
-                label:"Cantidad de esquemas",
-                descricion:"Cantidad de esquemas de asistencia técnica implementados",
-              }
-            ]
-          }
-        ]
-      }
-    ]
-  },
-  {
-    value:8,
-    label:"Delimitación de territorios",
-    descricion:`8.De delimitación, constitución y consolidación de territorios indígenas y de territorios colectivos de comunidades negras, afrocolombianas,
-    raizales, palenqueras y pueblo Rom, delimitación, uso, manejo y goce de los mismos, y fortalecimiento de la formación desde los saberes propios`,
-    APUESTA_ESTRATEGICA:[
-      {
-        value:1,
-        label:"Formalizar los territorios ancestrales",
-        descricion:`1. Formalizar los territorios ancestrales de los grupos étnicos, para el manejo, uso y posesión tradicional bajo los principios de la autonomía y gobierno propio.`,
-        CATEGORIA_TEMATICA:[
-          {
-            value:0,
-            label:"Titulación territorios grupos étnicos",
-            descricion:`8.1 Titulación de territorios de grupos étnicos`,
-            INDICADOR:[
-              {
-                value:0,
-                label:"Porcentaje predios títulados a grupos étnicos",
-                descricion:"Porcentaje de predios en territorios títulados a grupos étnicos",
-              },
-              {
-                value:1,
-                label:"Porcentaje área títulada a grupos étnicos",
-                descricion:"Porcentaje de área de predios en territorios títulados a grupos étnicos",
-              }
-            ]
-          }
-        ]
-      }
-    ]
-  },
-]
+const widgetID_Indicadores = 'widget_48'; // se genera al ingresar al widget objetivo y generarlo en el effect de inicio con props.id
 
-const TabIndicadores: React.FC<any> = ({dispatch}) => {
+const TabIndicadores: React.FC<any> = ({dispatch, departamentos, jimuMapView}) => {
 
-  const [contador, setContador] = useState(0);
+  const [constantes, setConstantes] = useState<InterfaceConstantes>(undefined);
   const [widgetModules, setWidgetModules] = useState(null);
+  const [servicios, setServicios] = useState(null);
+  const [utilsModule, setUtilsModule] = useState(null);
+  const [lastLayerDeployed, setLastLayerDeployed] = useState([]);
+  const [mensajeModal, setMensajeModal] = useState({
+    deployed:false,
+    type:typeMSM.info,
+    tittle:'',
+    body:'',
+    subBody:''
+  })
+  const [isLoading, setIsLoading] = useState(false);
+  const [clickHandler, setClickHandler] = useState(null); // Estado para almacenar el manejador del evento click y capturar las geometrias seleccionadas con un click
+  const [poligonoSeleccionado, setPoligonoSeleccionado] = useState(undefined);
+  const [dataCoropletico, setDataCoropletico] = useState<InterfaceDataCoropletico[]>([])
 
-  const [subsitemas, setSubsitemas] = useState(DATA);
+
+  const [subsitemas, setSubsitemas] = useState(DATA_Fuente_Indicadores);
   const [selectSubSistema, setSelectSubSistema] = useState(undefined)
 
   const [apuestaEstrategica, setApuestaEstrategica] = useState(null);
@@ -352,55 +36,111 @@ const TabIndicadores: React.FC<any> = ({dispatch}) => {
   const [selectCategoriaTematica, setSelectCategoriaTematica] = useState(undefined);
 
   const [indicadores, setIndicadores] = useState(null);
-  const [selectindIcadores, setSelectindIcadores] = useState(undefined)
+  const [selectIndicadores, setSelectIndicadores] = useState(undefined);
+  const [responseIndicadores, setResponseIndicadores] = useState(undefined);
 
+  const [departmentSelect, setDepartmentSelect] = useState(undefined);
 
+  const cancelClickEvent = () => {
+    if (clickHandler) {
+      clickHandler.remove();
+      setClickHandler(null); // Limpiar el estado del manejador del evento
+    }
+  };
 
-  const handleIncreDecreButton = (dato) => {
-      console.log({dato})
-      const result = contador + dato
-      console.log({result})
-      setContador(result)
-      const widgetID_Indicadores = 'widget_42'
-      dispatch(appActions.widgetStatePropChange(widgetID_Indicadores, "contador", result))
-  }
-
-  const getSubsistema = ({target}) => {
+  const handleSubsistemaSelected = ({target}) => {
     setSelectApuestaEstategica(undefined);
     setSelectCategoriaTematica(undefined)
-    setSelectindIcadores(undefined)
-    console.log((subsitemas.find(e => e.value == target.value)));
+    setSelectIndicadores(undefined)
+    if (utilsModule.logger()) console.log(subsitemas.find(e => e.value == target.value))
     setApuestaEstrategica(subsitemas.find(e => e.value == target.value));
     setSelectSubSistema(subsitemas.find(e => e.value == target.value));
     setCategoriaTematica(null)
     setIndicadores(null)
   };
-  const getApuestaEstrategica = ({target}) => {
-    console.log(target.value)
+  const handleApuestaEstrategicaSelected = ({target}) => {
+    if (utilsModule?.logger()) console.log(target.value)
     setSelectCategoriaTematica(undefined);
-    setSelectindIcadores(undefined)
-    console.log("APUESTA_ESTRATEGICA")
-    console.log(apuestaEstrategica.APUESTA_ESTRATEGICA.find(e => e.value == target.value))
+    setSelectIndicadores(undefined)
+    if (utilsModule?.logger()) console.log("APUESTA_ESTRATEGICA")
+    if (utilsModule?.logger()) console.log(apuestaEstrategica.APUESTA_ESTRATEGICA.find(e => e.value == target.value))
     setSelectApuestaEstategica(apuestaEstrategica.APUESTA_ESTRATEGICA.find(e => e.value == target.value))
     setCategoriaTematica(apuestaEstrategica.APUESTA_ESTRATEGICA.find(e => e.value == target.value))
     setIndicadores(null)
   };
-  const getCategoriaTematica = ({target}) => {
-    console.log(target.value)
-    setSelectindIcadores(undefined)
-    console.log("CATEGORIA_TEMATICA")
-    console.log(categoriaTematica.CATEGORIA_TEMATICA.find(e => e.value == target.value))
+  const handleCategoriaTematicaSelected = ({target}) => {
+    setSelectIndicadores(undefined)
     setIndicadores(categoriaTematica.CATEGORIA_TEMATICA.find(e => e.value == target.value));
     setSelectCategoriaTematica(categoriaTematica.CATEGORIA_TEMATICA.find(e => e.value == target.value));
+    if (utilsModule.logger()) console.log({value:target.value, CATEGORIA_TEMATICA: categoriaTematica.CATEGORIA_TEMATICA.find(e => e.value == target.value)});
   };
-  const getIndicador = ({target}) => {
-    console.log(target.value)
-    console.log("INDICADOR")
-    console.log(indicadores.INDICADOR.find(e => e.value == target.value))
-    setSelectindIcadores(indicadores.INDICADOR.find(e => e.value == target.value))
+  const handleIndicadorSelected = ({target}) => {
+    setIsLoading(true)
+    setDepartmentSelect(undefined)
+    const indiSelected = indicadores.INDICADOR.find(e => e.value == target.value);
+    if (utilsModule.logger()) console.log({"INDICADOR":target.value,indiSelected})
+    setSelectIndicadores(indiSelected)
+    setIsLoading(false)
   };
-  const consultar= () =>{
-    console.log(
+  /**
+   * En este metodo se selecciona el departamento al que se va realizar la consulta de indicadores
+   * y genera la consulta
+   * @param param0 
+   */
+  const handleDepartamentoSelected = async ({target}) => {
+    setIsLoading(true)
+    // Elimina las geometrias dibujadas previamente
+    if(lastLayerDeployed.length > 0) lastLayerDeployed.forEach(feature => jimuMapView.view.map.remove(feature))
+    const targetDepartment = target.value;
+    const itemSelected = departamentos.find(departamento => departamento.value == targetDepartment);
+    setDepartmentSelect(itemSelected) // se utiliza para sacar el label en la grafica, widget indicadores
+    const response = await utilsModule.realizarConsulta("*", `${servicios.urls.indicadores[selectIndicadores.url]}/query`, false, `cod_departamento='${itemSelected.decodigo}'`);
+    if (utilsModule.logger()) console.log({value: target.value,itemSelected, response, selectIndicadores});
+
+    if(!response || response?.features.length<1){
+      if (utilsModule.logger()) console.error("query don't get features to render");
+      setMensajeModal({
+        deployed: true,
+        type: typeMSM.warning,
+        tittle: 'Info',
+        body: "Sin información aun para el departamento seleccionado",        
+        subBody:''
+      })
+      setIsLoading(false)
+    }else{
+      /* Selecciona los responseIndicadores que coinciden con el departamento, para luego filtrar por municipio */
+      const _dataCoropletico = response.features;    
+      if (utilsModule.logger()) console.log({itemSelected, dataCoropletico, lastLayerDeployed, _dataCoropletico})
+      if (lastLayerDeployed) {
+        jimuMapView.view.map.remove(lastLayerDeployed)
+        setLastLayerDeployed(undefined)
+      }
+      // en esta consulta trae solo los municipios del departamento objetivo
+      // se direge al metodo ubicado en utils/module.ts
+      await utilsModule.pintarFeatureLayer({
+        _dataCoropletico,
+        definitionExpression:`${constantes.diccionario.indicadores.decodigo}='${targetDepartment}'`,
+        doZoom:true,
+        fieldValueToSetRangeCoropletico:selectIndicadores.fieldValue,//para calcular los colores del coropletico
+        geometryType:"polygon",
+        getAttributes:false,
+        identificadorMixData:constantes.diccionario.indicadores.mpcodigo,
+        jimuMapView,
+        lastLayerDeployed,
+        pintarFeature:true,
+        returnGeometry:true,
+        setClickHandler,
+        setLastLayerDeployed,
+        setPoligonoSeleccionado,
+        setIsLoading,
+        url:servicios.urls.Municipios,
+      });
+    }
+  }
+ 
+  const consultar = () =>{
+    setIsLoading(true)
+    if (utilsModule?.logger()) console.log(
       {
         subsitemas,
         apuestaEstrategica,
@@ -409,57 +149,125 @@ const TabIndicadores: React.FC<any> = ({dispatch}) => {
         selectSubSistema,
         selectApuestaEstategica,
         selectCategoriaTematica,
-        selectindIcadores,
+        selectIndicadores,
+        // municipioSelected,
+        departmentSelect,
+        // annioSelected,
+        responseIndicadores
       }
     )
+    setIsLoading(false)
   }
   const formularioIndicadores = () => {    
 
     return (
       <>
-        { widgetModules?.INPUTSELECT(subsitemas, getSubsistema, selectSubSistema?.value, "Sub Sitema") }
+        { widgetModules?.INPUTSELECT(subsitemas, handleSubsistemaSelected, selectSubSistema?.value, "Sub Sistema") }
 
         { (apuestaEstrategica && widgetModules) &&
-            widgetModules.INPUTSELECT(apuestaEstrategica, getApuestaEstrategica, selectApuestaEstategica?.value, "Apuesta Estrategica","APUESTA_ESTRATEGICA")
+            widgetModules.INPUTSELECT(apuestaEstrategica, handleApuestaEstrategicaSelected, selectApuestaEstategica?.value, "Apuesta Estrategica","APUESTA_ESTRATEGICA")
         }
         { (categoriaTematica && widgetModules)&&
-            widgetModules.INPUTSELECT(categoriaTematica, getCategoriaTematica, selectCategoriaTematica?.value, "Categoría Temática","CATEGORIA_TEMATICA")
+            widgetModules.INPUTSELECT(categoriaTematica, handleCategoriaTematicaSelected, selectCategoriaTematica?.value, "Categoría Temática","CATEGORIA_TEMATICA")
         }
         { (indicadores && widgetModules)&&
-            widgetModules.INPUTSELECT(indicadores, getIndicador, selectindIcadores?.value, "Indicador","INDICADOR")
+            widgetModules.INPUTSELECT(indicadores, handleIndicadorSelected, selectIndicadores?.value, "Indicador","INDICADOR")
+        }
+        { (selectIndicadores && widgetModules)&&
+            widgetModules.INPUTSELECT(departamentos, handleDepartamentoSelected, departmentSelect?.value, "Departamento","")
         } 
-        <Button
+        
+        {/* <Button
           size="sm"
           type="default"
           onClick={consultar}
           className="mb-4"
         >
           Consultar
-        </Button>
+        </Button> */}
       </>
     )
   }
 
   useEffect(() => {
-      import('../widgetsModule').then(modulo => setWidgetModules(modulo));
-      return () => {
-        // Acción a realizar cuando el widget se cierra.
-        console.log('El widget se cerrará');
-      };
+    if (utilsModule?.logger()) console.log("Effect selectSubSistema")
+    dispatch(appActions.widgetStatePropChange(widgetID_Indicadores, "poligonoSeleccionado", {clear:true}))
+    return () => {}
+  }, [selectSubSistema, categoriaTematica, selectCategoriaTematica, selectIndicadores, departmentSelect])
+  
+
+  useEffect(() => {
+    if(!poligonoSeleccionado) return
+    if (utilsModule.logger()) console.log({poligonoSeleccionado, dataCoropletico})
+    poligonoSeleccionado.departmentSelect=departmentSelect
+    poligonoSeleccionado.selectIndicadores=selectIndicadores
+    const dataToRender = JSON.stringify({poligonoSeleccionado, departmentSelect, selectIndicadores})
+    dispatch(appActions.widgetStatePropChange(widgetID_Indicadores, "poligonoSeleccionado", dataToRender))
+    return () => {}
+  }, [poligonoSeleccionado])
+
+  useEffect(() => {
+    import('../widgetsModule').then(modulo => setWidgetModules(modulo));
+    import('../../utils/module').then(modulo => setUtilsModule(modulo));
+    import('../../api/servicios').then(modulo => setServicios(modulo));
+    import('../../utils/constantes').then(modulo => setConstantes(modulo));    
   }, []);
 
   return (
     <div className="">
-       
-        Contador {contador}
-        <br />
-        <Button onClick={()=>handleIncreDecreButton(1)}>Increment</Button>
-        <Button onClick={()=>handleIncreDecreButton(-1)}>Decrement</Button>
         {
           formularioIndicadores()
         }
+        {
+          widgetModules?.MODAL(mensajeModal, setMensajeModal)
+        }
+        {
+          isLoading && <Loading />
+        } 
     </div>
   )
 }
 
 export default TabIndicadores
+
+enum typeMSM {
+  success = "success",
+  info    = "info",
+  error   = "error",
+  warning = "warning",
+}
+
+export interface InterfaceConstantes {
+  diccionario: diccionario;
+}
+
+export interface diccionario {
+  indicadores: Indicadores;
+}
+
+export interface Indicadores {
+  decodigo:         string;
+  cantidad_predios: string;
+  mpcodigo:         string;
+}
+
+export interface InterfaceDataCoropletico {
+  attributes: Attributes;
+}
+
+export interface Attributes {
+  cod_departamento: string;
+  cod_municipio:    string;
+  mpnombre:         string;
+  anio:             number;
+  tipo_predio:      TipoPredio;
+  cantidad_predios: number;
+  total_area_ha:    number;
+  ESRI_OID:         number;
+}
+
+export enum TipoPredio {
+  Baldio = "Baldio",
+  BaldioReservado = "Baldio Reservado",
+  FiscalPatrimonial = "Fiscal Patrimonial",
+}

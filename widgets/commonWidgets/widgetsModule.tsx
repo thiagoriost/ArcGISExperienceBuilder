@@ -35,7 +35,12 @@ const INPUT_TEXTAREA = (value, onChange, label) => (
         label={label}
     />
 )
-
+/**
+ * 
+ * @param mensajeModal {deployed:boolean, tittle: string, body:string, type:, subBody:string}
+ * @param setMensajeModal 
+ * @returns 
+ */
 const MODAL = (mensajeModal, setMensajeModal) => (
     <ModalComponent
         mensajeModal={mensajeModal}
@@ -43,8 +48,8 @@ const MODAL = (mensajeModal, setMensajeModal) => (
     />
 )
 
-const FILTROS_INDICADORES = (dispatch) => (
-    <TabIndicadores dispatch={dispatch}/>
+const FILTROS_INDICADORES = (dispatch, departamentos, jimuMapView) => (
+    <TabIndicadores dispatch={dispatch} departamentos={departamentos} jimuMapView={jimuMapView}/>
 )
 
 

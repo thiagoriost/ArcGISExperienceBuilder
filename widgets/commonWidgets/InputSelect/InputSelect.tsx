@@ -11,7 +11,7 @@ const InputSelect = ({
     campo = '',
     placeHolder=`Seleccione  ${label}...`,
 }) => {
-    console.log({dataArray}, {campo})
+    // console.log({dataArray, campo})
     const data = dataArray.length ? dataArray : dataArray[campo]
   return (
     <div className="mb-1">

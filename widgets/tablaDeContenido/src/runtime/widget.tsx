@@ -16,6 +16,8 @@ const Widget = (props: AllWidgetProps<any>) => {
   const [varJimuMapView, setJimuMapView] = useState<JimuMapView>(); // To add the layer to the Map, a reference to the Map must be saved into the component state.
   const [groupedLayers, setGroupedLayers] = useState<CapasTematicas[]>([]); // arreglo donde se almacenara la tabla de contenido ordenada
   const [servicios, setServicios] = useState(null);
+  const [utilsModule, setUtilsModule] = useState<any>(null);
+
 
   /**
    * En este metodo se referencia el mapa base
@@ -30,7 +32,7 @@ const Widget = (props: AllWidgetProps<any>) => {
   const TraerDataTablaContenido = async (modulo: typeof import("../../../api/servicios")) => {
     
     const tematicas = await getDataTablaContenido(modulo);
-    console.log(tematicas)
+    if (utilsModule?.logger()) console.log(tematicas)
     setGroupedLayers(tematicas);
   }
 
@@ -42,6 +44,8 @@ const Widget = (props: AllWidgetProps<any>) => {
       setServicios(modulo)
       TraerDataTablaContenido(modulo);      
     });  
+    import('../../../utils/module').then(modulo => setUtilsModule(modulo));
+
     
   }, []);
 
