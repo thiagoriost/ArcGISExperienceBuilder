@@ -20,19 +20,28 @@ const Widget = (props: AllWidgetProps<any>) => {
 
   useEffect(() => {
     if (mapView && miniMapDiv.current) {
-      loadModules(['esri/views/MapView', 'esri/WebMap', 'esri/Graphic', 'esri/geometry/Extent'])
-        .then(([MapView, WebMap, Graphic, Extent]) => {
+      loadModules(['esri/views/MapView', 'esri/WebMap', 'esri/Graphic', 'esri/geometry/Extent','esri/Map',])
+        .then(([MapView, WebMap, Graphic, Extent, Map]) => {
           const webMap = new WebMap({
             portalItem: {
               id: mapView.view.map.portalItem.id // Utiliza el mismo WebMap que el mapa principal
             }
           });
 
+          const miniMap = new Map({
+            basemap: 'topo-vector'
+          });
+
           const miniView = new MapView({
             container: miniMapDiv.current,
             map: webMap,
-            center: mapView.view.center,
-            zoom: mapView.view.zoom - 0 // Ajusta el nivel de zoom para la vista general
+            // map: miniMap,
+            // center: mapView.view.center,
+            // zoom: mapView.view.zoom - 0 // Ajusta el nivel de zoom para la vista general
+            ui: { components: [] }, // Remove default UI components
+            constraints: {
+              snapToZoom: false
+            }
           });
 
           miniView.when(() => {
@@ -64,12 +73,12 @@ const Widget = (props: AllWidgetProps<any>) => {
   }, [mapView]);
     
     return (
-      <div  className="w-100 p-3 bg-primary text-white widget-minimap">
+      <div  className="w-100 p-1 bg-primary text-white widget-minimap">
         {props.useMapWidgetIds && props.useMapWidgetIds.length === 1 && (
           <JimuMapViewComponent useMapWidgetId={props.useMapWidgetIds?.[0]} onActiveViewChange={activeViewChangeHandler} />
         )}
         
-        <div ref={miniMapDiv} style={{ width: '200px', height: '230px' }}></div>
+        <div ref={miniMapDiv} className="containerOverview" ></div>
         
       </div>
     );

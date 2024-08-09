@@ -215,6 +215,9 @@ const Widget_Tree: React.FC<Widget_Tree_Props> = ({ dataTablaContenido, varJimuM
                 url: `${url}/${nombreCapa}`
             });
             varJimuMapView.view.map.add(layer);
+            layer.when(()=>{
+                varJimuMapView.view.goTo(layer.fullExtent)
+            })
             setFeaturesLayersDeployed(features => [...features,{capa: capa.IDCAPA ? capa : capa.capasNietas[0], layer}]);
             // const testLayer = varJimuMapView.view.map.layers.getItemAt(0) 
         });
@@ -317,9 +320,9 @@ const Widget_Tree: React.FC<Widget_Tree_Props> = ({ dataTablaContenido, varJimuM
         <div style={{height:'inherit'}}>
             <Tabs>
                 <TabList>
-                    <Tab>Tabla de contenido</Tab>
+                    <Tab>Lista de Capas</Tab>
                     {
-                        capasSelectd.length>0 && <Tab>Orden Capas</Tab>
+                        capasSelectd.length>0 && <Tab>Orden de Capas</Tab>
                     }
                 </TabList>
 

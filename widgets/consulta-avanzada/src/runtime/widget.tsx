@@ -10,6 +10,7 @@ import { InterfaceResponseConsulta, interfaceFeature } from "../types/interfaceR
 import '../styles/style.css'
 import FeatureLayer from "@arcgis/core/layers/FeatureLayer";
 import { InterfaceColumns, Row, interfaceMensajeModal, typeMSM } from "../types/interfaces";
+import { loadModules } from "esri-loader";
 // import ModalComponent from "./components/ModalComponent";
 // import { loadEsriModules } from "./components/TablaResultados";
 // import InputSelect from "./components/InputSelect";
@@ -474,62 +475,71 @@ const Consulta_Avanzada = (props: AllWidgetProps<any>) => {
     if (!jimuMapView || features.length === 0 || !response) return;
 
 
-    const [
+    /* const [
       Graphic, GraphicsLayer, SimpleFillSymbol, SimpleLineSymbol, SimpleMarkerSymbol, Point, Extent, PopupTemplate
-    ] = await utilsModule.loadEsriModules();
+    ] = await utilsModule.loadEsriModules(); */
 
-    const graphicsLayer = new GraphicsLayer();
-
-    features.forEach((feature: interfaceFeature) => {
-
-      const polygon = new Polygon({
-        rings: feature.geometry.rings,
-        spatialReference: spatialReference
-      });
-
-      const popupTemplate = new PopupTemplate({
-        title: "Feature Info",
-        content: `
-            <ul>
-              ${Object.keys(feature.attributes).map(key => `<li><strong>${key}:</strong> ${feature.attributes[key]}</li>`).join('')}
-            </ul>
-          `
-      });
-
-      const SYMBOL = new SimpleFillSymbol({
-        color: "blue", // Amarillo con transparencia
-        outline: new SimpleLineSymbol({
-          color: "darkblue",
-          width: 0.5
-        })
-      });
-
-      const graphic = new Graphic({
-        geometry: polygon,
-        /* symbol: {
-          type: 'simple-fill',
-          color: "blue",
-          outline: {
+    loadModules([
+      'esri/layers/GraphicsLayer', 'esri/PopupTemplate',
+      'esri/symbols/SimpleFillSymbol', 'esri/symbols/SimpleLineSymbol', 'esri/Graphic',
+    ]).then(([GraphicsLayer, PopupTemplate, SimpleFillSymbol,
+      SimpleLineSymbol, Graphic]) => {
+      const graphicsLayer = new GraphicsLayer();
+      
+      features.forEach((feature: interfaceFeature) => {
+  
+        const polygon = new Polygon({
+          rings: feature.geometry.rings,
+          spatialReference: spatialReference
+        });
+  
+        const popupTemplate = new PopupTemplate({
+          title: "Feature Info",
+          content: `
+              <ul>
+                ${Object.keys(feature.attributes).map(key => `<li><strong>${key}:</strong> ${feature.attributes[key]}</li>`).join('')}
+              </ul>
+            `
+        });
+  
+        const SYMBOL = new SimpleFillSymbol({
+          color: "blue", // Amarillo con transparencia
+          outline: new SimpleLineSymbol({
             color: "darkblue",
             width: 0.5
-          }
-        }, */
-        symbol: SYMBOL,
-        attributes: feature.attributes,
-        popupTemplate: popupTemplate
+          })
+        });
+  
+        const graphic = new Graphic({
+          geometry: polygon,
+          /* symbol: {
+            type: 'simple-fill',
+            color: "blue",
+            outline: {
+              color: "darkblue",
+              width: 0.5
+            }
+          }, */
+          symbol: SYMBOL,
+          attributes: feature.attributes,
+          popupTemplate: popupTemplate
+        });
+  
+        graphicsLayer.add(graphic);
       });
+  
+      jimuMapView.view.map.add(graphicsLayer);
+      setGraphicsLayerDeployed(graphicsLayer);
+      
+      jimuMapView.view.goTo({
+        target: graphicsLayer.graphics.items[0].geometry,
+        zoom: 10 
+      });
+      setIsLoading(false);
+      
+    })
 
-      graphicsLayer.add(graphic);
-    });
 
-    jimuMapView.view.map.add(graphicsLayer);
-    setGraphicsLayerDeployed(graphicsLayer);
-    
-    jimuMapView.view.goTo({
-      target: graphicsLayer.graphics.items[0].geometry,
-      zoom: 10 
-    });
-    setIsLoading(false);
   };
 
   /**
@@ -618,7 +628,7 @@ const Consulta_Avanzada = (props: AllWidgetProps<any>) => {
     setCondicionBusqueda(adicionValor);
   }
 
-  const RealizarConsulta = async() => {
+  const _RealizarConsulta = async() => {
     console.log("RealizarConsulta");
     setIsLoading(true);
     console.log(condicionBusqueda)
@@ -647,8 +657,8 @@ const Consulta_Avanzada = (props: AllWidgetProps<any>) => {
           tittle:'Sin resultados para esta consulta',
           body: "Intenta con otros parámetros"
         });
-        setIsLoading(false);
       }
+      setIsLoading(false);
     }
   }
 
@@ -721,19 +731,19 @@ const Consulta_Avanzada = (props: AllWidgetProps<any>) => {
         }
         {
           campo &&
-          <div className="condition-buttons text-center">
-            <Button type="primary" size="sm" className="mr-1 mb-1" onClick={() => asignarSimbolCondicionBusqueda('=')}>=</Button>
-            <Button type="primary" size="sm" className="mr-1 mb-1" onClick={() => asignarSimbolCondicionBusqueda('BETWEEN')}>{"<>"}</Button>
-            <Button type="primary" size="sm" className="mr-1 mb-1" onClick={() => asignarSimbolCondicionBusqueda('>')}>&gt;</Button>
-            <Button type="primary" size="sm" className="mr-1 mb-1" onClick={() => asignarSimbolCondicionBusqueda('<')}>&lt;</Button>
-            <Button type="primary" size="sm" className="mr-1 mb-1" onClick={() => asignarSimbolCondicionBusqueda('>=')}>&gt;=</Button>
-            <Button type="primary" size="sm" className="mr-1 mb-1" onClick={() => asignarSimbolCondicionBusqueda('<=')}>&lt;=</Button>
-            <Button type="primary" size="sm" className="mr-1 mb-1" onClick={() => asignarSimbolCondicionBusqueda('LIKE')}>LIKE</Button>
-            <Button type="primary" size="sm" className="mr-1 mb-1" onClick={() => asignarSimbolCondicionBusqueda('AND')}>AND</Button>
-            <Button type="primary" size="sm" className="mr-1 mb-1" onClick={() => asignarSimbolCondicionBusqueda('OR')}>OR</Button>
-            <Button type="primary" size="sm" className="mr-1 mb-1" onClick={() => asignarSimbolCondicionBusqueda('NOT')}>NOT</Button>
-            <Button type="primary" size="sm" className="mr-1 mb-1" onClick={() => asignarSimbolCondicionBusqueda('IS')}>IS</Button>
-            <Button type="primary" size="sm" className="mr-1 mb-1" onClick={() => asignarSimbolCondicionBusqueda('NULL')}>NULL</Button>
+          <div className="condition-buttons text-center bg-dark pt-1">
+            <Button type="primary" size="sm" className="mr-1 mb-1 color-deep-purple-100" onClick={() => asignarSimbolCondicionBusqueda('=')}>=</Button>
+            <Button type="primary" size="sm" className="mr-1 mb-1 color-deep-purple-100" onClick={() => asignarSimbolCondicionBusqueda('BETWEEN')}>{"<>"}</Button>
+            <Button type="primary" size="sm" className="mr-1 mb-1 color-deep-purple-100" onClick={() => asignarSimbolCondicionBusqueda('>')}>&gt;</Button>
+            <Button type="primary" size="sm" className="mr-1 mb-1 color-deep-purple-100" onClick={() => asignarSimbolCondicionBusqueda('<')}>&lt;</Button>
+            <Button type="primary" size="sm" className="mr-1 mb-1 color-deep-purple-100" onClick={() => asignarSimbolCondicionBusqueda('>=')}>&gt;=</Button>
+            <Button type="primary" size="sm" className="mr-1 mb-1 color-deep-purple-100" onClick={() => asignarSimbolCondicionBusqueda('<=')}>&lt;=</Button>
+            <Button type="primary" size="sm" className="mr-1 mb-1 color-deep-purple-100" onClick={() => asignarSimbolCondicionBusqueda('LIKE')}>LIKE</Button>
+            <Button type="primary" size="sm" className="mr-1 mb-1 color-deep-purple-100" onClick={() => asignarSimbolCondicionBusqueda('AND')}>AND</Button>
+            <Button type="primary" size="sm" className="mr-1 mb-1 color-deep-purple-100" onClick={() => asignarSimbolCondicionBusqueda('OR')}>OR</Button>
+            <Button type="primary" size="sm" className="mr-1 mb-1 color-deep-purple-100" onClick={() => asignarSimbolCondicionBusqueda('NOT')}>NOT</Button>
+            <Button type="primary" size="sm" className="mr-1 mb-1 color-deep-purple-100" onClick={() => asignarSimbolCondicionBusqueda('IS')}>IS</Button>
+            <Button type="primary" size="sm" className="mr-1 mb-1 color-deep-purple-100" onClick={() => asignarSimbolCondicionBusqueda('NULL')}>NULL</Button>
           </div>
 
         }
@@ -744,7 +754,7 @@ const Consulta_Avanzada = (props: AllWidgetProps<any>) => {
               htmlType="button"
               size="sm"
               type="primary"
-              onClick={RealizarConsulta}
+              onClick={_RealizarConsulta}
             >
               Consultar
             </Button>
@@ -829,12 +839,12 @@ const Consulta_Avanzada = (props: AllWidgetProps<any>) => {
         })
         : formularioConsulta()
       }
-        {
-          isLoading && <Loading />
-        }
-        {
-          widgetModules?.MODAL(mensajeModal, setMensajeModal)
-        }        
+      {
+        isLoading && <Loading />
+      }
+      {
+        widgetModules?.MODAL(mensajeModal, setMensajeModal)
+      }        
     </div>
   );
 };

@@ -168,7 +168,7 @@ import { InterfaceResponseConsultaSimple, InterfaceMensajeModal, typeMSM  } from
           if (_responseConsultaSimple.features == undefined)
           {
             dialogAlert = true;
-            console.log("Resp Features Serv Mapas =>",_responseConsultaSimple.features):            
+            console.log("Resp Features Serv Mapas =>",_responseConsultaSimple.features)            
           }
           else if (_responseConsultaSimple.features.length == 0)
           {
@@ -243,8 +243,7 @@ import { InterfaceResponseConsultaSimple, InterfaceMensajeModal, typeMSM  } from
         features.forEach((feature) => {
           console.log("Tipo geometría =>",feature.geometry);
           //Validación de un Polígono
-          if (feature.geometry.rings)
-          {
+          if (feature.geometry.rings){
             setTypeGraphMap("polygon");
             
             const polygon = new Polygon({
@@ -290,8 +289,7 @@ import { InterfaceResponseConsultaSimple, InterfaceMensajeModal, typeMSM  } from
           zoom  = 11;
         }
         //Validación del tipo polilinea
-        if (feature.geometry.paths)
-        {
+        if (feature.geometry.paths){
           setTypeGraphMap("polyline");
 
           const polyline = new Polyline({
