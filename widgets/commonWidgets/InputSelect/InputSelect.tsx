@@ -25,8 +25,8 @@ const InputSelect = ({
             {
                 data && 
                     data.map(
-                    (option) => (
-                        <option value={option.value}>{option.label}</option>
+                    ({value, label}) => (
+                        <option value={value}>{label}</option>
                     ))
             }
         </Select>

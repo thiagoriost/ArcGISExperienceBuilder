@@ -20,8 +20,8 @@ const servicioMadre = "https://pruebassig.igac.gov.co/server/rest/services/Indic
 
 const urls = {
     tablaContenido:"https://sigquindio.gov.co:8443/ADMINSERV/AdminGeoApplication/AdminGeoWebServices/getTablaContenidoJsTree/public",
-    Departamentos: `${servicioMadre}/1`,
     Municipios: `${servicioMadre}/0`,
+    Departamentos: `${servicioMadre}/1`,
     indicadores:{
         v_predios_fondo_tierras_mun: `${servicioMadre}/3`,
         v_predios_inventario_baldios_mun: `${servicioMadre}/4`,

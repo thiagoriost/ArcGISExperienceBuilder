@@ -9,6 +9,10 @@ import { PieChart } from 'jimu-ui/advanced/lib/chart/pie';
 import '../styles/style.css'
 import { Pagination } from 'jimu-ui';
 
+
+ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
+
+
 ChartJS.register(
   CategoryScale,
   LinearScale,
@@ -32,6 +36,8 @@ const tiposGraficos: Grafico[] = [
   { label: "Area Chart", value: 2 },
   { label: "Bubble Chart", value: 3 },
 ];
+
+
 
 const Indicadores = (props: AllWidgetProps<any>) => {
   const [jimuMapView, setJimuMapView] = useState<JimuMapView>();
@@ -183,10 +189,26 @@ const Indicadores = (props: AllWidgetProps<any>) => {
               legend: {
                 position: 'top',
               },
+              tooltip: {
+                enabled: true
+              },
+              datalabels: {
+                anchor: 'end',
+                align: 'top',
+                formatter: Math.round,
+                font: {
+                  weight: 'bold'
+                }
+              },
               title: {
                 display: true,
                 text: 'Concentración por PCC',
               },
+              scales: {
+                y: {
+                  beginAtZero: true
+                }
+              }
             },
           };
           setOptions(options)
@@ -284,6 +306,22 @@ const Indicadores = (props: AllWidgetProps<any>) => {
           display: true,
           text: `${descricion} ${poligonoSeleccionado.attributes.mpnombre} - ${departmentSelect.label}`,
         },
+        tooltip: {
+          enabled: true
+        },
+        datalabels: {
+          anchor: 'end',
+          align: 'top',
+          formatter: Math.round,
+          font: {
+            weight: 'bold'
+          }
+        },
+        scales: {
+          y: {
+            beginAtZero: true
+          }
+        }
       },
     });
   }
@@ -328,13 +366,13 @@ const Indicadores = (props: AllWidgetProps<any>) => {
 
   useEffect(() => {
     if (props.hasOwnProperty("stateProps")) {
-      if (utilsModule.logger()) console.log({props, id:props.id}, )    
+      if (utilsModule?.logger()) console.log({props, id:props.id}, )    
       if (props.stateProps.poligonoSeleccionado?.clear) {
-        if (utilsModule.logger()) console.log("clearing graphic")
+        if (utilsModule?.logger()) console.log("clearing graphic")
         setDataGrafico([])
         setOptions(null)
       }else {
-        if (utilsModule.logger()) console.log(JSON.parse(props.stateProps.poligonoSeleccionado));
+        if (utilsModule?.logger()) console.log(JSON.parse(props.stateProps.poligonoSeleccionado));
         setPoligonoSeleccionado(JSON.parse(props.stateProps.poligonoSeleccionado))      
         _fixDataToRenderGrafig(JSON.parse(props.stateProps.poligonoSeleccionado));
         setCurrentpage(1);

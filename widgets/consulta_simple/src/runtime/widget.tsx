@@ -108,7 +108,6 @@ const Widget = (props: AllWidgetProps<any>) => {
     @dateUpdated 2024-06-21
     @changes Adicionar objeto spatialReference para permitir almacenar el objeto spatialReference
   */
-  console.log("Iniciando Widget...");
     //Para componente FiltersCS
     const [jsonSERV, setJsonSERV]     = useState ([]);
     const [temas, setTemas]           = useState ([]);
@@ -128,6 +127,8 @@ const Widget = (props: AllWidgetProps<any>) => {
     //2024-06-13 - DataGrid
     const [rows, setRows]             = useState([]);
     const [columns, setColumns]       = useState([]);
+    const [utilsModule, setUtilsModule] = useState(null);
+
     
     //To add the layer to the Map, a reference to the Map must be saved into the component state.
     //Mapa
@@ -649,8 +650,8 @@ const Widget = (props: AllWidgetProps<any>) => {
       const DgridRows= features.map(({ attributes, geometry}) => ({ ...attributes, geometry}));
 
       //Depuración
-      console.log("Data Grid Cols =>",DgridCol);
-      console.log("Data Grid Rows =>",DgridRows);
+      if (utilsModule?.logger()) console.log("Data Grid Cols =>",DgridCol);
+      if (utilsModule?.logger()) console.log("Data Grid Rows =>",DgridRows);
 
       //Seteo de los resultados al DataGrid
       setColumns(DgridCol);
@@ -678,27 +679,31 @@ const Widget = (props: AllWidgetProps<any>) => {
     // {}      
 
     useEffect(() => {
-      console.log("Control asociado al Alert =>",alertDial);
-      // console.log("Control asociado al Modal =>", mensModal.deployed);
-      console.log("controlForms (Filter y DG) =>",controlForms);
-      console.log("Control renderMap =>",renderMap);
-      console.log("Asigna cond desde state =>",cond);
+      if (utilsModule?.logger()) console.log("Control asociado al Alert =>",alertDial);
+      // if (utilsModule?.logger()) console.log("Control asociado al Modal =>", mensModal.deployed);
+      if (utilsModule?.logger()) console.log("controlForms (Filter y DG) =>",controlForms);
+      if (utilsModule?.logger()) console.log("Control renderMap =>",renderMap);
+      if (utilsModule?.logger()) console.log("Asigna cond desde state =>",cond);
     },[renderMap])
 
     //https://developers.arcgis.com/experience-builder/guide/add-layers-to-a-map/
     const activeViewChangeHandler = (jmv: JimuMapView) => {
-      console.log("Ingresando al evento objeto JimuMapView...");
+      if (utilsModule?.logger()) console.log("Ingresando al evento objeto JimuMapView...");
       if (jmv) {
         setJimuMapView(jmv);        
       }
     };
 
     {
-      // console.log("Control asociado al Alert =>",alertDial);
-      // // console.log("Control asociado al Modal =>", mensModal.deployed);
-      // console.log("controlForms (Filter y DG) =>",controlForms);
-      // console.log("Control renderMap =>",renderMap);
+      // if (utilsModule?.logger()) console.log("Control asociado al Alert =>",alertDial);
+      // // if (utilsModule?.logger()) console.log("Control asociado al Modal =>", mensModal.deployed);
+      // if (utilsModule?.logger()) console.log("controlForms (Filter y DG) =>",controlForms);
+      // if (utilsModule?.logger()) console.log("Control renderMap =>",renderMap);
     }
+
+    useEffect(() => {
+      import('../../../utils/module').then(modulo => setUtilsModule(modulo));
+    }, []);
     
     return (
       <div className="w-100 p-3 bg-primary text-white">
