@@ -1,6 +1,8 @@
 import { React, AllWidgetProps } from "jimu-core";
 import { JimuMapViewComponent, JimuMapView } from 'jimu-arcgis'; // The map object can be accessed using the JimuMapViewComponent
 import { useEffect, useState } from "react";
+// import "../styles/styles.css"
+import "../styles/style.css"
 
 const Widget = (props: AllWidgetProps<any>) => {
   const [jimuMapView, setJimuMapView] = useState<JimuMapView>();
@@ -42,7 +44,7 @@ const Widget = (props: AllWidgetProps<any>) => {
   }, []);
     
     return (
-      <div  className="w-100 p-3 bg-primary text-white">
+      <div  className="w-100 p-3 bg-primary text-white contendorTabFiltroIndicadores">
         {props.useMapWidgetIds && props.useMapWidgetIds.length === 1 && (
           <JimuMapViewComponent useMapWidgetId={props.useMapWidgetIds?.[0]} onActiveViewChange={activeViewChangeHandler} />
         )}

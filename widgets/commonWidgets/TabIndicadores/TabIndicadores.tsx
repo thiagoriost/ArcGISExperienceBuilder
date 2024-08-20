@@ -14,13 +14,15 @@ const legendItems = [
   { color: 'rgb(211, 84, 0, 0.8)', range: '38 - 1868' },
 ];
 
+const initLastLayerDeployed = {graphics:[],graphicsLayers:[]}
+
 const TabIndicadores: React.FC<any> = ({dispatch, departamentos, jimuMapView}) => {
 
   const [constantes, setConstantes] = useState<InterfaceConstantes>(undefined);
   const [widgetModules, setWidgetModules] = useState(null);
   const [servicios, setServicios] = useState(null);
   const [utilsModule, setUtilsModule] = useState(null);
-  const [lastLayerDeployed, setLastLayerDeployed] = useState([]);
+  const [lastLayerDeployed, setLastLayerDeployed] = useState(initLastLayerDeployed);
   const [mensajeModal, setMensajeModal] = useState({
     deployed:false,
     type:typeMSM.info,
@@ -140,10 +142,10 @@ const TabIndicadores: React.FC<any> = ({dispatch, departamentos, jimuMapView}) =
       /* Selecciona los responseIndicadores que coinciden con el departamento, para luego filtrar por municipio */
       const _dataCoropletico = response.features;    
       if (utilsModule.logger()) console.log({itemSelected, dataCoropletico, lastLayerDeployed, _dataCoropletico})
-      if (lastLayerDeployed) {
+      /* if (lastLayerDeployed.graphicsLayers) {
         jimuMapView.view.map.remove(lastLayerDeployed)
         setLastLayerDeployed(undefined)
-      }
+      } */
       // en esta consulta trae solo los municipios del departamento objetivo
       // se direge al metodo ubicado en utils/module.ts
       await utilsModule.pintarFeatureLayer({
@@ -174,13 +176,23 @@ const TabIndicadores: React.FC<any> = ({dispatch, departamentos, jimuMapView}) =
     setMunicipioSelect(itemSelected)
     if (utilsModule.logger()) console.log({municipios:itemSelected});
     utilsModule.goToOneExtentAndZoom({jimuMapView, extent:itemSelected.value.geometry.extent, duration:1000})
+    const graphicMunicipioSlected = lastLayerDeployed.graphics.find(e=>e.attributes.mpcodigo == itemSelected.mpcodigo);
+    setPoligonoSeleccionado(graphicMunicipioSlected);
+    utilsModule.dibujarPoligonoToResaltar({rings:graphicMunicipioSlected.geometry.rings,
+      wkid:graphicMunicipioSlected.geometry.spatialReference.wkid,
+      attributes:graphicMunicipioSlected.attributes, jimuMapView, times:3, borrar:true})
     // jimuMapView.view.goTo(itemSelected.value.geometry.extent);
   }
 
   // Elimina las geometrias dibujadas previamente
   const clearGraphigs = () => {
     if (utilsModule.logger()) console.log("clearGraphigs")
-    if(lastLayerDeployed.length > 0) utilsModule.removeLayer(jimuMapView, lastLayerDeployed);    
+    // if(lastLayerDeployed.length > 0) utilsModule.removeLayer(jimuMapView, lastLayerDeployed);    
+    if(lastLayerDeployed.graphicsLayers.length > 0) utilsModule.removeLayer(jimuMapView, lastLayerDeployed.graphicsLayers);
+    setTimeout(() => {
+      // setLastLayerDeployed(initLastLayerDeployed);
+    }, 2000);
+    // jimuMapView.view.
   }
  
   const consultar = () =>{

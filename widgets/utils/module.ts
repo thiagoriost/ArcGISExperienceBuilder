@@ -409,7 +409,11 @@ const dibujarPoligono = ({features, interval, fieldValueToSetRangeCoropletico, w
   
     graphicsLayer.add(graphic);
     jimuMapView.view.map.add(graphicsLayer);
-    tempLastLayerDeployed = [...tempLastLayerDeployed, graphicsLayer]
+    // tempLastLayerDeployed = [...tempLastLayerDeployed, graphic]
+    tempLastLayerDeployed = {
+      graphics:[...tempLastLayerDeployed.graphics, graphic],
+      graphicsLayers:[...tempLastLayerDeployed.graphicsLayers, graphicsLayer]
+    }
     // if(logger()) console.log({tempLastLayerDeployed})
     console.log({fieldToFixRange, rangos})
     
@@ -433,6 +437,7 @@ const dibujarPoligono = ({features, interval, fieldValueToSetRangeCoropletico, w
   setClickHandler(handler); // Guardar el manejador del evento en el estado
   jimuMapView.view.on('pointer-move', (event) => {
     console.log('Puntero movido a:', event.mapPoint);
+    
   });
   
   /* jimuMapView.view.on('mouse-wheel', (event) => {
@@ -465,7 +470,7 @@ async function renderPolygonsWithColorsFromService(jimuMapView) {
     ]);
 
     // Crear el renderer basado en class breaks
-    const renderer = new ClassBreaksRenderer({
+    /* const renderer = new ClassBreaksRenderer({
       field: 'cantidad_predios',
       classBreakInfos: [
         {
@@ -534,7 +539,7 @@ async function renderPolygonsWithColorsFromService(jimuMapView) {
           label: '51+ predios'
         }
       ]
-    });
+    }); */
 
     // Crear el FeatureLayer utilizando la URL del servicio
     const featureLayer = new FeatureLayer({
@@ -598,6 +603,70 @@ const goToOneExtentAndZoom = ({jimuMapView, extent, duration= 10000}) => {
   }, 2000);
 }
 
+const dibujarPoligonoToResaltar = async ({rings, wkid, attributes, jimuMapView, times, borrar}) => {
+
+  const [SimpleFillSymbol, Polygon, Graphic, GraphicsLayer] = await loadModules([
+    'esri/symbols/SimpleFillSymbol', 'esri/geometry/Polygon', 'esri/Graphic', 'esri/layers/GraphicsLayer',], {
+    url: 'https://js.arcgis.com/4.29/'
+  });
+  const graphicsLayer = new GraphicsLayer();
+  const polygon = new Polygon({
+    rings,
+    spatialReference: { wkid }
+  });
+
+  const graphic = new Graphic({
+    geometry: polygon,
+    symbol: new SimpleFillSymbol({
+      color:[51, 51, 204, 0.5],
+      outline: {
+        color: 'red',
+        width: 3
+      }
+    }),
+    attributes,
+    popupTemplate: {
+      title: "Metadata",
+      content: [
+        {
+          type: "fields",
+          fieldInfos: Object.keys(attributes)
+          .filter(key => key !== "dataIndicadores") // Filtra la clave específica
+          .map(key => ({
+            fieldName: key,
+            label: key.replace(/_/g, ' ')
+          }))
+        }
+      ]
+    }
+  });
+
+  graphicsLayer.add(graphic);
+  jimuMapView.view.map.add(graphicsLayer);
+
+  let blinkCount = 0;
+  let render = true;
+  const intervalos = 6;
+  const interval = setInterval(() => {
+    if (blinkCount < intervalos) {
+      if (render) {
+        jimuMapView.view.map.add(graphicsLayer);
+        console.log(11111)
+        render = !render
+      } else {
+        jimuMapView.view.map.remove(graphicsLayer);
+        console.log(222222)
+        render = !render
+      }
+      blinkCount++;
+    } else {
+      clearInterval(interval); // Detiene el intervalo después de 3 veces
+      jimuMapView.view.map.remove(graphicsLayer);
+    }
+  }, 1500); // Intervalo de 1.5 segundo
+
+}
+
 export {
   moduleExportToCSV,
   loadEsriModules,
@@ -612,5 +681,6 @@ export {
   logger,
   removeLayer,
   renderPolygonsWithColorsFromService,
-  goToOneExtentAndZoom
+  goToOneExtentAndZoom,
+  dibujarPoligonoToResaltar
 }
