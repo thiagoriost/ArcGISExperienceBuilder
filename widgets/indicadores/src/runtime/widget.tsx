@@ -9,6 +9,10 @@ import { PieChart } from 'jimu-ui/advanced/lib/chart/pie';
 import '../styles/style.css'
 import { Pagination } from 'jimu-ui';
 
+
+ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
+
+
 ChartJS.register(
   CategoryScale,
   LinearScale,
@@ -32,6 +36,8 @@ const tiposGraficos: Grafico[] = [
   { label: "Area Chart", value: 2 },
   { label: "Bubble Chart", value: 3 },
 ];
+
+
 
 const Indicadores = (props: AllWidgetProps<any>) => {
   const [jimuMapView, setJimuMapView] = useState<JimuMapView>();
@@ -101,36 +107,7 @@ const Indicadores = (props: AllWidgetProps<any>) => {
             acc[curr.DEPARTAMEN] = (acc[curr.DEPARTAMEN] || 0) + 1;
             return acc;
           }, {});
-
-          /* const labels = Object.keys(distributionByDepartment);
-          const values = Object.values(distributionByDepartment);
-
-          const chartData = {
-            labels: labels,
-            datasets: [
-              {
-                label: 'Número de Registros',
-                data: values,
-                backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                borderColor: 'rgba(75, 192, 192, 1)',
-                borderWidth: 1,
-              },
-            ],
-          };
-          setDataGrafico(chartData)
-          const options = {
-            responsive: true,
-            plugins: {
-              legend: {
-                position: 'top',
-              },
-              title: {
-                display: true,
-                text: 'Distribución por Departamento',
-              },
-            },
-          }; */
-          // setOptions(options)
+         
           if (utilsModule.logger())console.log("Distribución por Departamento:", distributionByDepartment);
           
           // Distribución por Municipio
@@ -183,10 +160,26 @@ const Indicadores = (props: AllWidgetProps<any>) => {
               legend: {
                 position: 'top',
               },
+              tooltip: {
+                enabled: true
+              },
+              datalabels: {
+                anchor: 'end',
+                align: 'top',
+                formatter: Math.round,
+                font: {
+                  weight: 'bold'
+                }
+              },
               title: {
                 display: true,
                 text: 'Concentración por PCC',
               },
+              scales: {
+                y: {
+                  beginAtZero: true
+                }
+              }
             },
           };
           setOptions(options)
@@ -215,6 +208,22 @@ const Indicadores = (props: AllWidgetProps<any>) => {
               label: "El municipio seleccionado no presenta información",
               // label: 'Cantidad de Predios',
               data: [0],
+              backgroundColor: getRandomRGBA(),
+            },
+          ],
+        };
+      }else if(!departmentSelect){ // para la grafica a nivel nacional
+
+        const ajusteLeyenda = (leyenda =="Cantidad de predios por tipo" || leyenda =='Cantidad de área por tipo') ? 
+        leyenda.replace("por tipo", "").trim()
+        :leyenda;
+        return {
+          labels:[fieldValue],//: labels.sort(), // Ordenar etiquetas para asegurar consistencia
+          datasets: [
+            {
+              label: fieldValue,
+              // label: 'Cantidad de Predios',
+              data: [data[fieldValue]],
               backgroundColor: getRandomRGBA(),
             },
           ],
@@ -257,7 +266,7 @@ const Indicadores = (props: AllWidgetProps<any>) => {
         datasets,
       }; */
     };
-    setTotalPage(fieldlabel.length)
+    setTotalPage(departmentSelect?fieldlabel.length:0)
     /* 
       const chartData = generateChartData(attributes.dataIndicadores, fieldlabel[0], fieldValue, leyenda[0]);
       setDataGrafico(chartData);
@@ -270,8 +279,12 @@ const Indicadores = (props: AllWidgetProps<any>) => {
     fieldlabel.forEach((fl, i) => {
       if (fl.includes("anio")) {
         dataToRenderGraphics.push(ordenarDatos(generateChartData(attributes.dataIndicadores, fl, fieldValue, leyenda[i])));
-      } else {
+      } else if(attributes.dataIndicadores){
         dataToRenderGraphics.push(generateChartData(attributes.dataIndicadores, fl, fieldValue, leyenda[i]));
+      }else if(!departmentSelect){ // cuando es nacional
+        dataToRenderGraphics.push(generateChartData(attributes, fl, fieldValue, leyenda[i]));
+      }else{
+        console.log("caso no comtemplado", {poligonoSeleccionado, selectIndicadores, departmentSelect})
       }
     });
     setDataGrafico(dataToRenderGraphics);
@@ -282,8 +295,24 @@ const Indicadores = (props: AllWidgetProps<any>) => {
         legend: { position: 'top' as const, },
         title: {
           display: true,
-          text: `${descricion} ${poligonoSeleccionado.attributes.mpnombre} - ${departmentSelect.label}`,
+          text: `${descricion} ${poligonoSeleccionado.attributes.mpnombre} - ${departmentSelect?.label?departmentSelect.label:poligonoSeleccionado.attributes.depto}`,
         },
+        tooltip: {
+          enabled: true
+        },
+        datalabels: {
+          anchor: 'end',
+          align: 'top',
+          formatter: Math.round,
+          font: {
+            weight: 'bold'
+          }
+        },
+        scales: {
+          y: {
+            beginAtZero: true
+          }
+        }
       },
     });
   }
@@ -328,15 +357,16 @@ const Indicadores = (props: AllWidgetProps<any>) => {
 
   useEffect(() => {
     if (props.hasOwnProperty("stateProps")) {
-      if (utilsModule.logger()) console.log({props, id:props.id}, )    
-      if (props.stateProps.poligonoSeleccionado?.clear) {
-        if (utilsModule.logger()) console.log("clearing graphic")
+      const dataFromDispatch = JSON.parse(props.stateProps.poligonoSeleccionado)
+      if (utilsModule?.logger()) console.log({props, id:props.id, dataFromDispatch});
+      if (dataFromDispatch?.clear) {
+        if (utilsModule?.logger()) console.log("clearing graphic")
         setDataGrafico([])
         setOptions(null)
       }else {
-        if (utilsModule.logger()) console.log(JSON.parse(props.stateProps.poligonoSeleccionado));
-        setPoligonoSeleccionado(JSON.parse(props.stateProps.poligonoSeleccionado))      
-        _fixDataToRenderGrafig(JSON.parse(props.stateProps.poligonoSeleccionado));
+        // const data = JSON.parse(props.stateProps.poligonoSeleccionado);
+        setPoligonoSeleccionado(dataFromDispatch)      
+        _fixDataToRenderGrafig(dataFromDispatch);
         setCurrentpage(1);
       }      
     }
@@ -359,7 +389,7 @@ const Indicadores = (props: AllWidgetProps<any>) => {
       )}
       <>
         { 
-          dataGrafico.length > 0 && (
+          (dataGrafico.length > 0 && poligonoSeleccionado.departmentSelect) && (
             <div style={{ padding: '10px', width:'500px', height:'300px', border:'solid', borderRadius:'10px' }}>
               {
                 totalPage > 1 && 

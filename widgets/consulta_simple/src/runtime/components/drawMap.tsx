@@ -2,7 +2,7 @@
     Sección de importación
     @date 2024-06-11
 */
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import { AllWidgetProps, esri } from "jimu-core";
 import FeatureLayer from "@arcgis/core/layers/FeatureLayer";
 import { JimuMapViewComponent, JimuMapView } from 'jimu-arcgis'; // The map object can be accessed using the JimuMapViewComponent
@@ -117,8 +117,8 @@ import { InterfaceResponseConsultaSimple, InterfaceMensajeModal, typeMSM  } from
 
         //Objetos locales
         var dialogAlert = false;
-        console.log("TxtValor en DrawMap =>",txtValor);
-        console.log("Valor state =>",txtValorState);
+        if (utilsModule?.logger()) console.log("TxtValor en DrawMap =>",txtValor);
+        if (utilsModule?.logger()) console.log("Valor state =>",txtValorState);
         if ((!txtValor && txtValor.trim() === "") || txtValorState)        
         {
           setAlertDial(true);
@@ -145,8 +145,8 @@ import { InterfaceResponseConsultaSimple, InterfaceMensajeModal, typeMSM  } from
         }
         //Gestión URL servicio de mapas
         const capasURL = urlCapas.replace("?f=json","/query");
-        console.log("URL para query =>",capasURL);
-        console.log("Formulacion WHERE => ",cond);
+        if (utilsModule?.logger()) console.log("URL para query =>",capasURL);
+        if (utilsModule?.logger()) console.log("Formulacion WHERE => ",cond);
 
         const url = capasURL;
         //const url = 'https://sigquindio.gov.co/arcgis/rest/services/QUINDIO_III/Ambiental_T_Ajustado/MapServer/14/query';
@@ -168,11 +168,11 @@ import { InterfaceResponseConsultaSimple, InterfaceMensajeModal, typeMSM  } from
           if (_responseConsultaSimple.features == undefined)
           {
             dialogAlert = true;
-            console.log("Resp Features Serv Mapas =>",_responseConsultaSimple.features)            
+            if (utilsModule?.logger()) console.log("Resp Features Serv Mapas =>",_responseConsultaSimple.features)            
           }
           else if (_responseConsultaSimple.features.length == 0)
           {
-            console.log("Resp Features Serv Mapas =>",_responseConsultaSimple.features.length);
+            if (utilsModule?.logger()) console.log("Resp Features Serv Mapas =>",_responseConsultaSimple.features.length);
             dialogAlert = true;            
           }
 
@@ -190,7 +190,7 @@ import { InterfaceResponseConsultaSimple, InterfaceMensajeModal, typeMSM  } from
           }
           setResponseConsultaSimple(_responseConsultaSimple || {});
         } catch (error) {
-          console.log("Se presentó error al procesar los features =>",error);
+          if (utilsModule?.logger()) console.log("Se presentó error al procesar los features =>",error);
         }
       }
 
@@ -241,7 +241,7 @@ import { InterfaceResponseConsultaSimple, InterfaceMensajeModal, typeMSM  } from
         const graphicsLayer = new GraphicsLayer();
     
         features.forEach((feature) => {
-          console.log("Tipo geometría =>",feature.geometry);
+          if (utilsModule?.logger()) console.log("Tipo geometría =>",feature.geometry);
           //Validación de un Polígono
           if (feature.geometry.rings){
             setTypeGraphMap("polygon");
@@ -273,7 +273,7 @@ import { InterfaceResponseConsultaSimple, InterfaceMensajeModal, typeMSM  } from
               spatialReference: spatialReference
             });
             
-            console.log("Objeto Point =>",point);
+            if (utilsModule?.logger()) console.log("Objeto Point =>",point);
 
             const outlPoint = new SimpleLineSymbol({
               color: [255, 255, 0], // Amarillo
@@ -347,7 +347,7 @@ import { InterfaceResponseConsultaSimple, InterfaceMensajeModal, typeMSM  } from
 
     //https://developers.arcgis.com/experience-builder/guide/add-layers-to-a-map/
     const activeViewChangeHandler = (jmv: JimuMapView) => {
-      console.log("Ingresando al evento objeto JimuMapView...");
+      if (utilsModule?.logger()) console.log("Ingresando al evento objeto JimuMapView...");
       if (jmv) {
         setJimuMapView(jmv);        
       }
@@ -375,7 +375,7 @@ import { InterfaceResponseConsultaSimple, InterfaceMensajeModal, typeMSM  } from
      */
     
     useEffect(() => {
-      console.log("En pruebas desde Hook...",cond);
+      if (utilsModule?.logger()) console.log("En pruebas desde Hook...",cond);
       if (urlCapa && cond)
       {
         tstDrawMap(urlCapa, cond)
@@ -389,12 +389,17 @@ import { InterfaceResponseConsultaSimple, InterfaceMensajeModal, typeMSM  } from
   //FUENTE: https://www.pluralsight.com/resources/blog/guides/how-to-get-selected-value-from-a-mapped-select-input-in-react#:~:text=To%20fetch%20the%20selected%20value,state%20to%20pass%20the%20value.
 
     const mapDiv = useRef(null);
+    const [utilsModule, setUtilsModule] = useState(null);
 
-    //console.log("=>",jsonSERV);
-    //console.log("Temas =>",temas);
+    //if (utilsModule?.logger()) console.log("=>",jsonSERV);
+    //if (utilsModule?.logger()) console.log("Temas =>",temas);
 
-    //console.log("Array JSON SERV =>",jsonSERV);  
+    //if (utilsModule?.logger()) console.log("Array JSON SERV =>",jsonSERV);  
     //Evento sobre opción Consultar => onClick={consultaSimple}
+
+    useEffect(() => {
+      import('../../../../utils/module').then(modulo => setUtilsModule(modulo));
+    }, []);
 
     return (
       <div className="w-100 p-3 bg-primary text-white">

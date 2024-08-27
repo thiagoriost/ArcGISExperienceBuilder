@@ -1,37 +1,37 @@
 // const servicioMadre = "https://pruebassig.igac.gov.co/server/rest/services/Indicadores/MapServer"
-const servicioMadre = "https://pruebassig.igac.gov.co/server/rest/services/Indicadores_municipios/MapServer"
-/* const urls = {
-    tablaContenido:"https://sigquindio.gov.co:8443/ADMINSERV/AdminGeoApplication/AdminGeoWebServices/getTablaContenidoJsTree/public",
-    Departamentos: `${servicioMadre}/11`,
-    Municipios: `${servicioMadre}/10`,
-    indicadores:{
-        v_predios_fondo_tierras_mun: `${servicioMadre}/1`,
-        v_predios_inventario_baldios_mun: `${servicioMadre}/2`,
-        v_predios_adjudicados_mun: `${servicioMadre}/3`,
-        v_predios_adj_baldios_mun: `${servicioMadre}/4`,
-        v_bienes_fiscales_adj_mun: `${servicioMadre}/5`,
-        v_predios_sub_integrales_mun: `${servicioMadre}/6`,
-        v_predios_entregados_ft_mun: `${servicioMadre}/7`,
-        v_predios_formalizados_mun: `${servicioMadre}/8`,
-        v_predios_formal_mujeres_mun: `${servicioMadre}/9`,
-    }
-} */
-
+const MapServerMunicipal = "https://pruebassig.igac.gov.co/server/rest/services/Indicadores_municipios/MapServer";
+const mapServerNal = "https://pruebassig.igac.gov.co/server/rest/services/Indicadores_nacionales_municipales/MapServer";
 
 const urls = {
     tablaContenido:"https://sigquindio.gov.co:8443/ADMINSERV/AdminGeoApplication/AdminGeoWebServices/getTablaContenidoJsTree/public",
-    Departamentos: `${servicioMadre}/1`,
-    Municipios: `${servicioMadre}/0`,
-    indicadores:{
-        v_predios_fondo_tierras_mun: `${servicioMadre}/3`,
-        v_predios_inventario_baldios_mun: `${servicioMadre}/4`,
-        v_predios_adjudicados_mun: `${servicioMadre}/5`,
-        v_predios_adj_baldios_mun: `${servicioMadre}/6`,
-        v_bienes_fiscales_adj_mun: `${servicioMadre}/7`,
-        v_predios_sub_integrales_mun: `${servicioMadre}/8`,
-        v_predios_entregados_ft_mun: `${servicioMadre}/9`,
-        v_predios_formalizados_mun: `${servicioMadre}/10`,
-        v_predios_formal_mujeres_mun: `${servicioMadre}/11`,
+    Municipios: `${MapServerMunicipal}/0`,
+    Departamentos: `${MapServerMunicipal}/1`,
+    indicadores:{// municipales
+        v_predios_fondo_tierras_mun: `${MapServerMunicipal}/3`,
+        v_predios_inventario_baldios_mun: `${MapServerMunicipal}/4`,
+        v_predios_adjudicados_mun: `${MapServerMunicipal}/5`,
+        v_predios_adj_baldios_mun: `${MapServerMunicipal}/6`,
+        v_bienes_fiscales_adj_mun: `${MapServerMunicipal}/7`,
+        v_predios_sub_integrales_mun: `${MapServerMunicipal}/8`,
+        v_predios_entregados_ft_mun: `${MapServerMunicipal}/9`,
+        v_predios_formalizados_mun: `${MapServerMunicipal}/10`,
+        v_predios_formal_mujeres_mun: `${MapServerMunicipal}/11`,
+        v_predios_uaf_mun: `${MapServerMunicipal}/12`,
+        v_predios_restierras_mun: `${MapServerMunicipal}/13`,
+    },
+    indicadoresNaci:{ // nacionales
+        v_predios_fondo_tierras_nacmun:`${mapServerNal}/3`,
+        v_predios_inv_baldios_nacmun:`${mapServerNal}/4`,
+        v_predios_adjudicados_macmun:`${mapServerNal}/5`,
+        v_predios_adj_baldios_nacmun:`${mapServerNal}/6`,
+        v_bienes_fiscales_adj_nacmun:`${mapServerNal}/7`,
+        v_predios_sub_integrales_nacmun:`${mapServerNal}/8`,
+        v_predios_entregados_ft_nacmun:`${mapServerNal}/9`,
+        v_predios_formalizados_nacmun:`${mapServerNal}/10`,
+        v_predios_for_mujeres_nacmun:`${mapServerNal}/11`,
+        v_predios_uaf_nacmun:`${mapServerNal}/12`,//por definir
+        v_predios_restierras_nacmun:`${mapServerNal}/13`,//por definir
+
     }
 }
 

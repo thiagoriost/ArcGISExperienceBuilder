@@ -3,6 +3,7 @@ import { React} from "jimu-core";
 import { Button, Icon, Modal, ModalBody, ModalFooter, ModalHeader, Alert } from 'jimu-ui'; // import components
 import { interfaceMensajeModal } from "./interfaces";
 import './style.css'
+import { useEffect, useState } from "react";
 
 
 interface Modal_Props {
@@ -16,14 +17,21 @@ interface Modal_Props {
  * @returns 
  */
 const ModalComponent: React.FC<Modal_Props> = ({mensajeModal, setMensajeModal}) => {
+  const [utilsModule, setUtilsModule] = useState<any>(null);
+
+  useEffect(() => {
+    import('../../utils/module').then(modulo => setUtilsModule(modulo));
+    // import('../../../commonWidgets/widgetsModule').then(modulo => setWidgetModules(modulo));
+  }, []);
+
   return (
     <div>
         <Modal
-            // onClosed={()=>{console.log(111)}}
-            // onEnter={()=>{console.log(222)}}
-            // onExit={()=>{console.log(3333)}}
-            // onOpened={()=>{console.log(444)}}
-            toggle={(e)=>{console.log(e); setMensajeModal({...mensajeModal, deployed:false})}}
+            // onClosed={()=>{if (utilsModule?.logger()) console.log(111)}}
+            // onEnter={()=>{if (utilsModule?.logger()) console.log(222)}}
+            // onExit={()=>{if (utilsModule?.logger()) console.log(3333)}}
+            // onOpened={()=>{if (utilsModule?.logger()) console.log(444)}}
+            toggle={(e)=>{if (utilsModule?.logger()) console.log(e); setMensajeModal({...mensajeModal, deployed:false})}}
             isOpen={mensajeModal.deployed}
             >
             <ModalHeader
@@ -64,12 +72,14 @@ const ModalComponent: React.FC<Modal_Props> = ({mensajeModal, setMensajeModal}) 
                     
                 </ModalBody>
             <ModalFooter>
-                <Button onClick={(e)=>{console.log(e); setMensajeModal({...mensajeModal, deployed:false})}}>
+                <Button onClick={(e)=>{
+                    if (utilsModule?.logger()) console.log(e);
+                    setMensajeModal({...mensajeModal, deployed:false})}}>
                     X
                 </Button>
                 {' '}
                {/*  <Button
-                onClick={(e)=>{console.log(e); setMensajeModal('')}}
+                onClick={(e)=>{if (utilsModule?.logger()) console.log(e); setMensajeModal('')}}
                 type="primary"
                 >
                 Do Something
