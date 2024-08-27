@@ -19,6 +19,7 @@ export const DATA_Fuente_Indicadores = [
                   label:"Cantidad predios fondo tierras RA",
                   descricion:"Cantidad de predios en el Fondo de Tierras para la Reforma Agraria",
                   url:"v_predios_fondo_tierras_mun",
+                  urlNal:"v_predios_fondo_tierras_nacmun",
                   fieldlabel:["tipo_predio", "anio"], // con esto se especifica la cantidad de graficas q se desplegaran segun la data de cada feature
                   fieldValue:"cantidad_predios",// estees el valor que tomara generar las cantidades para cada label
                   leyenda:["Cantidad de predios por tipo","Cantidad de predios por año"] // las leyendas para cada label
@@ -28,6 +29,7 @@ export const DATA_Fuente_Indicadores = [
                   label:"Cantidad de área",
                   descricion:"Cantidad de área dispuesta en el Fondo de Tierras para la Reforma Agraria",
                   url:"v_predios_fondo_tierras_mun",
+                  urlNal:"v_predios_fondo_tierras_nacmun",
                   fieldlabel:["tipo_predio", "anio"],
                   fieldValue:"total_area_ha",
                   leyenda:["Cantidad de área por tipo","Cantidad de área por año"]
@@ -37,6 +39,7 @@ export const DATA_Fuente_Indicadores = [
                   label:"Inventario Predios Nacional de Baldíos",
                   descricion:"Cantidad de predios en el Inventario Nacional de Baldíos",
                   url:"v_predios_inventario_baldios_mun",
+                  urlNal:"v_predios_inv_baldios_nacmun",
                   fieldlabel:["destinacion_predio", "anio"],
                   fieldValue:"cantidad_predios",
                   leyenda:["Cantidad de predios por destino","Cantidad de predios por año"]
@@ -46,6 +49,7 @@ export const DATA_Fuente_Indicadores = [
                   label:"Inventario Årea Nacional de Baldíos",
                   descricion:"Cantidad de área en el Inventario Nacional de Baldíos",
                   url:"v_predios_inventario_baldios_mun",
+                  urlNal:"v_predios_inv_baldios_nacmun",
                   fieldlabel:["destinacion_predio", "anio"],
                   fieldValue:"total_area_ha",
                   leyenda:["Cantidad de área por destino","Cantidad de área por año"]
@@ -62,6 +66,7 @@ export const DATA_Fuente_Indicadores = [
                   label:"Predios adjudicados",
                   descricion:"Cantidad de predios adjudicados",
                   url:"v_predios_adjudicados_mun",
+                  urlNal:"v_predios_adjudicados_macmun",
                   fieldlabel:["cat_anio_adjudicacion", "tipo_beneficiario", "genero_beneficiario"],
                   fieldValue:"cantidad_predios",
                   leyenda:["Predios adjudicados por año","Predios adjudicados por beneficiario ","Predios adjudicados por tipo de género"]
@@ -71,6 +76,7 @@ export const DATA_Fuente_Indicadores = [
                   label:"Årea de predios adjudicados",
                   descricion:"Cantidad de área de predios adjudicados",
                   url:"v_predios_adjudicados_mun",
+                  urlNal:"v_predios_adjudicados_macmun",
                   fieldlabel:["cat_anio_adjudicacion", "tipo_beneficiario", "genero_beneficiario"],
                   fieldValue:"total_area_ha",
                   leyenda:["Área adjudicada por año","Área adjudicada por beneficiario ","Área adjudicada por tipo de género"]
@@ -80,6 +86,7 @@ export const DATA_Fuente_Indicadores = [
                   label:"Predios baldíos adjudicados",
                   descricion:"Cantidad de predios baldíos adjudicados",
                   url:"v_predios_adj_baldios_mun",
+                  urlNal:"v_predios_adj_baldios_nacmun",
                   fieldlabel:["cat_anio_adjudicacion", "tipo_beneficiario", "genero_beneficiario"],
                   fieldValue:"cantidad_predios",
                   leyenda:["Predios por año","Predios por beneficiario ","Predios por tipo de género"]
@@ -89,6 +96,7 @@ export const DATA_Fuente_Indicadores = [
                   label:"Área de predios baldíos adjudicados",
                   descricion:"Cantidad de área de predios baldíos adjudicados",
                   url:"v_predios_adj_baldios_mun",
+                  urlNal:"v_predios_adj_baldios_nacmun",
                   fieldlabel:["cat_anio_adjudicacion", "tipo_beneficiario", "genero_beneficiario"],
                   fieldValue:"total_area_ha",
                   leyenda:["Área por año","Área por beneficiario ","Área por tipo de género"]
@@ -98,6 +106,7 @@ export const DATA_Fuente_Indicadores = [
                   label:"Bienes Fiscales Patrimoniales adjudicados",
                   descricion:"Cantidad de Bienes Fiscales Patrimoniales adjudicados",
                   url:"v_bienes_fiscales_adj_mun",
+                  urlNal:"v_bienes_fiscales_adj_nacmun",
                   fieldlabel:["cat_anio_adjudicacion", "tipo_beneficiario", "genero_beneficiario"],
                   fieldValue:"cantidad_predios",
                   leyenda:["Predios por año","Predios por beneficiario ","Predios por tipo de género"]
@@ -107,6 +116,7 @@ export const DATA_Fuente_Indicadores = [
                   label:"Área de Bienes Fiscales Patrimoniales adjudicados",
                   descricion:"Cantidad de área de Bienes Fiscales Patrimoniales adjudicados",
                   url:"v_bienes_fiscales_adj_mun",
+                  urlNal:"v_bienes_fiscales_adj_nacmun",
                   fieldlabel:["cat_anio_adjudicacion", "tipo_beneficiario", "genero_beneficiario"],
                   fieldValue:"total_area_ha",
                   leyenda:["Área por año","Área por beneficiario ","Área por tipo de género"]
@@ -116,6 +126,7 @@ export const DATA_Fuente_Indicadores = [
                   label:"Beneficiarios de subsidios integrales para la compra de tierras",
                   descricion:"Cantidad de predios beneficiarios de subsidios integrales para la compra de tierras",
                   url:"v_predios_sub_integrales_mun",
+                  urlNal:"v_predios_sub_integrales_nacmun",
                   fieldlabel:["cat_anio_adjudicacion", "tipo_beneficiario", "genero_beneficiario"],
                   fieldValue:"cantidad_predios",
                   leyenda:["Predios por año","Predios por beneficiario ","Predios por tipo de género"]
@@ -125,6 +136,7 @@ export const DATA_Fuente_Indicadores = [
                   label:"Årea de predios beneficiarios de subsidios integrales para la compra de tierras",
                   descricion:"Cantidad de área de predios beneficiarios de subsidios integrales para la compra de tierras",
                   url:"v_predios_sub_integrales_mun",
+                  urlNal:"v_predios_sub_integrales_nacmun",
                   fieldlabel:["cat_anio_adjudicacion", "tipo_beneficiario", "genero_beneficiario"],
                   fieldValue:"total_area_ha",
                   leyenda:["Área por año","Área por beneficiario ","Área por tipo de género"]
@@ -134,6 +146,7 @@ export const DATA_Fuente_Indicadores = [
                   label:"Predios entregados a través del Fondo de Tierras",
                   descricion:"Cantidad de predios entregados a través del Fondo de Tierras",
                   url:" v_predios_entregados_ft_mun",
+                  urlNal:" v_predios_entregados_ft_nacmun",
                   fieldlabel:["cat_anio_adjudicacion", "tipo_beneficiario", "genero_beneficiario"],
                   fieldValue:"cantidad_predios",
                   leyenda:["Predios por año","Predios por beneficiario ","Predios por tipo de género"]
@@ -143,6 +156,7 @@ export const DATA_Fuente_Indicadores = [
                   label:"Årea entregada a través del Fondo de Tierras",
                   descricion:"Cantidad de área entregada a través del Fondo de Tierras",
                   url:" v_predios_entregados_ft_mun",
+                  urlNal:" v_predios_entregados_ft_nacmun",
                   fieldlabel:["cat_anio_adjudicacion", "tipo_beneficiario", "genero_beneficiario"],
                   fieldValue:"total_area_ha",
                   leyenda:["Área por año","Área por beneficiario ","Área por tipo de género"]
@@ -158,12 +172,22 @@ export const DATA_Fuente_Indicadores = [
                   value:0,
                   label:"Porcentaje de predios",
                   descricion:"Porcentaje de predios con área por encima de la UAF mínima municipal",
+                  url:'v_predios_uaf_mun',
+                  urlNal:'v_predios_uaf_nacmun',
+                  fieldlabel:['anio'],
+                  fieldValue:'porcentaje_predios',
+                  leyenda:['Porcentaje de predios'],
                   
                 },
                 {
                   value:1,
                   label:"Porcentaje de área",
                   descricion:"Porcentaje de área de predios por encima de la UAF mínima municipal",
+                  url:'v_predios_uaf_mun',
+                  urlNal:'v_predios_uaf_nacmun',
+                  fieldlabel:['anio'],
+                  fieldValue:'porcentaje_area',
+                  leyenda:['Porcentaje de área'],
                 }
               ]
             },
@@ -177,6 +201,7 @@ export const DATA_Fuente_Indicadores = [
                   label:"Cantidad de predios",
                   descricion:"Cantidad de predios formalizados",
                   url:"v_predios_formalizados_mun",
+                  urlNal:"v_predios_formalizados_nacmun",
                   fieldlabel:["tipo_beneficiario", "genero_beneficiario", "cat_anio_formalizado"],
                   fieldValue:"cantidad_predios",
                   leyenda:["Predios por tipo","Predios por genero" ,"Predios por año"]
@@ -186,6 +211,7 @@ export const DATA_Fuente_Indicadores = [
                   label:"Cantidad de área",
                   descricion:"Cantidad de área de predios formalizados",
                   url:"v_predios_formalizados_mun",
+                  urlNal:"v_predios_formalizados_nacmun",
                   fieldlabel:["tipo_beneficiario", "genero_beneficiario", "cat_anio_formalizado"],
                   fieldValue:"total_area_ha",
                   leyenda:["Área por tipo","Área por genero" ,"Área por año"]
@@ -195,6 +221,7 @@ export const DATA_Fuente_Indicadores = [
                   label:"Cantidad de predios a mujeres",
                   descricion:"Cantidad de predios formalizados a mujeres",
                   url:"v_predios_formal_mujeres_mun",
+                  urlNal:"v_predios_for_mujeres_nacmun",
                   fieldlabel:["cat_anio_formalizado"],
                   fieldValue:"cantidad_predios",
                   leyenda:["Predios por año"]
@@ -204,6 +231,7 @@ export const DATA_Fuente_Indicadores = [
                   label:"Cantidad de área a mujeres",
                   descricion:"Cantidad de área de predios formalizados a mujeres",
                   url:"v_predios_formal_mujeres_mun",
+                  urlNal:"v_predios_for_mujeres_nacmun",
                   fieldlabel:["cat_anio_formalizado"],
                   fieldValue:"total_area_ha",
                   leyenda:["Área por año"]
@@ -226,21 +254,41 @@ export const DATA_Fuente_Indicadores = [
                   value:0,
                   label:"Porcentaje de predios",
                   descricion:"Porcentaje de predios actualizados",
+                  url:'',
+                  urlNal:'',
+                  fieldlabel:[''],
+                  fieldValue:'',
+                  leyenda:[''],
                 },
                 {
                   value:1,
                   label:"Porcentaje de área",
                   descricion:"Porcentaje de área de predios actualizados",
+                  url:'',
+                  urlNal:'',
+                  fieldlabel:[''],
+                  fieldValue:'',
+                  leyenda:[''],
                 },
                 {
                   value:2,
                   label:"Cantidad de municipios",
                   descricion:"Cantidad de municipios actualizados en cada vigencia",
+                  url:'',
+                  urlNal:'',
+                  fieldlabel:[''],
+                  fieldValue:'',
+                  leyenda:[''],
                 },
                 {
                   value:3,
                   label:"Número de municipios",
                   descricion:"Número de municipios formados en cada vigencia",
+                  url:'',
+                  urlNal:'',
+                  fieldlabel:[''],
+                  fieldValue:'',
+                  leyenda:[''],
                 }
               ]
             },
@@ -260,6 +308,11 @@ export const DATA_Fuente_Indicadores = [
                   value:0,
                   label:"Cantidad de predios",
                   descricion:"Cantidad de predios asociados a solicitudes de inscripción al Registro de Tierras Despojadas y Abandonadas Forzosamente",
+                  url:'v_predios_restierras_mun',
+                  urlNal:'v_predios_restierras_nacmun',
+                  fieldlabel:['pdet', 'nucleo_reforma'],
+                  fieldValue:'cantidad_predios',
+                  leyenda:[''],
                 }
               ]
             }
@@ -286,11 +339,21 @@ export const DATA_Fuente_Indicadores = [
                   value:0,
                   label:"Porcentaje de predios",
                   descricion:"Porcentaje de predios en Zonas de Reserva Campesina",
+                  url:'',
+                  urlNal:'',
+                  fieldlabel:[''],
+                  fieldValue:'',
+                  leyenda:[''],
                 },
                 {
                   value:1,
                   label:"Porcentaje de área",
                   descricion:"Porcentaje de área de predios en Zonas de Reserva Campesina",
+                  url:'',
+                  urlNal:'',
+                  fieldlabel:[''],
+                  fieldValue:'',
+                  leyenda:[''],
                 }
               ]
             }
@@ -317,11 +380,21 @@ export const DATA_Fuente_Indicadores = [
                   value:0,
                   label:"Índice de Gini de la propiedad",
                   descricion:"Índice de Gini de la propiedad",
+                  url:'',
+                  urlNal:'',
+                  fieldlabel:[''],
+                  fieldValue:'',
+                  leyenda:[''],
                 },
                 {
                   value:1,
                   label:"Índice de Disparidad Superior - IDS",
                   descricion:"Índice de Disparidad Superior - IDS",
+                  url:'',
+                  urlNal:'',
+                  fieldlabel:[''],
+                  fieldValue:'',
+                  leyenda:[''],
                 }
               ]
             },
@@ -334,11 +407,21 @@ export const DATA_Fuente_Indicadores = [
                   value:0,
                   label:"Porcentaje predios presunta subutilización del uso del suelo",
                   descricion:"Porcentaje de predios con presunta subutilización en el uso del suelo",
+                  url:'',
+                  urlNal:'',
+                  fieldlabel:[''],
+                  fieldValue:'',
+                  leyenda:[''],
                 },
                 {
                   value:1,
                   label:"Porcentaje predios, Territorios ley 2da",
                   descricion:"Porcentaje de predios en Territorios con ley 2da",
+                  url:'',
+                  urlNal:'',
+                  fieldlabel:[''],
+                  fieldValue:'',
+                  leyenda:[''],
                 }
               ]
             }
@@ -365,6 +448,11 @@ export const DATA_Fuente_Indicadores = [
                   value:0,
                   label:"Cantidad de esquemas",
                   descricion:"Cantidad de esquemas de asistencia técnica implementados",
+                  url:'',
+                  urlNal:'',
+                  fieldlabel:[''],
+                  fieldValue:'',
+                  leyenda:[''],
                 }
               ]
             }
@@ -392,11 +480,21 @@ export const DATA_Fuente_Indicadores = [
                   value:0,
                   label:"Porcentaje predios títulados a grupos étnicos",
                   descricion:"Porcentaje de predios en territorios títulados a grupos étnicos",
+                  url:'',
+                  urlNal:'',
+                  fieldlabel:[''],
+                  fieldValue:'',
+                  leyenda:[''],
                 },
                 {
                   value:1,
                   label:"Porcentaje área títulada a grupos étnicos",
                   descricion:"Porcentaje de área de predios en territorios títulados a grupos étnicos",
+                  url:'',
+                  urlNal:'',
+                  fieldlabel:[''],
+                  fieldValue:'',
+                  leyenda:[''],
                 }
               ]
             }

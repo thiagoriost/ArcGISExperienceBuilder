@@ -4,6 +4,7 @@ import { exportToCSV } from "./exportToCSV";
 import { JimuMapView, loadArcGISJSAPIModules } from "jimu-arcgis";
 import ClassBreaksRenderer from '@arcgis/core/renderers/ClassBreaksRenderer';
 import Polygon from "@arcgis/core/geometry/Polygon";
+import { coloresMapaCoropletico } from "./constantes";
 
 
 
@@ -13,20 +14,16 @@ const moduleExportToCSV = (rows, fileName) => {
 
 const loadEsriModules = async () => {
   try {
-    return await loadModules([
-      'esri/Graphic',
-      'esri/layers/GraphicsLayer',
-      'esri/symbols/SimpleFillSymbol',
-      'esri/symbols/SimpleLineSymbol',
-      'esri/symbols/SimpleMarkerSymbol',
-      'esri/geometry/Point',
-      'esri/geometry/Extent',
-      'esri/PopupTemplate',
-      'esri/tasks/Query', 'esri/tasks/QueryTask'
-    ]);
+    const [FeatureLayer, SimpleFillSymbol, Polygon, Graphic, GraphicsLayer, SimpleMarkerSymbol,SimpleLineSymbol] = await loadModules([
+      'esri/layers/FeatureLayer', 'esri/symbols/SimpleFillSymbol', 'esri/geometry/Polygon', 'esri/Graphic',
+       'esri/layers/GraphicsLayer', 'esri/symbols/SimpleMarkerSymbol', 'esri/symbols/SimpleLineSymbol'], {
+      url: 'https://js.arcgis.com/4.29/'
+    });
+
+    return {FeatureLayer, SimpleFillSymbol, Polygon, Graphic, GraphicsLayer,SimpleMarkerSymbol,SimpleLineSymbol}
     
   } catch (error) {
-    if(logger()) console.error('Error fetching data: ', error);
+    if(logger()) console.error('Error loading loadModules: ', error);
   }
 };
 
@@ -164,17 +161,12 @@ const realizarConsulta = async (campo: string, url: string, returnGeometry: bool
 const pintarFeatureLayer = async ({url, jimuMapView, colorOutline="white", color='transparent', doZoom, geometryType,
     outFields="*",returnGeometry=false, definitionExpression='1=1', getAttributes=false,pintarFeature=false,
     _dataCoropletico, identificadorMixData, fieldValueToSetRangeCoropletico, lastLayerDeployed,
-    setPoligonoSeleccionado, setClickHandler, setLastLayerDeployed, setIsLoading, setMunicipios, setRangosLeyenda
+    setPoligonoSeleccionado, setClickHandler, setLastLayerDeployed, setIsLoading, setMunicipios, setRangosLeyenda,
+    FeatureLayer,Graphic,GraphicsLayer,SimpleFillSymbol,SimpleMarkerSymbol,SimpleLineSymbol
 }) => {
   try {
     if(logger()) console.log("pintarFeatureLayer",{url, jimuMapView, colorOutline, color, doZoom, geometryType, outFields,
-      returnGeometry, definitionExpression, getAttributes,pintarFeature, _dataCoropletico, identificadorMixData, fieldValueToSetRangeCoropletico });
-    // Cargar los módulos necesarios de Esri
-    const [FeatureLayer,SimpleFillSymbol, SimpleLineSymbol, SimpleMarkerSymbol, Polygon, Graphic, GraphicsLayer] = await loadModules([
-      'esri/layers/FeatureLayer','esri/symbols/SimpleFillSymbol', 'esri/symbols/SimpleLineSymbol', 'esri/symbols/SimpleMarkerSymbol', 'esri/geometry/Polygon', 
-        'esri/Graphic', 'esri/layers/GraphicsLayer',], {
-      url: 'https://js.arcgis.com/4.29/'
-    });
+      returnGeometry, definitionExpression, getAttributes,pintarFeature, _dataCoropletico, identificadorMixData, fieldValueToSetRangeCoropletico });    
 
     const layer = new FeatureLayer({ url, outFields, definitionExpression, /* renderer:classBreaksRenderer, */
       editingEnabled: true, objectIdField: "objectid",
@@ -192,7 +184,9 @@ const pintarFeatureLayer = async ({url, jimuMapView, colorOutline="white", color
       // Con el siguietne for, se agrega los indicadores a cada feature dependiendo del codigo de municipio
       features.map(f=>{
         _dataCoropletico.forEach(dc =>{
-            if(f.attributes.mpcodigo == dc.attributes.cod_municipio){
+          const codigoMunicipio = f.attributes.mpcodigo?f.attributes.mpcodigo:f.attributes.cod_municipio;
+            if(codigoMunicipio == dc.attributes.cod_municipio){
+            // if(f.attributes.mpcodigo == dc.attributes.cod_municipio){
                 f.attributes.dataIndicadores
                     ? f.attributes.dataIndicadores.push(dc)
                     : f.attributes.dataIndicadores=[dc]
@@ -203,19 +197,7 @@ const pintarFeatureLayer = async ({url, jimuMapView, colorOutline="white", color
       setMunicipios(dataOrdenada)
       if(logger()) console.log({features})      
       // Datos para configurar los rangos del coropletico
-      const values = []; // guarda los acumulados totales del valor de indicador para el campo fieldValueToSetRangeCoropletico, para cada feature
-      features.forEach(featu => {
-        let tempValue = 0;
-        if(featu.attributes.dataIndicadores){
-            featu.attributes.dataIndicadores.forEach(indicadore => tempValue += indicadore.attributes[fieldValueToSetRangeCoropletico]);
-            featu.attributes[fieldValueToSetRangeCoropletico]=tempValue
-        }
-        values.push(tempValue)
-      });      
-      const minValue = Math.min(...values);
-      const maxValue = Math.max(...values);
-      const numClasses = 5;
-      const interval = (maxValue - minValue) / numClasses;
+      const {minValue, maxValue, interval} = rangosCoropleticos(features, fieldValueToSetRangeCoropletico);
       // end Datos para configurar los rangos del coropletico
 
       dibujarPoligono({features, minValue, maxValue, jimuMapView, setPoligonoSeleccionado,
@@ -288,6 +270,27 @@ const pintarFeatureLayer = async ({url, jimuMapView, colorOutline="white", color
   }
 };
 
+const rangosCoropleticos = (features, fieldValueToSetRangeCoropletico) => {
+  const values = []; // guarda los acumulados totales del valor de indicador para el campo fieldValueToSetRangeCoropletico, para cada feature
+  features.forEach(featu => {
+    let tempValue = 0;
+    if(featu.attributes.dataIndicadores){ //este aplica para el coropletico municipal
+        featu.attributes.dataIndicadores.forEach(indicadore => tempValue += indicadore.attributes[fieldValueToSetRangeCoropletico]);
+        featu.attributes[fieldValueToSetRangeCoropletico]=tempValue
+    }else if(!featu.attributes[fieldValueToSetRangeCoropletico]){
+      if(logger()) console.error("Sin match para el campo => ", {fieldValueToSetRangeCoropletico, features})
+    }else if(featu.attributes[fieldValueToSetRangeCoropletico]){//este aplica para el coropletico nacional
+      tempValue = featu.attributes[fieldValueToSetRangeCoropletico];
+    }
+    values.push(tempValue)
+  });      
+  const minValue = Math.min(...values);
+  const maxValue = Math.max(...values);
+  const numClasses = 5;
+  const interval = (maxValue - minValue) / numClasses;
+  return {minValue, maxValue, interval}
+}
+
 const queryAttributesLayer = async ({url, definitionExpression, returnGeometry, outFields}) => {
   if(logger()) console.log({url, definitionExpression, returnGeometry, outFields})
   const [FeatureLayer] = await loadModules(['esri/layers/FeatureLayer'], {
@@ -333,18 +336,18 @@ const dibujarPoligono = ({features, interval, fieldValueToSetRangeCoropletico, w
   setClickHandler, setLastLayerDeployed, setPoligonoSeleccionado, lastLayerDeployed, Polygon, Graphic,
   GraphicsLayer, SimpleFillSymbol}) => {
 
-  if(logger()) console.log({features, interval, fieldValueToSetRangeCoropletico, wkid})
   
   const graphicsLayer = new GraphicsLayer();
   let tempLastLayerDeployed = lastLayerDeployed;
   interval = Math.round(interval);
   const rangos = [
-    [ 1, interval],
-    [ interval+1      , interval*2 ],
-    [ (interval*2)+1  , 3*interval ],
-    [ (interval*3)+1  , 4*interval ],
-    [ (interval*4)+1  , 5*interval ]
-  ]
+    [ 1               , interval    ],
+    [ interval+1      , interval*2  ],
+    [ (interval*2)+1  , 3*interval  ],
+    [ (interval*3)+1  , 4*interval  ],
+    [ (interval*4)+1  , 5*interval  ]
+  ];
+  if(logger()) console.log({features, interval, fieldValueToSetRangeCoropletico, wkid, rangos})
   setRangosLeyenda(rangos);
   let fieldToFixRange;
   features.forEach(feature => {
@@ -368,17 +371,17 @@ const dibujarPoligono = ({features, interval, fieldValueToSetRangeCoropletico, w
     if(logger()) console.log({fieldToFixRange}) */
     
     if (!fieldToFixRange){
-      color = [52, 152, 219, 0.1];
-    }else if (rangos[0][0] < fieldToFixRange && fieldToFixRange <= rangos[0][1]) {
-      color = [52, 152, 219, 0.8];
+      color = [255, 255, 255, 0.1];
+    }else if (rangos[0][0] <= fieldToFixRange && fieldToFixRange <= rangos[0][1]) {
+      color = coloresMapaCoropletico[0].value;
     }else if (rangos[1][0] < fieldToFixRange && fieldToFixRange <= rangos[1][1]) {
-      color =  [22, 160, 133, 0.8];
+      color = coloresMapaCoropletico[1].value;
     }else if (rangos[2][0] < fieldToFixRange && fieldToFixRange <= rangos[2][1]) {
-      color = [46, 204, 112, 0.8];
+      color = coloresMapaCoropletico[2].value;
     }else if (rangos[3][0] < fieldToFixRange && fieldToFixRange <= rangos[3][1]) {
-      color = [242, 156, 18, 0.8];
+      color = coloresMapaCoropletico[3].value;
     }else {
-      color = [211, 84, 0, 0.8];
+      color = coloresMapaCoropletico[4].value;
     }
   
     const graphic = new Graphic({
@@ -392,7 +395,7 @@ const dibujarPoligono = ({features, interval, fieldValueToSetRangeCoropletico, w
       }),
       attributes,
       popupTemplate: {
-        title: "Metadata",
+        title: attributes.mpnombre,
         content: [
           {
             type: "fields",
@@ -414,8 +417,7 @@ const dibujarPoligono = ({features, interval, fieldValueToSetRangeCoropletico, w
       graphics:[...tempLastLayerDeployed.graphics, graphic],
       graphicsLayers:[...tempLastLayerDeployed.graphicsLayers, graphicsLayer]
     }
-    // if(logger()) console.log({tempLastLayerDeployed})
-    console.log({fieldToFixRange, rangos})
+    if(logger()) console.log({tempLastLayerDeployed, fieldToFixRange, rangos})
     
   });
 
@@ -436,7 +438,7 @@ const dibujarPoligono = ({features, interval, fieldValueToSetRangeCoropletico, w
   });
   setClickHandler(handler); // Guardar el manejador del evento en el estado
   jimuMapView.view.on('pointer-move', (event) => {
-    console.log('Puntero movido a:', event.mapPoint);
+    // console.log('Puntero movido a:', event.mapPoint);
     
   });
   
@@ -572,7 +574,7 @@ async function renderPolygonsWithColorsFromService(jimuMapView) {
       query.outFields = ["*"];
       const featureSet = await featureLayer.queryFeatures(query);
       const features = featureSet.features;
-      console.log({featureSet})
+      if(logger)console.log({featureSet})
 
       dibujarPoligono({features, minValue:0, maxValue:0, jimuMapView, setPoligonoSeleccionado:()=>{},
         setClickHandler:()=>{}, fieldValueToSetRangeCoropletico:'cantidad_predios',
@@ -598,7 +600,7 @@ const goToOneExtentAndZoom = ({jimuMapView, extent, duration= 10000}) => {
   // jimuMapView.view.goTo(extent, { duration}, zoom);
   jimuMapView.view.goTo(extent, { duration});
   setTimeout(() => {
-    jimuMapView.view.zoom = jimuMapView.view.zoom - 0.5;    
+    jimuMapView.view.zoom = jimuMapView.view.zoom - 1.5;    
     if(logger)console.log("zoooom",{"jimuMapView.view.zoom":jimuMapView.view.zoom})
   }, 2000);
 }
@@ -651,11 +653,9 @@ const dibujarPoligonoToResaltar = async ({rings, wkid, attributes, jimuMapView, 
     if (blinkCount < intervalos) {
       if (render) {
         jimuMapView.view.map.add(graphicsLayer);
-        console.log(11111)
         render = !render
       } else {
         jimuMapView.view.map.remove(graphicsLayer);
-        console.log(222222)
         render = !render
       }
       blinkCount++;
@@ -682,5 +682,7 @@ export {
   removeLayer,
   renderPolygonsWithColorsFromService,
   goToOneExtentAndZoom,
-  dibujarPoligonoToResaltar
+  dibujarPoligonoToResaltar,
+  dibujarPoligono,
+  rangosCoropleticos
 }

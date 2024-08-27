@@ -33,6 +33,7 @@ const Widget = (props: AllWidgetProps<any>) => {
     
     const tematicas = await getDataTablaContenido(modulo);
     if (utilsModule?.logger()) console.log(tematicas)
+    if(!tematicas) return
     setGroupedLayers(tematicas);
   }
 
