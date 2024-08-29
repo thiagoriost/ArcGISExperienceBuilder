@@ -197,12 +197,12 @@ const pintarFeatureLayer = async ({url, jimuMapView, colorOutline="white", color
       setMunicipios(dataOrdenada)
       if(logger()) console.log({features})      
       // Datos para configurar los rangos del coropletico
-      const {minValue, maxValue, interval} = rangosCoropleticos(features, fieldValueToSetRangeCoropletico);
+      // const {minValue, maxValue, interval} = rangosCoropleticos(features, fieldValueToSetRangeCoropletico);
       // end Datos para configurar los rangos del coropletico
 
-      dibujarPoligono({features, minValue, maxValue, jimuMapView, setPoligonoSeleccionado,
+      dibujarPoligono({features, jimuMapView, setPoligonoSeleccionado,
         setClickHandler, fieldValueToSetRangeCoropletico, setLastLayerDeployed, lastLayerDeployed,
-         interval, setRangosLeyenda, Polygon, Graphic, GraphicsLayer, SimpleFillSymbol}
+         setRangosLeyenda, Polygon, Graphic, GraphicsLayer, SimpleFillSymbol}
       )
 
       // Esperar a que la capa esté lista
@@ -270,7 +270,7 @@ const pintarFeatureLayer = async ({url, jimuMapView, colorOutline="white", color
   }
 };
 
-const rangosCoropleticos = (features, fieldValueToSetRangeCoropletico) => {
+/* const rangosCoropleticos = (features, fieldValueToSetRangeCoropletico) => {
   const values = []; // guarda los acumulados totales del valor de indicador para el campo fieldValueToSetRangeCoropletico, para cada feature
   features.forEach(featu => {
     let tempValue = 0;
@@ -283,12 +283,88 @@ const rangosCoropleticos = (features, fieldValueToSetRangeCoropletico) => {
       tempValue = featu.attributes[fieldValueToSetRangeCoropletico];
     }
     values.push(tempValue)
-  });      
+  });    
+  if(logger()) console.log({values})
   const minValue = Math.min(...values);
   const maxValue = Math.max(...values);
   const numClasses = 5;
   const interval = (maxValue - minValue) / numClasses;
   return {minValue, maxValue, interval}
+} */
+
+const calculoValoresQuintiles = (features, fieldValueToSetRangeCoropletico) => {
+  const values = []; // guarda los acumulados totales del valor de indicador para el campo fieldValueToSetRangeCoropletico, para cada feature
+  features.forEach(featu => {
+    let tempValue = 0;
+    if(featu.attributes.dataIndicadores){ //este aplica para el coropletico municipal
+        featu.attributes.dataIndicadores.forEach(indicadore => tempValue += indicadore.attributes[fieldValueToSetRangeCoropletico]);
+        featu.attributes[fieldValueToSetRangeCoropletico]=tempValue
+    }else if(!featu.attributes[fieldValueToSetRangeCoropletico]){
+      if(logger()) console.error("Sin match para el campo => ", {fieldValueToSetRangeCoropletico, features})
+    }else if(featu.attributes[fieldValueToSetRangeCoropletico]){//este aplica para el coropletico nacional
+      tempValue = featu.attributes[fieldValueToSetRangeCoropletico];
+    }
+    values.push(tempValue)
+  }); 
+
+  values.sort((a, b) => a - b);
+  const minValue = parseFloat(Math.min(...values).toFixed(2));
+  const maxValue = parseFloat(Math.max(...values).toFixed(2));
+/* 
+  const getQuantile = (datos, k) => {
+    const n = datos.length;
+    const position = (n - 1) * k;
+    // const position = (n * k) / 5;
+    
+      const base = Math.floor(position);
+      const rest = position - base;
+
+      if ((datos[base + 1] !== undefined)) {
+          return datos[base] + rest * (datos[base + 1] - datos[base]);
+      } else {
+          return datos[base];
+      }      
+  }
+  // Calcular los quintiles
+  const q1 = parseFloat(getQuantile(values, 0.2).toFixed(2));
+  const q2 = parseFloat(getQuantile(values, 0.4).toFixed(2));
+  const q3 = parseFloat(getQuantile(values, 0.6).toFixed(2));
+  const q4 = parseFloat(getQuantile(values, 0.8).toFixed(2));
+  const q5 = parseFloat(getQuantile(values, 1.0).toFixed(2));
+ 
+  const rangos = [
+    [ minValue , q1    ],
+    [ q1+0.01  , q2  ],
+    [ q2+0.01  , q3  ],
+    [ q3+0.01  , q4  ],    
+    [ q4+0.01  , q5  ]
+  ]
+  console.log("Quintiles ", { minValue, q1, q2, q3, q4, q5, maxValue, rangos });
+  return { q1, q2, q3, q4, q5, rangos }
+   */
+  let quintiles = [];
+  const n = values.length;
+  for (let k = 1; k < 5; k++) {
+      const P = (n * k) / 5;
+      
+      if (Number.isInteger(P)) {
+          quintiles.push(parseFloat(values[P - 1].toFixed(2)));
+      } else {
+          const lowerIndex = Math.floor(P) - 1;
+          const upperIndex = lowerIndex + 1;
+          const interpolatedValue = values[lowerIndex] + (P - Math.floor(P)) * (values[upperIndex] - values[lowerIndex]);
+          quintiles.push(parseFloat(interpolatedValue.toFixed(2)));
+      }
+  }
+  if(logger()) console.log({rangos:quintiles})
+  const rangos = [
+    [minValue, quintiles[0]],
+    [parseFloat((quintiles[0]+0.01).toFixed(2)) , quintiles[1]],
+    [parseFloat((quintiles[1]+0.01).toFixed(2)) , quintiles[2]],
+    [parseFloat((quintiles[2]+0.01).toFixed(2)) , quintiles[3]],
+    [parseFloat((quintiles[3]+0.01).toFixed(2)) , maxValue],
+  ]
+  return {rangos};
 }
 
 const queryAttributesLayer = async ({url, definitionExpression, returnGeometry, outFields}) => {
@@ -331,23 +407,24 @@ const ajustarDataToRender = (data: any, valueField, labelField) => {
   return objetosOrdenados
 }
 
-const dibujarPoligono = ({features, interval, fieldValueToSetRangeCoropletico, wkid=4326, jimuMapView,
-  minValue, maxValue, setRangosLeyenda,
-  setClickHandler, setLastLayerDeployed, setPoligonoSeleccionado, lastLayerDeployed, Polygon, Graphic,
-  GraphicsLayer, SimpleFillSymbol}) => {
+const dibujarPoligono = ({features, fieldValueToSetRangeCoropletico, wkid=4326, jimuMapView,
+  setRangosLeyenda, setClickHandler, setLastLayerDeployed, setPoligonoSeleccionado, lastLayerDeployed,
+  Polygon, Graphic, GraphicsLayer, SimpleFillSymbol}) => {
 
   
   const graphicsLayer = new GraphicsLayer();
   let tempLastLayerDeployed = lastLayerDeployed;
-  interval = Math.round(interval);
+  /* interval = Math.round(interval);
   const rangos = [
-    [ 1               , interval    ],
+    [ minValue        , interval    ],
     [ interval+1      , interval*2  ],
     [ (interval*2)+1  , 3*interval  ],
     [ (interval*3)+1  , 4*interval  ],
-    [ (interval*4)+1  , 5*interval  ]
-  ];
-  if(logger()) console.log({features, interval, fieldValueToSetRangeCoropletico, wkid, rangos})
+    // [ (interval*4)+1  , 5*interval  ]
+    [ (interval*4)+1  , maxValue  ]
+  ]; */
+  const {rangos} = calculoValoresQuintiles(features, fieldValueToSetRangeCoropletico);
+  // if(logger()) console.log({features, interval, fieldValueToSetRangeCoropletico, wkid, rangos})
   setRangosLeyenda(rangos);
   let fieldToFixRange;
   features.forEach(feature => {
@@ -464,144 +541,13 @@ const removeLayer = (jimuMapView, features: __esri.Layer[]) => {
   jimuMapView.view.zoom = jimuMapView.view.zoom -0.00000001;
 }
 
-async function renderPolygonsWithColorsFromService(jimuMapView) {
-  try {
-    const [FeatureLayer, ClassBreaksRenderer, Graphic, GraphicsLayer,SimpleFillSymbol] = await loadModules([
-      'esri/layers/FeatureLayer','esri/renderers/ClassBreaksRenderer', 'esri/Graphic',
-      'esri/layers/GraphicsLayer','esri/symbols/SimpleFillSymbol'
-    ]);
-
-    // Crear el renderer basado en class breaks
-    /* const renderer = new ClassBreaksRenderer({
-      field: 'cantidad_predios',
-      classBreakInfos: [
-        {
-          minValue: 0,
-          maxValue: 5,
-          symbol: {
-            type: 'simple-fill',
-            color: [255, 255, 178, 0.8], // Amarillo claro
-            outline: {
-              color: 'white',
-              width: 1
-            }
-          },
-          label: '0 - 5 predios'
-        },
-        {
-          minValue: 6,
-          maxValue: 15,
-          symbol: {
-            type: 'simple-fill',
-            color: [254, 204, 92, 0.8], // Amarillo
-            outline: {
-              color: 'white',
-              width: 1
-            }
-          },
-          label: '6 - 15 predios'
-        },
-        {
-          minValue: 16,
-          maxValue: 30,
-          symbol: {
-            type: 'simple-fill',
-            color: [253, 141, 60, 0.8], // Naranja
-            outline: {
-              color: 'white',
-              width: 1
-            }
-          },
-          label: '16 - 30 predios'
-        },
-        {
-          minValue: 31,
-          maxValue: 50,
-          symbol: {
-            type: 'simple-fill',
-            color: [240, 59, 32, 0.8], // Rojo
-            outline: {
-              color: 'white',
-              width: 1
-            }
-          },
-          label: '31 - 50 predios'
-        },
-        {
-          minValue: 51,
-          maxValue: Infinity,
-          symbol: {
-            type: 'simple-fill',
-            color: [189, 0, 38, 0.8], // Rojo oscuro
-            outline: {
-              color: 'white',
-              width: 1
-            }
-          },
-          label: '51+ predios'
-        }
-      ]
-    }); */
-
-    // Crear el FeatureLayer utilizando la URL del servicio
-    const featureLayer = new FeatureLayer({
-      url: 'https://pruebassig.igac.gov.co/server/rest/services/Indicadores_municipios/MapServer/3',
-      outFields: ['cod_municipio', 'cantidad_predios'], // Campos que quieres obtener
-      // renderer: renderer, // Aplicar el renderer para el estilo coroplético
-      visible: true, // Asegúrate de que la capa sea visible
-      popupTemplate: { // Configurar un template para el popup
-        title: 'Información del Municipio',
-        content: [{
-          type: 'fields',
-          fieldInfos: [
-            {
-              fieldName: 'cod_municipio',
-              label: 'Código Municipio',
-              visible: true
-            },
-            {
-              fieldName: 'cantidad_predios',
-              label: 'Cantidad de Predios',
-              visible: true
-            }
-          ]
-        }]
-      }
-    });
-
-    const query = featureLayer.createQuery();
-      query.returnGeometry = true;
-      query.outFields = ["*"];
-      const featureSet = await featureLayer.queryFeatures(query);
-      const features = featureSet.features;
-      if(logger)console.log({featureSet})
-
-      dibujarPoligono({features, minValue:0, maxValue:0, jimuMapView, setPoligonoSeleccionado:()=>{},
-        setClickHandler:()=>{}, fieldValueToSetRangeCoropletico:'cantidad_predios',
-        setLastLayerDeployed:()=>{}, lastLayerDeployed:[], interval:5, Polygon, Graphic,
-        GraphicsLayer, SimpleFillSymbol, setRangosLeyenda:()=>{}
-      })
-    // Añadir un evento de carga para verificar si la capa se carga correctamente
-    /* featureLayer.when(() => {
-      console.log('FeatureLayer se ha cargado correctamente');
-      jimuMapView.view.map.add(featureLayer);
-    }, (error) => {
-      console.error('Error al cargar el FeatureLayer: ', error);
-    }); */
-
-    // Añadir la capa al mapa
-
-  } catch (error) {
-    console.error('Error al renderizar los polígonos: ', error);
-  }
-}
 
 const goToOneExtentAndZoom = ({jimuMapView, extent, duration= 10000}) => {
   // jimuMapView.view.goTo(extent, { duration}, zoom);
   jimuMapView.view.goTo(extent, { duration});
   setTimeout(() => {
     jimuMapView.view.zoom = jimuMapView.view.zoom - 1.5;    
-    if(logger)console.log("zoooom",{"jimuMapView.view.zoom":jimuMapView.view.zoom})
+    if(logger())console.log("zoooom",{"jimuMapView.view.zoom":jimuMapView.view.zoom})
   }, 2000);
 }
 
@@ -680,9 +626,8 @@ export {
   ajustarDataToRender,
   logger,
   removeLayer,
-  renderPolygonsWithColorsFromService,
   goToOneExtentAndZoom,
   dibujarPoligonoToResaltar,
   dibujarPoligono,
-  rangosCoropleticos
+  // rangosCoropleticos
 }

@@ -312,7 +312,7 @@ export const DATA_Fuente_Indicadores = [
                   urlNal:'v_predios_restierras_nacmun',
                   fieldlabel:['pdet', 'nucleo_reforma'],
                   fieldValue:'cantidad_predios',
-                  leyenda:[''],
+                  leyenda:['Cantidad de predios por PDET', 'Cantidad de predios por reforma'],
                 }
               ]
             }

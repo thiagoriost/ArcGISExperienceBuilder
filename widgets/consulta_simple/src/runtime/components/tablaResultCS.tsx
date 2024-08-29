@@ -47,7 +47,7 @@ const TablaResultCS = function({rows, columns, view, setControlForms, jimuMapVie
     function limpiarCapaMapa()
     {
         setResponseConsultaSimple(null);      
-        console.log("Obj Geometria =>",view);      
+        //console.log("Obj Geometria =>",view);      
         if (view){
             jimuMapView.view.map.remove(view);
             //Definición del extent centrado al dpto de Quindio
@@ -100,11 +100,11 @@ const TablaResultCS = function({rows, columns, view, setControlForms, jimuMapVie
   
         const geometryType  = view.graphics.items[0].geometry.type;
          
-        console.log("Row DG =>",row.row);      
+        //console.log("Row DG =>",row.row);      
        
         const spatialReference            = view.graphics.items.find(e => e.attributes.OBJECTID == row.row.OBJECTID).geometry.spatialReference;
         
-        console.log("Tipo Geom =>",geometryType);
+        //console.log("Tipo Geom =>",geometryType);
               
         const geometry = createGeometry({ Point }, geometryType, row.row.geometry, spatialReference);
   
@@ -318,12 +318,12 @@ const TablaResultCS = function({rows, columns, view, setControlForms, jimuMapVie
         const minutesCSV  = procesaFechaHora(date.getMinutes());
         const secondsFullCSV= procesaFechaHora(date.getSeconds());
         
-        console.log("Anio =>",yearCSV);
-        console.log("Mes =>",monthFullCSV);
-        console.log("Dia =>",dayCSV);
-        console.log("Hora =>",hourCSV);
-        console.log("Minutos =>",minutesCSV);
-        console.log("Segundos =>",secondsFullCSV);
+        //console.log("Anio =>",yearCSV);
+        //console.log("Mes =>",monthFullCSV);
+        //console.log("Dia =>",dayCSV);
+        //console.log("Hora =>",hourCSV);
+        //console.log("Minutos =>",minutesCSV);
+        //console.log("Segundos =>",secondsFullCSV);
   
         return (fName+"_"+yearCSV+"_"+monthFullCSV+"_"+dayCSV+"_"+hourCSV+"_"+minutesCSV+"_"+secondsFullCSV);
   
@@ -337,7 +337,7 @@ const TablaResultCS = function({rows, columns, view, setControlForms, jimuMapVie
        */
   
       const procesaFechaHora = function(nTime: Number){      
-          if (nTime > 0 && nTime < 10)
+          if (Number(nTime) > 0 && Number(nTime) < 10)
           {
             return '0'+nTime.toString();
           }

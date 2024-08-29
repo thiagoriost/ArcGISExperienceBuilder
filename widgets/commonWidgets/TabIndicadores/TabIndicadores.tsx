@@ -57,6 +57,7 @@ const TabIndicadores: React.FC<any> = ({dispatch, departamentos, jimuMapView}) =
 
   const [rangosLeyenda, setRangosLeyenda] = useState([]);
   const [esriModules, setEsriModules] = useState(undefined);
+  const [dataTempQueryNal, setDataTempQueryNal] = useState([]);
 
   const cancelClickEvent = () => {
     if (clickHandler) {
@@ -97,49 +98,67 @@ const TabIndicadores: React.FC<any> = ({dispatch, departamentos, jimuMapView}) =
     setSelectCategoriaTematica(categoriaTematica.CATEGORIA_TEMATICA.find(e => e.value == target.value));
     if (utilsModule.logger()) console.log({value:target.value, CATEGORIA_TEMATICA: categoriaTematica.CATEGORIA_TEMATICA.find(e => e.value == target.value)});
     setMunicipios([]);
+    setIsLoading(false)
   };
-  const handleIndicadorSelected = async ({target}) => {
-    setIsLoading(true)
-    clearGraphigs(); // Elimina las geometrias dibujadas previamente
-    setDepartmentSelect(undefined)
-    setRangosLeyenda([]);
-    const indiSelected = indicadores.INDICADOR.find(e => e.value == target.value);
-    setSelectIndicadores(indiSelected)
-    setMunicipios([]);
-    const url = `${servicios.urls.indicadoresNaci[indiSelected.urlNal]}/query`
-    let responseIndicadorNacional = await utilsModule.realizarConsulta("*", url, false, `1=1`);    
-    if(!responseIndicadorNacional.features){
-      if (utilsModule.logger()) console.error("Sin data en el responseIndicadorNacional => ", {responseIndicadorNacional});
+  const handleIndicadorSelected_Continua = async ({indiSelected, target}) => {
+    const {FeatureLayer, SimpleFillSymbol, Polygon, Graphic, GraphicsLayer} = esriModules;
+
+    let url = servicios.urls.indicadoresNaci[indiSelected.urlNal];
+    let responseIndicadorNacional;
+    let layer;
+    if(!url){
+      setIsLoading(false);
       setMensajeModal({
         deployed: true,
         type: typeMSM.warning,
         tittle: 'Info',
-        body: "Sin información nacional para el indicador seleccionado",        
+        body: "El indicador seleccionado no presenta servicio",        
         subBody:''
       });
-      setIsLoading(false);
+      setSelectIndicadores(undefined)
       return
     }
-    // obtiene las geometrias para cada feature de las geometrias municipios previamente cargadas
-    responseIndicadorNacional = responseIndicadorNacional.features.map(RIN=>{
-      const geome = geometriaMunicipios.features.find(GM => GM.attributes.mpcodigo == RIN.attributes.cod_municipio)
-      return {attributes: {...RIN.attributes, ...geome.attributes}, geometry:geome.geometry}
-    })
+    url = `${url}/query`;
+    const existeQuery = dataTempQueryNal.find(d => (d.id == indiSelected.label && d.url == url));
+    if (existeQuery) {
+      responseIndicadorNacional = existeQuery.responseIndicadorNacional;
+      layer = existeQuery.layer;
+    }else{
+      responseIndicadorNacional = await utilsModule.realizarConsulta("*", url, false, `1=1`);    
+      if(!responseIndicadorNacional.features){
+        if (utilsModule.logger()) console.error("Sin data en el responseIndicadorNacional => ", {responseIndicadorNacional});
+        setMensajeModal({
+          deployed: true,
+          type: typeMSM.warning,
+          tittle: 'Info',
+          body: "Sin información nacional para el indicador seleccionado",        
+          subBody:''
+        });
+        setIsLoading(false);
+        return
+      }
+      // obtiene las geometrias para cada feature de las geometrias municipios previamente cargadas
+      responseIndicadorNacional = responseIndicadorNacional.features.map(RIN=>{
+        const geome = geometriaMunicipios.features.find(GM => GM.attributes.mpcodigo == RIN.attributes.cod_municipio)
+        return {attributes: {...RIN.attributes, ...geome.attributes}, geometry:geome.geometry}
+      })
+      layer = new FeatureLayer({ url:`${servicios.urls.indicadoresNaci[indiSelected.urlNal]}` });
+      const guardarConsultaIndicadorNacional = {url, responseIndicadorNacional, layer, id:indiSelected.label};
+      setDataTempQueryNal([...dataTempQueryNal, guardarConsultaIndicadorNacional]);
+    }
+
     // Datos para configurar los rangos del coropletico
     const fieldValueToSetRangeCoropletico=indiSelected.fieldValue;
-    const {minValue, maxValue, interval} = utilsModule.rangosCoropleticos(responseIndicadorNacional, fieldValueToSetRangeCoropletico);
-    
-    
-    const {FeatureLayer, SimpleFillSymbol, Polygon, Graphic, GraphicsLayer} = esriModules;
-    const layer = new FeatureLayer({ url:`${servicios.urls.indicadoresNaci[indiSelected.urlNal]}` });
+    // const {minValue, maxValue, interval} = utilsModule.rangosCoropleticos(responseIndicadorNacional, fieldValueToSetRangeCoropletico);
+
     // dibujar Municipios en coropletico   
-    utilsModule.dibujarPoligono({features:responseIndicadorNacional, minValue, maxValue, jimuMapView, setPoligonoSeleccionado,
+    utilsModule.dibujarPoligono({features:responseIndicadorNacional, minValue:0, maxValue:0, jimuMapView, setPoligonoSeleccionado,
       setClickHandler, fieldValueToSetRangeCoropletico, setLastLayerDeployed, lastLayerDeployed,
-       interval, setRangosLeyenda, Polygon, Graphic, GraphicsLayer, SimpleFillSymbol
+       interval:0, setRangosLeyenda, Polygon, Graphic, GraphicsLayer, SimpleFillSymbol
     });     
     // const layer = new FeatureLayer({ url:`https://pruebassig.igac.gov.co/server/rest/services/Indicadores_nacionales_municipales/MapServer/0` });
     if (utilsModule.logger()) console.log({"INDICADOR":target.value,indiSelected, url, responseIndicadorNacional,fieldValueToSetRangeCoropletico
-      ,layer})
+      ,layer, dataTempQueryNal})
 
     await layer.load();
     // layer.when();
@@ -147,6 +166,21 @@ const TabIndicadores: React.FC<any> = ({dispatch, departamentos, jimuMapView}) =
       jimuMapView.view.goTo(layer.fullExtent);      
       setIsLoading(false)
     }, 500);
+
+  }
+  const handleIndicadorSelected = ({target}) => {
+    setIsLoading(true);
+    clearGraphigs(); // Elimina las geometrias dibujadas previamente
+    setDepartmentSelect(undefined)
+    setRangosLeyenda([]);
+    const indiSelected = indicadores.INDICADOR.find(e => e.value == target.value);
+    setSelectIndicadores(indiSelected)
+    setMunicipios([]);
+    setTimeout(() => {
+      handleIndicadorSelected_Continua({indiSelected, target})
+    }, 1000);
+
+    
   };
   /**
    * En este metodo se selecciona el departamento al que se va realizar la consulta de indicadores
@@ -262,7 +296,6 @@ const TabIndicadores: React.FC<any> = ({dispatch, departamentos, jimuMapView}) =
 
   
   const formularioIndicadores = () => {    
-
     return (
       <>
         { widgetModules?.INPUTSELECT(subsitemas, handleSubsistemaSelected, selectSubSistema?.value, "Sub Sistema") }
@@ -303,14 +336,14 @@ const TabIndicadores: React.FC<any> = ({dispatch, departamentos, jimuMapView}) =
           Limpiar
         </Button>
         
-        <Button
+       {/*  <Button
           size="sm"
           type="default"
           onClick={consultar}
           className="mb-4"
         >
           Consultar
-        </Button>
+        </Button> */}
 
         {
          ( rangosLeyenda.length>0 && constantes) &&
@@ -328,15 +361,6 @@ const TabIndicadores: React.FC<any> = ({dispatch, departamentos, jimuMapView}) =
       </>
     )
   }
-
-  const test = () => {
-    setTimeout(async () => {
-    // utilsModule.renderPolygonsWithColorsFromService(jimuMapView)       
-      // const response = await utilsModule.realizarConsulta("*", `https://pruebassig.igac.gov.co/server/rest/services/Indicadores_municipios/MapServer/3/query`, true, `1=1`); 
-    }, 8000);
-
-  }
-
   const getGeometriasMunicipios = async (url: string) => {
     setIsLoading(true)
     const municipiosResponse = await utilsModule.queryAttributesLayer({url:url+"/query", definitionExpression:"1=1", returnGeometry:true,outFields:"*"});   
