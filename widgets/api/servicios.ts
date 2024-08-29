@@ -29,8 +29,8 @@ const urls = {
         v_predios_entregados_ft_nacmun:`${mapServerNal}/9`,
         v_predios_formalizados_nacmun:`${mapServerNal}/10`,
         v_predios_for_mujeres_nacmun:`${mapServerNal}/11`,
-        v_predios_uaf_nacmun:`${mapServerNal}/12`,//por definir
-        v_predios_restierras_nacmun:`${mapServerNal}/13`,//por definir
+        v_predios_uaf_nacmun:`${mapServerNal}/12`,
+        v_predios_restierras_nacmun:`${mapServerNal}/13`,
 
     }
 }

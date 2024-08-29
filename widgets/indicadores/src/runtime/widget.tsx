@@ -284,7 +284,8 @@ const Indicadores = (props: AllWidgetProps<any>) => {
       }else if(!departmentSelect){ // cuando es nacional
         dataToRenderGraphics.push(generateChartData(attributes, fl, fieldValue, leyenda[i]));
       }else{
-        console.log("caso no comtemplado", {poligonoSeleccionado, selectIndicadores, departmentSelect})
+        if (utilsModule.logger())console.log("el municipio no presenta data estadistica",
+          {poligonoSeleccionado, selectIndicadores, departmentSelect, attributes, fl, fieldValue, leyenda})
       }
     });
     setDataGrafico(dataToRenderGraphics);
