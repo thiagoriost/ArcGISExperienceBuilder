@@ -5,6 +5,10 @@ import './style.css'
 import { DATA_Fuente_Indicadores } from './dataFormularioIndicadores';
 
 const widgetID_Indicadores = 'widget_48'; // se genera al ingresar al widget objetivo y generarlo en el effect de inicio con props.id
+const constantesTabIndicadores = {
+  "decodigo":"decodigo",
+  "mpcodigo":"mpcodigo"
+}
 /* 
 const legendItems = [
   { color: 'rgb(52, 152, 219, 0.8)', range: '1 - 2' },
@@ -220,12 +224,12 @@ const TabIndicadores: React.FC<any> = ({dispatch, departamentos, jimuMapView}) =
       const {FeatureLayer,Graphic,GraphicsLayer,SimpleFillSymbol,SimpleMarkerSymbol,SimpleLineSymbol} = esriModules;
       await utilsModule.pintarFeatureLayer({
         _dataCoropletico,
-        definitionExpression:`${constantes.diccionario.indicadores.decodigo}='${targetDepartment}'`,
+        definitionExpression:`${constantesTabIndicadores.decodigo}='${targetDepartment}'`,
         doZoom:true,
         fieldValueToSetRangeCoropletico:selectIndicadores.fieldValue,//para calcular los colores del coropletico
         geometryType:"polygon",
         getAttributes:false,
-        identificadorMixData:constantes.diccionario.indicadores.mpcodigo,
+        identificadorMixData:constantesTabIndicadores.mpcodigo,
         jimuMapView,
         lastLayerDeployed,
         pintarFeature:true,
