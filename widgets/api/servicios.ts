@@ -18,6 +18,13 @@ const urls = {
         v_predios_formal_mujeres_mun: `${MapServerMunicipal}/11`,
         v_predios_uaf_mun: `${MapServerMunicipal}/12`,
         v_predios_restierras_mun: `${MapServerMunicipal}/13`,
+        v_predios_zrc_mun: `${MapServerMunicipal}/14`,
+        v_indice_gini_ids_mun: `${MapServerMunicipal}/15`,
+        v_predios_conflicto_mun: `${MapServerMunicipal}/16`,
+        v_predios_ley2da_mun: `${MapServerMunicipal}/17`,
+        v_predios_etnicos_mun: `${MapServerMunicipal}/18`,
+        
+        
     },
     indicadoresNaci:{ // nacionales
         v_predios_fondo_tierras_nacmun:`${mapServerNal}/3`,
@@ -31,7 +38,13 @@ const urls = {
         v_predios_for_mujeres_nacmun:`${mapServerNal}/11`,
         v_predios_uaf_nacmun:`${mapServerNal}/12`,
         v_predios_restierras_nacmun:`${mapServerNal}/13`,
-
+        v_predios_zrc_nacmun:`${mapServerNal}/14`,
+        v_indice_gini_ids_nacmun:`${mapServerNal}/15`,
+        v_predios_conflicto_nacmun:`${mapServerNal}/16`,
+        v_predios_ley2da_nacmun:`${mapServerNal}/17`,
+        v_predios_etnicos_nacmun:`${mapServerNal}/18`,
+        
+        
     }
 }
 
