@@ -3,9 +3,13 @@ const MapServerMunicipal = "https://pruebassig.igac.gov.co/server/rest/services/
 const mapServerNal = "https://pruebassig.igac.gov.co/server/rest/services/Indicadores_nacionales_municipales/MapServer";
 
 const urls = {
-    tablaContenido:"https://sigquindio.gov.co:8443/ADMINSERV/AdminGeoApplication/AdminGeoWebServices/getTablaContenidoJsTree/public",
+    // tablaContenido:"https://sigquindio.gov.co:8443/ADMINSERV/AdminGeoApplication/AdminGeoWebServices/getTablaContenidoJsTree/public",
+    // tablaContenido:"http://172.17.3.205:8080/ADMINSERV/AdminGeoApplication/AdminGeoWebServices/getTablaContenidoJsTree/public",    
+    tablaContenido:"https://sae.igac.gov.co:8443/ADMINSERV/AdminGeoApplication/AdminGeoWebServices/getTablaContenidoJsTree/public",    
+
     Municipios: `${MapServerMunicipal}/0`,
     Departamentos: `${MapServerMunicipal}/1`,
+    
     indicadores:{// municipales
         v_predios_fondo_tierras_mun: `${MapServerMunicipal}/3`,
         v_predios_inventario_baldios_mun: `${MapServerMunicipal}/4`,
@@ -23,8 +27,6 @@ const urls = {
         v_predios_conflicto_mun: `${MapServerMunicipal}/16`,
         v_predios_ley2da_mun: `${MapServerMunicipal}/17`,
         v_predios_etnicos_mun: `${MapServerMunicipal}/18`,
-        
-        
     },
     indicadoresNaci:{ // nacionales
         v_predios_fondo_tierras_nacmun:`${mapServerNal}/3`,
