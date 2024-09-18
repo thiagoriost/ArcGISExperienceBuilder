@@ -240,7 +240,7 @@ export const DATA_Fuente_Indicadores = [
             }
           ]
         },
-        {
+        /* {
           value:2,
           label:"Ordenar el suelo rural",
           descricion:"2. Ordenar el suelo rural agropecuario y avanzar en los procesos de actualización catastral con enfoque multipropósito.",
@@ -293,7 +293,7 @@ export const DATA_Fuente_Indicadores = [
               ]
             },
           ]
-        },
+        }, */
         {
           value:3,
           label:"Ejecutar la política de restitución de tierras",
@@ -429,7 +429,7 @@ export const DATA_Fuente_Indicadores = [
         }
       ]
     },
-    {
+    /* {
       value:5,
       label:"Investigación",
       descricion:"5. De investigación, asistencia técnica, capacitación, transferencia de tecnología y diversiﬁcación de cultivos",
@@ -459,7 +459,7 @@ export const DATA_Fuente_Indicadores = [
           ]
         }
       ]
-    },
+    }, */
     {
       value:8,
       label:"Delimitación de territorios",

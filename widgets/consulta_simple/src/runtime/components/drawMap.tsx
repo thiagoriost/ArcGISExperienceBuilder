@@ -74,9 +74,12 @@ import { InterfaceResponseConsultaSimple, InterfaceMensajeModal, typeMSM  } from
       cond: string 
       setCond: any
       props: AllWidgetProps<any>      
+      setIsLoading: (d:boolean)=>void
     }
     
-    const DrawMap: React.FC<Props> = function ({jimuMapView, setJimuMapView, setAlertDial, ResponseConsultaSimple, setResponseConsultaSimple, mensModal, setMensModal, typeGraphMap, setTypeGraphMap, view, setView, spatialRefer, setSpatialRefer, txtValor, txtValorState, setValor, urlCapa, setUrlCapa, cond, setCond, props}){
+    const DrawMap: React.FC<Props> = function ({jimuMapView, setJimuMapView, setAlertDial, ResponseConsultaSimple, setResponseConsultaSimple, mensModal, setMensModal,
+      typeGraphMap, setTypeGraphMap, view, setView, spatialRefer, setSpatialRefer, txtValor, txtValorState, setValor, urlCapa, setUrlCapa, cond, setCond, props,
+      setIsLoading}){
   
   /**
      * tstDrawMap => Función prueba capacitación renderizado de información al mapa base
@@ -175,7 +178,7 @@ import { InterfaceResponseConsultaSimple, InterfaceMensajeModal, typeMSM  } from
             if (utilsModule?.logger()) console.log("Resp Features Serv Mapas =>",_responseConsultaSimple.features.length);
             dialogAlert = true;            
           }
-
+          setIsLoading(false);
           if (dialogAlert)
           {
             setAlertDial(true);

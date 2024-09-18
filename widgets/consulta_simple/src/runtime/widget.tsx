@@ -54,6 +54,7 @@ import _ from "lodash";
 
 //Importación interfaces
 import { InterfaceResponseConsultaSimple, InterfaceMensajeModal, typeMSM } from "../types/interfaceResponseConsultaSimple";
+import { Loading } from "jimu-ui";
 
 //Definición objetos
 const { useState } = React
@@ -128,6 +129,9 @@ const Widget = (props: AllWidgetProps<any>) => {
     const [rows, setRows]             = useState([]);
     const [columns, setColumns]       = useState([]);
     const [utilsModule, setUtilsModule] = useState(null);
+
+  const [isLoading, setIsLoading] = useState(false);
+
 
     
     //To add the layer to the Map, a reference to the Map must be saved into the component state.
@@ -642,8 +646,7 @@ const Widget = (props: AllWidgetProps<any>) => {
      * @changes Mantenimiento cargue información componente DataGrid, especificando un tiempo de 10 ms para visualizar el cambio de estado en la constante controlForms
      */
     useEffect(() => {
-      if (!ResponseConsultaSimple)
-        return;
+      if (!ResponseConsultaSimple) return;
       const {features} = ResponseConsultaSimple;
       //Data Grid
       const DgridCol = Object.keys(features[0].attributes).map(key => ({key: key, name: key}));
@@ -661,6 +664,7 @@ const Widget = (props: AllWidgetProps<any>) => {
       
       setTimeout(() => {
         setControlForms(true);
+        setIsLoading(false)
       },10);
 
     },[ResponseConsultaSimple]);
@@ -779,6 +783,7 @@ const Widget = (props: AllWidgetProps<any>) => {
           setAlertDial={setAlertDial}
           mensModal={mensModal}
           setMensModal={setMensModal}
+          setIsLoading={setIsLoading}
           ></FiltersCS>
         }
         {renderMap &&
@@ -803,7 +808,11 @@ const Widget = (props: AllWidgetProps<any>) => {
           cond={cond}
           setCond={setCond}
           props={props}          
+          setIsLoading={setIsLoading}
           ></DrawMap>
+        }
+        {
+          isLoading && <Loading />
         }
       </div>      
     );

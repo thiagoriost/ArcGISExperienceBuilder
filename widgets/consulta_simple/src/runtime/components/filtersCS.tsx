@@ -22,8 +22,13 @@ import { urls } from '../../../../api/servicios';
  * @param param0 
  * @returns (HTML)
  */
-const FiltersCS = function({jsonSERV, setJsonSERV, temas, setTemas, subtemas, setSubtemas, capas, setCapas, urlCapa, setUrlCapa, grupos, setGrupos, capasAttr, setCapasAttr, txtValorState, setValorState, txtValor, setValor, selTema, setselTema, selSubtema, setselSubtema, selGrupo, setselGrupo, selCapas, setselCapas, selAttr, setselAttr, ResponseConsultaSimple, setResponseConsultaSimple, view, setView, jimuMapView, lastGeometriDeployed, condic, setCond, setRenderMap, setAlertDial, mensModal, setMensModal}){
+const FiltersCS = function({jsonSERV, setJsonSERV, temas, setTemas, subtemas, setSubtemas, capas, setCapas, urlCapa, setUrlCapa, grupos,
+  setGrupos, capasAttr, setCapasAttr, txtValorState, setValorState, txtValor, setValor, selTema, setselTema, selSubtema, setselSubtema,
+  selGrupo, setselGrupo, selCapas, setselCapas, selAttr, setselAttr, ResponseConsultaSimple, setResponseConsultaSimple, view, setView,
+  jimuMapView, lastGeometriDeployed, condic, setCond, setRenderMap, setAlertDial, mensModal, setMensModal, setIsLoading}){
  
+
+  
     /**
     Cargue del contenido alusivo a las temáticas, subtemáticas, grupos y capas desde el servidor de contenidos
     @date 2024-05-22
@@ -455,7 +460,7 @@ const FiltersCS = function({jsonSERV, setJsonSERV, temas, setTemas, subtemas, se
         setCapasAttr([]);
         setValor("");
         setValorState(true);
-  
+        setselAttr(undefined)
         setselCapas(capa.target.value);
         setUrlCapa(urlCapaJson);
   
@@ -469,12 +474,14 @@ const FiltersCS = function({jsonSERV, setJsonSERV, temas, setTemas, subtemas, se
           .then((rows) => rows.json())
           .then((data) => {
             //Rearmado estructura datos de atributos: name, alias          
-            for (var cont = 0; cont < data.fields.length; cont++){            
-              JsonAtrCapa = {
-                "name":data.fields[cont].name,
-                "alias":data.fields[cont].alias
-              };
-              AtrCapaArr.push(JsonAtrCapa);
+            for (var cont = 0; cont < data.fields.length; cont++){        
+              if (data.fields[cont].name !== "shape" && data.fields[cont].name !== "elemento") {
+                JsonAtrCapa = {
+                  "name":data.fields[cont].name,
+                  "alias":data.fields[cont].alias
+                };
+                AtrCapaArr.push(JsonAtrCapa);                
+              }    
             }
             if (utilsModule?.logger()) console.log("Obj Attr Capas =>",AtrCapaArr);
             setCapasAttr(AtrCapaArr);
@@ -558,7 +565,7 @@ const FiltersCS = function({jsonSERV, setJsonSERV, temas, setTemas, subtemas, se
       setCapasAttr([]);
       setValor("");
       setValorState(true);
-      setselAttr([]);
+      setselAttr(undefined);
 
       //Rutina para limpiar capa del mapa
      /*  setResponseConsultaSimple(null);      
@@ -590,6 +597,7 @@ const FiltersCS = function({jsonSERV, setJsonSERV, temas, setTemas, subtemas, se
     */
       function consultaSimple(evt: { preventDefault: () => void; }){
         //if (utilsModule?.logger()) console.log("En pruebas...");
+        setIsLoading(true)
         evt.preventDefault();
         setRenderMap(false);
         var cond = "";
@@ -610,7 +618,7 @@ const FiltersCS = function({jsonSERV, setJsonSERV, temas, setTemas, subtemas, se
         //const cond = selAttr + "=" +"'"+txtValor+"'";
   
         //Validación prueba (2024-06-17)
-        if (selAttr == "SHAPE.AREA" || selAttr == "SHAPE.LEN" || selAttr == "AREA_HA")
+        if (selAttr == "SHAPE.AREA" || selAttr == "SHAPE.LEN" || selAttr == "AREA_HA" || selAttr == "objectid"|| selAttr == "st_area(shape)"|| selAttr == "st_perimeter(shape)")
         {
           cond = selAttr + "=" +txtValor;
         }
@@ -689,106 +697,124 @@ const FiltersCS = function({jsonSERV, setJsonSERV, temas, setTemas, subtemas, se
 
     
     return (        
-          <form onSubmit={consultaSimple}>        
-              <div className="mb-1">
-                <Label size="default"> Tema </Label>
-                <Select
-                    onChange={getSubtemas}
-                    placeholder="Seleccione tema..."
-                    value={selTema}
-                  >             
-                  {temas.map(
-                      (option) => (
-                        <option value={option.value}>{option.label}</option>
-                      )
-                  )}
-                </Select>
-              </div>
-              <div className="mb-1">
-              <Label size="default"> Subtema </Label>
+        <form onSubmit={consultaSimple}>        
+            <div className="mb-1">
+              <Label size="default"> Tema </Label>
               <Select
-                onChange={getGrupoOrCapa}
-                placeholder="Seleccione subtema..."
-                value={selSubtema}>
-                {
-                  subtemas.map(
+                  onChange={getSubtemas}
+                  placeholder="Seleccione tema..."
+                  value={selTema}
+                >             
+                {temas.map(
                     (option) => (
-                      <option value={option.idTematica}>{option.nombreTematica}</option>
+                      <option value={option.value}>{option.label}</option>
                     )
-                  )
-                }
+                )}
               </Select>
-              </div>
-              <div className="mb-1">
-                <Label size="default"> Grupo </Label>
-                <Select
-                  onChange={getCapaByGrupo}
-                  placeholder="Seleccione grupo..."
-                  value={selGrupo}
-                >
-                {
-                  grupos.map(
-                    (option) =>
-                    <option value={option.idTematica}>{option.nombreTematica}</option>
-                  )
-                }
-                </Select>
-              </div>
-              <div className="mb-1">
-                <Label size="default"> Capa </Label>
-                <Select
-                  onChange={getAtributosCapa}
-                  placeholder="Seleccione una capa:"
-                  value={selCapas}
+            </div>
+            {
+              subtemas.length > 0 &&
+                <div className="mb-1">
+                  <Label size="default"> Subtema </Label>
+                  <Select
+                    onChange={getGrupoOrCapa}
+                    placeholder="Seleccione subtema..."
+                    value={selSubtema}>
+                    {
+                      subtemas.map(
+                        (option) => (
+                          <option value={option.idTematica}>{option.nombreTematica}</option>
+                        )
+                      )
+                    }
+                  </Select>
+                </div>
+            }            
+            {
+              grupos.length > 0 &&
+                <div className="mb-1">
+                  <Label size="default"> Grupo </Label>
+                  <Select
+                    onChange={getCapaByGrupo}
+                    placeholder="Seleccione grupo..."
+                    value={selGrupo}
                   >
                   {
-                    capas.map(
-                      (option) => 
-                      <option value={option.idCapa}>{option.nombreCapa}</option>
-                    )
-                  } 
-                </Select>
-              </div>
-              <div className="mb-1">
-                <Label size="default"> Atributo </Label>
-                <Select
-                  onChange={enableValor}
-                  placeholder="Seleccione un atributo:"
-                  value={selAttr}
-                >
-                  {
-                    capasAttr.map(
+                    grupos.map(
                       (option) =>
-                        <option value={option.alias}>{option.name}</option>
+                      <option value={option.idTematica}>{option.nombreTematica}</option>
                     )
                   }
-                </Select>
-              </div>
-              <div className="mb-1">
-                <Label size="default"> Valor</Label>
-                <TextInput placeholder="Escriba patrón de búsqueda" 
-                onAcceptValue={function noRefCheck(){}}
-                type="search" className="mb-4" required readOnly={txtValorState}
-                value={txtValor} onChange={handleChangevalorTxt}></TextInput>
-              </div>
-              <div className="btns">
-                <Button
-                  htmlType="submit"              
-                  size="default"
-                  type="default"              
-                >
-                  Consultar
-                </Button>
-                <Button
-                  htmlType="button"
-                  onClick={limpiarCons}
-                  size="default"
-                  type="default"
-                >
-                  Limpiar
-                </Button>
-              </div>
-            </form>        
+                  </Select>
+                </div>
+            }
+            {
+              capas.length > 0 &&
+                <div className="mb-1">
+                  <Label size="default"> Capa </Label>
+                  <Select
+                    onChange={getAtributosCapa}
+                    placeholder="Seleccione una capa:"
+                    value={selCapas}
+                    >
+                    {
+                      capas.map(
+                        (option) => 
+                        <option value={option.idCapa}>{option.nombreCapa}</option>
+                      )
+                    } 
+                  </Select>
+                </div>
+            }
+            {
+              capasAttr.length > 0 &&
+                <div className="mb-1">
+                  <Label size="default"> Atributo </Label>
+                  <Select
+                    onChange={enableValor}
+                    placeholder="Seleccione un atributo:"
+                    value={selAttr}
+                  >
+                    {
+                      capasAttr.map(
+                        (option) =>
+                          <option value={option.alias}>{option.name}</option>
+                      )
+                    }
+                  </Select>
+                </div>
+            }  
+            {
+              selAttr &&
+              <>
+                <div className="mb-1">
+                  <Label size="default"> Valor</Label>
+                  <TextInput placeholder="Escriba patrón de búsqueda" 
+                  onAcceptValue={function noRefCheck(){}}
+                  type="search" className="mb-4" required readOnly={txtValorState}
+                  value={txtValor} onChange={handleChangevalorTxt}></TextInput>
+                </div>
+                <div className="btns">
+                  <Button
+                    htmlType="submit"              
+                    size="default"
+                    type="default"              
+                  >
+                    Consultar
+                  </Button>
+                  <Button
+                    htmlType="button"
+                    onClick={limpiarCons}
+                    size="default"
+                    type="default"
+                  >
+                    Limpiar
+                  </Button>
+                </div>
+              </>
+            }    
+                  
+        </form>       
     );
     
 }

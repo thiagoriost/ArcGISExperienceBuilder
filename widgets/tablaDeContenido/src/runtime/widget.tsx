@@ -30,11 +30,12 @@ const Widget = (props: AllWidgetProps<any>) => {
   };
 
   const TraerDataTablaContenido = async (modulo: typeof import("../../../api/servicios")) => {
-    
-    const tematicas = await getDataTablaContenido(modulo);
-    if (utilsModule?.logger()) console.log(tematicas)
-    if(!tematicas) return
-    setGroupedLayers(tematicas);
+    setTimeout(async () => {
+      const tematicas = await getDataTablaContenido(modulo);
+      if (utilsModule?.logger()) console.log(tematicas)
+      if(!tematicas) return
+      setGroupedLayers(tematicas);      
+    }, 3000);
   }
 
   /**
@@ -73,14 +74,16 @@ export const getDataTablaContenido = async (servicios: { urls: { tablaContenido:
   
   // const url = 'https://sigquindio.gov.co:8443/ADMINSERV/AdminGeoApplication/AdminGeoWebServices/getTablaContenidoJsTree/public';
   const url = servicios.urls.tablaContenido;
+  let responseTablaDeContenido: TablaDeContenidoInterface[] = [];
+  // let responseTablaDeContenido: any[] = [];
   try {
     const response = await fetch(url);
     if (!response.ok) {
       throw new Error(`HTTP error! Status: ${response.status}`);
     }
-    const responseTablaDeContenido: TablaDeContenidoInterface[] = await response.json();
+    responseTablaDeContenido = await response.json();
     const tematicas = ordenarDataTablaContenido(responseTablaDeContenido);
-    return tematicas;
+    return tematicas;    
   } catch (error) {
     console.error('Error fetching layers:', error);
   }

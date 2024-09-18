@@ -66,75 +66,81 @@ const Consulta_Avanzada = (props: AllWidgetProps<any>) => {
     @remarks FUENTE: https://www.freecodecamp.org/news/how-to-fetch-api-data-in-react/
   */
   const getJSONContenido = async (jsonSERV) => {
-    const urlServicioTOC = servicios.urls.tablaContenido;
-    var nombreServicio, idTematica, idCapaMapa, idCapaDeServicio, nombreTematica, tituloCapa, urlMetadatoCapa, url: string;
-    var idTematicaPadre: any;
-    var visible: Boolean;
-    var existeTematica: [];
-    var newTematica, newCapa: object;
-
-    fetch(urlServicioTOC, {
-      method: "GET"
-    })
-      .then((rows) => rows.json())
-      .then((data) => {
-        for (var cont = 0; cont < data.length; cont++) {
-          nombreServicio = data[cont].DESCRIPCIONSERVICIO;
-          idTematica = data[cont].IDTEMATICA + 't';
-          idCapaMapa = data[cont].IDCAPA + 'c';
-          nombreTematica = data[cont].NOMBRETEMATICA;
-          tituloCapa = data[cont].TITULOCAPA;
-          idTematicaPadre = data[cont].IDTEMATICAPADRE;
-          visible = data[cont].VISIBLE;
-          url = data[cont].URL;
-          idCapaDeServicio = data[cont].NOMBRECAPA;
-          urlMetadatoCapa = data[cont].METADATOCAPA;
-
-          if (!idTematicaPadre) {
-            idTematicaPadre = "#";
-          } else {
-            idTematicaPadre = idTematicaPadre + 't';
-          }
-
-          existeTematica = where(jsonSERV, { 'id': idTematica });
-
-          //Cadena JSON de temática
-          newTematica = {
-            "id": idTematica,
-            "text": nombreTematica,
-            "type": "tematica",
-            "parent": idTematicaPadre
-          };
-
-          //Cadena JSON de Capa
-          newCapa = {
-            "id": idCapaMapa.replace("c", ""),
-            "idCapaMapa": idCapaMapa,
-            "text": tituloCapa,
-            "type": "capa",
-            "parent": idTematica,
-            "url": url + "/" + idCapaDeServicio,
-            "idCapaDeServicio": idCapaDeServicio,
-            "urlMetadatoCapa": urlMetadatoCapa
-          };
-          if (existeTematica.length !== 0) {
-            jsonSERV.push(newCapa);
-          }
-          else {
-            jsonSERV.push(newTematica);
-            if (data[cont].IDCAPA) {
+    
+    try {
+      const urlServicioTOC = servicios.urls.tablaContenido;
+      var nombreServicio, idTematica, idCapaMapa, idCapaDeServicio, nombreTematica, tituloCapa, urlMetadatoCapa, url: string;
+      var idTematicaPadre: any;
+      var visible: Boolean;
+      var existeTematica: [];
+      var newTematica, newCapa: object;
+      
+      fetch(urlServicioTOC, {
+        method: "GET"
+      })
+        .then((rows) => rows.json())
+        .then((data) => {
+          for (var cont = 0; cont < data.length; cont++) {
+            nombreServicio = data[cont].DESCRIPCIONSERVICIO;
+            idTematica = data[cont].IDTEMATICA + 't';
+            idCapaMapa = data[cont].IDCAPA + 'c';
+            nombreTematica = data[cont].NOMBRETEMATICA;
+            tituloCapa = data[cont].TITULOCAPA;
+            idTematicaPadre = data[cont].IDTEMATICAPADRE;
+            visible = data[cont].VISIBLE;
+            url = data[cont].URL;
+            idCapaDeServicio = data[cont].NOMBRECAPA;
+            urlMetadatoCapa = data[cont].METADATOCAPA;
+  
+            if (!idTematicaPadre) {
+              idTematicaPadre = "#";
+            } else {
+              idTematicaPadre = idTematicaPadre + 't';
+            }
+  
+            existeTematica = where(jsonSERV, { 'id': idTematica });
+  
+            //Cadena JSON de temática
+            newTematica = {
+              "id": idTematica,
+              "text": nombreTematica,
+              "type": "tematica",
+              "parent": idTematicaPadre
+            };
+  
+            //Cadena JSON de Capa
+            newCapa = {
+              "id": idCapaMapa.replace("c", ""),
+              "idCapaMapa": idCapaMapa,
+              "text": tituloCapa,
+              "type": "capa",
+              "parent": idTematica,
+              "url": url + "/" + idCapaDeServicio,
+              "idCapaDeServicio": idCapaDeServicio,
+              "urlMetadatoCapa": urlMetadatoCapa
+            };
+            if (existeTematica.length !== 0) {
               jsonSERV.push(newCapa);
             }
+            else {
+              jsonSERV.push(newTematica);
+              if (data[cont].IDCAPA) {
+                jsonSERV.push(newCapa);
+              }
+            }
           }
-        }
-        //if (utilsModule?.logger()) console.log("Contenido json SERV en petición =>", jsonSERV);
-
-        //Invocación al método para obtener la información sobre el campo Temas
-        if (jsonSERV != undefined) {
-          setJsonSERV(jsonSERV);
-          getTemas(jsonSERV);
-        }
-      })
+          //if (utilsModule?.logger()) console.log("Contenido json SERV en petición =>", jsonSERV);
+  
+          //Invocación al método para obtener la información sobre el campo Temas
+          if (jsonSERV != undefined) {
+            setJsonSERV(jsonSERV);
+            getTemas(jsonSERV);
+          }
+        })
+    } catch (error) {
+      console.error({error});
+      
+    }
   }
 
   /* Método getTemas()=> obtiene temáticas desde el objeto jsonData
@@ -715,14 +721,14 @@ const Consulta_Avanzada = (props: AllWidgetProps<any>) => {
         }
         {
           campo &&
-          <div className="align-items-center mt-1">            
+          <div className="align-items-center mt-1" style={{ paddingBottom: '5px', paddingTop:'5px'}}>            
             {widgetModules?.INPUT_TEXTAREA(condicionBusqueda, handleChangeTextArea, "Condición de búsqueda")}
-            <div className="w-100 text-center">
+            <div className="w-100 text-center" style={{backgroundColor:'rgb(0 0 0 / 70%)', padding:'5px'}}>
               <Button
                 // size="sm"
                 type="primary"
                 onClick={() => setCondicionBusqueda('')}
-                className="mb-4"
+                
               >
                 Borrar condición de busqueda
               </Button>
@@ -732,7 +738,7 @@ const Consulta_Avanzada = (props: AllWidgetProps<any>) => {
         }
         {
           campo &&
-          <div className="condition-buttons text-center bg-dark pt-1">
+          <div className="condition-buttons text-center pt-1" style={{backgroundColor:'rgb(0 0 0 / 70%)', padding:'5px'}}>
             <Button type="primary" size="sm" className="mr-1 mb-1 color-deep-purple-100" onClick={() => asignarSimbolCondicionBusqueda('=')}>=</Button>
             <Button type="primary" size="sm" className="mr-1 mb-1 color-deep-purple-100" onClick={() => asignarSimbolCondicionBusqueda('BETWEEN')}>{"<>"}</Button>
             <Button type="primary" size="sm" className="mr-1 mb-1 color-deep-purple-100" onClick={() => asignarSimbolCondicionBusqueda('>')}>&gt;</Button>
@@ -750,7 +756,7 @@ const Consulta_Avanzada = (props: AllWidgetProps<any>) => {
         }
         {
           (condicionBusqueda && valores.length > 0) &&
-          <div className="fila">
+          <div className="fila" style={{backgroundColor:'rgb(0 0 0 / 70%)', height:'40px', padding:'5px', marginTop:'5px'}}>
             <Button
               htmlType="button"
               size="sm"
