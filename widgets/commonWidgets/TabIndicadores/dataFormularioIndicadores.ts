@@ -1,22 +1,22 @@
 export const DATA_Fuente_Indicadores = [
     {
       value:1,
-      label: "Adquisición",
+      label: "De adquisición, adjudicación de tierras y de procesos agrarios para la reforma agraria",
       descricion:"1. De adquisición, adjudicación de tierras y de procesos agrarios para la reforma agraria, y garantía de derechos territoriales de los campesinos, pueblos indígenas y de las comunidades negras, afrocolombianas, raizales, palenqueras y pueblo Rom",
       APUESTA_ESTRATEGICA:[    
         {
           value:1,
-          label:"Estrategia de acceso a la tierra",
+          label:"Implementar la estretegia de acceso a tierra",
           descricion:"1. Implementar la estretegia de acceso a la tierra por medio del programa especial de adquisición de tierras para la producción de alimentos y otros instrumentos y materializar el Plan Nacional de Formalización Masiva de la Propiedad Rural.",
           CATEGORIA_TEMATICA:[
             {
               value:0,
-              label:"Disposición de predios",
+              label:"Disposición de predios para la Reforma Agraria",
               descricion:"1.1 Disposición de predios para la Reforma Agraria",
               INDICADOR:[
                 {
                   value:0,
-                  label:"Cantidad predios fondo tierras RA",
+                  label:"Predios dispuestos en el Fondo de Tierras para la Reforma Agraria",
                   descricion:"Cantidad de predios en el Fondo de Tierras para la Reforma Agraria",
                   url:"v_predios_fondo_tierras_mun",
                   fieldlabel:["tipo_predio", "anio"], // con esto se especifica la cantidad de graficas q se desplegaran segun la data de cada feature
@@ -25,7 +25,7 @@ export const DATA_Fuente_Indicadores = [
                 },
                 {
                   value:1,
-                  label:"Cantidad de área",
+                  label:"Área dispuesta en el Fondo de Tierras para la Reforma Agraria",
                   descricion:"Cantidad de área dispuesta en el Fondo de Tierras para la Reforma Agraria",
                   url:"v_predios_fondo_tierras_mun",
                   fieldlabel:["tipo_predio", "anio"],
@@ -34,7 +34,7 @@ export const DATA_Fuente_Indicadores = [
                 },
                 {
                   value:2,
-                  label:"Inventario Predios Nacional de Baldíos",
+                  label:"Predios dispuestos en el Inventario Nacional de Baldíos",
                   descricion:"Cantidad de predios en el Inventario Nacional de Baldíos",
                   url:"v_predios_inventario_baldios_mun",
                   fieldlabel:["destinacion_predio", "anio"],
@@ -43,7 +43,7 @@ export const DATA_Fuente_Indicadores = [
                 },
                 {
                   value:3,
-                  label:"Inventario Årea Nacional de Baldíos",
+                  label:"Área dispuesta en el Inventario Nacional de Baldíos",
                   descricion:"Cantidad de área en el Inventario Nacional de Baldíos",
                   url:"v_predios_inventario_baldios_mun",
                   fieldlabel:["destinacion_predio", "anio"],
@@ -113,7 +113,7 @@ export const DATA_Fuente_Indicadores = [
                 },
                 {
                   value:6,
-                  label:"Beneficiarios de subsidios integrales para la compra de tierras",
+                  label:"Predios beneficiarios de SIT",
                   descricion:"Cantidad de predios beneficiarios de subsidios integrales para la compra de tierras",
                   url:"v_predios_sub_integrales_mun",
                   fieldlabel:["cat_anio_adjudicacion", "tipo_beneficiario", "genero_beneficiario"],
@@ -122,7 +122,7 @@ export const DATA_Fuente_Indicadores = [
                 },
                 {
                   value:7,
-                  label:"Årea de predios beneficiarios de subsidios integrales para la compra de tierras",
+                  label:"Área de predios beneficiarios de SIT",
                   descricion:"Cantidad de área de predios beneficiarios de subsidios integrales para la compra de tierras",
                   url:"v_predios_sub_integrales_mun",
                   fieldlabel:["cat_anio_adjudicacion", "tipo_beneficiario", "genero_beneficiario"],
@@ -156,13 +156,13 @@ export const DATA_Fuente_Indicadores = [
               INDICADOR:[
                 {
                   value:0,
-                  label:"Porcentaje de predios",
+                  label:"Porcentaje de predios con área por encima de la UAF mínima municipal",
                   descricion:"Porcentaje de predios con área por encima de la UAF mínima municipal",
                   
                 },
                 {
                   value:1,
-                  label:"Porcentaje de área",
+                  label:"Porcentaje de área de predios por encima de la UAF mínima municipal",
                   descricion:"Porcentaje de área de predios por encima de la UAF mínima municipal",
                 }
               ]
@@ -174,7 +174,7 @@ export const DATA_Fuente_Indicadores = [
               INDICADOR:[
                 {
                   value:0,
-                  label:"Cantidad de predios",
+                  label:"Predios formalizados",
                   descricion:"Cantidad de predios formalizados",
                   url:"v_predios_formalizados_mun",
                   fieldlabel:["tipo_beneficiario", "genero_beneficiario", "cat_anio_formalizado"],
@@ -183,7 +183,7 @@ export const DATA_Fuente_Indicadores = [
                 },
                 {
                   value:1,
-                  label:"Cantidad de área",
+                  label:"Área de predios formalizados",
                   descricion:"Cantidad de área de predios formalizados",
                   url:"v_predios_formalizados_mun",
                   fieldlabel:["tipo_beneficiario", "genero_beneficiario", "cat_anio_formalizado"],
@@ -192,7 +192,7 @@ export const DATA_Fuente_Indicadores = [
                 },
                 {
                   value:2,
-                  label:"Cantidad de predios a mujeres",
+                  label:"Predios formalizados a mujeres",
                   descricion:"Cantidad de predios formalizados a mujeres",
                   url:"v_predios_formal_mujeres_mun",
                   fieldlabel:["cat_anio_formalizado"],
@@ -201,7 +201,7 @@ export const DATA_Fuente_Indicadores = [
                 },
                 {
                   value:3,
-                  label:"Cantidad de área a mujeres",
+                  label:"Área de predios formalizados a mujeres",
                   descricion:"Cantidad de área de predios formalizados a mujeres",
                   url:"v_predios_formal_mujeres_mun",
                   fieldlabel:["cat_anio_formalizado"],
@@ -214,7 +214,7 @@ export const DATA_Fuente_Indicadores = [
         },
         {
           value:2,
-          label:"Ordenar el suelo rural",
+          label:"Ordenar el suelo rural agropecuario y actualizar el catastro multipropósito",
           descricion:"2. Ordenar el suelo rural agropecuario y avanzar en los procesos de actualización catastral con enfoque multipropósito.",
           CATEGORIA_TEMATICA:[
             {
@@ -224,22 +224,22 @@ export const DATA_Fuente_Indicadores = [
               INDICADOR:[
                 {
                   value:0,
-                  label:"Porcentaje de predios",
+                  label:"Porcentaje de predios actualizados",
                   descricion:"Porcentaje de predios actualizados",
                 },
                 {
                   value:1,
-                  label:"Porcentaje de área",
+                  label:"Porcentaje de área de predios actualizados",
                   descricion:"Porcentaje de área de predios actualizados",
                 },
                 {
                   value:2,
-                  label:"Cantidad de municipios",
+                  label:"Municipios actualizados",
                   descricion:"Cantidad de municipios actualizados en cada vigencia",
                 },
                 {
                   value:3,
-                  label:"Número de municipios",
+                  label:"Municipios formados",
                   descricion:"Número de municipios formados en cada vigencia",
                 }
               ]
@@ -258,7 +258,7 @@ export const DATA_Fuente_Indicadores = [
               INDICADOR:[
                 {
                   value:0,
-                  label:"Cantidad de predios",
+                  label:"Predios asociados a solicitudes de inscripción al RTDAF",
                   descricion:"Cantidad de predios asociados a solicitudes de inscripción al Registro de Tierras Despojadas y Abandonadas Forzosamente",
                 }
               ]
@@ -269,12 +269,12 @@ export const DATA_Fuente_Indicadores = [
     },
     {
       value:2,
-      label:"Delimitación de zonas de reserva",
+      label:"De delimitación, constitución y consolidación de ZRC y manejo de playones y sabanas comunales",
       descricion:"2. De delimitación, constitución y consolidación de zonas de reserva campesina, delimitación, uso y manejo de playones y sabanas comunales y de organización y capacitación campesina",
       APUESTA_ESTRATEGICA:[
         {
           value:0,
-          label:"Delimitar, consolidar y constituir las zonas de reserva",
+          label:"Delimitar, consolidar y constituir las ZRC",
           descricion:"1. Delimitar, consolidar y constituir las zonas de reserva campesina como territorialidad cuyo ordenamiento territorial se presta para frenar la expansión de la frontera agrícola, servir para la conservación ambiental y potenciar la producción de alimentos ",
           CATEGORIA_TEMATICA:[
             {
@@ -284,12 +284,12 @@ export const DATA_Fuente_Indicadores = [
               INDICADOR:[
                 {
                   value:0,
-                  label:"Porcentaje de predios",
+                  label:"Porcentaje de predios en Zonas de Reserva Campesina",
                   descricion:"Porcentaje de predios en Zonas de Reserva Campesina",
                 },
                 {
                   value:1,
-                  label:"Porcentaje de área",
+                  label:"Porcentaje de área de predios en Zonas de Reserva Campesina",
                   descricion:"Porcentaje de área de predios en Zonas de Reserva Campesina",
                 }
               ]
@@ -300,12 +300,12 @@ export const DATA_Fuente_Indicadores = [
     },
     {
       value:3,
-      label:"Ordenamiento Territorial",
+      label:"De ordenamiento territorial y solución de conﬂictos socioambientales",
       descricion:"3. De ordenamiento territorial y solución de conﬂictos socioambientales para la reforma agraria",
       APUESTA_ESTRATEGICA:[
         {
           value:0,
-          label:"Resolución de Conflictos",
+          label:"Resolución de Conflictos socioambientales",
           descricion:"1. Resolución de Conflictos socioambientales en áreas de especial importancia ambiental, mediante la regularización del uso, ocupación y tenencia hacia el uso sostenible y la protección de los recursos naturales",
           CATEGORIA_TEMATICA:[
             {
@@ -332,12 +332,12 @@ export const DATA_Fuente_Indicadores = [
               INDICADOR:[
                 {
                   value:0,
-                  label:"Porcentaje predios presunta subutilización del uso del suelo",
+                  label:"Porcentaje de predios con presunta subutilización",
                   descricion:"Porcentaje de predios con presunta subutilización en el uso del suelo",
                 },
                 {
                   value:1,
-                  label:"Porcentaje predios, Territorios ley 2da",
+                  label:"Porcentaje de predios en Territorios con ley 2da",
                   descricion:"Porcentaje de predios en Territorios con ley 2da",
                 }
               ]
@@ -348,7 +348,7 @@ export const DATA_Fuente_Indicadores = [
     },
     {
       value:5,
-      label:"Investigación",
+      label:"De investigación, asistencia técnica, capacitación, transferencia de tecnología y diversiﬁcación de cultivos",
       descricion:"5. De investigación, asistencia técnica, capacitación, transferencia de tecnología y diversiﬁcación de cultivos",
       APUESTA_ESTRATEGICA:[
         {
@@ -363,7 +363,7 @@ export const DATA_Fuente_Indicadores = [
               INDICADOR:[
                 {
                   value:0,
-                  label:"Cantidad de esquemas",
+                  label:"Esquemas de asistencia técnica implementados",
                   descricion:"Cantidad de esquemas de asistencia técnica implementados",
                 }
               ]
@@ -374,28 +374,28 @@ export const DATA_Fuente_Indicadores = [
     },
     {
       value:8,
-      label:"Delimitación de territorios",
+      label:"De delimitación, constitución y consolidación de territorios étnicos",
       descricion:`8.De delimitación, constitución y consolidación de territorios indígenas y de territorios colectivos de comunidades negras, afrocolombianas,
       raizales, palenqueras y pueblo Rom, delimitación, uso, manejo y goce de los mismos, y fortalecimiento de la formación desde los saberes propios`,
       APUESTA_ESTRATEGICA:[
         {
           value:1,
-          label:"Formalizar los territorios ancestrales",
+          label:"Formalizar los territorios ancestrales de los grupos étnicos",
           descricion:`1. Formalizar los territorios ancestrales de los grupos étnicos, para el manejo, uso y posesión tradicional bajo los principios de la autonomía y gobierno propio.`,
           CATEGORIA_TEMATICA:[
             {
               value:0,
-              label:"Titulación territorios grupos étnicos",
+              label:"Titulación de territorios de grupos étnicos",
               descricion:`8.1 Titulación de territorios de grupos étnicos`,
               INDICADOR:[
                 {
                   value:0,
-                  label:"Porcentaje predios títulados a grupos étnicos",
+                  label:"Porcentaje de predios en territorios títulados a grupos étnicos",
                   descricion:"Porcentaje de predios en territorios títulados a grupos étnicos",
                 },
                 {
                   value:1,
-                  label:"Porcentaje área títulada a grupos étnicos",
+                  label:"Porcentaje de área de predios en territorios títulados a grupos étnicos",
                   descricion:"Porcentaje de área de predios en territorios títulados a grupos étnicos",
                 }
               ]

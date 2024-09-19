@@ -19,7 +19,9 @@ const servicioMadre = "https://pruebassig.igac.gov.co/server/rest/services/Indic
 
 
 const urls = {
-    tablaContenido:"https://sigquindio.gov.co:8443/ADMINSERV/AdminGeoApplication/AdminGeoWebServices/getTablaContenidoJsTree/public",
+    // tablaContenido:"https://sigquindio.gov.co:8443/ADMINSERV/AdminGeoApplication/AdminGeoWebServices/getTablaContenidoJsTree/public",
+    tablaContenido:"https://sae.igac.gov.co:8443/ADMINSERV/AdminGeoApplication/AdminGeoWebServices/getTablaContenidoJsTree/public",
+    
     Departamentos: `${servicioMadre}/1`,
     Municipios: `${servicioMadre}/0`,
     indicadores:{
