@@ -66,75 +66,81 @@ const Consulta_Avanzada = (props: AllWidgetProps<any>) => {
     @remarks FUENTE: https://www.freecodecamp.org/news/how-to-fetch-api-data-in-react/
   */
   const getJSONContenido = async (jsonSERV) => {
-    const urlServicioTOC = servicios.urls.tablaContenido;
-    var nombreServicio, idTematica, idCapaMapa, idCapaDeServicio, nombreTematica, tituloCapa, urlMetadatoCapa, url: string;
-    var idTematicaPadre: any;
-    var visible: Boolean;
-    var existeTematica: [];
-    var newTematica, newCapa: object;
-
-    fetch(urlServicioTOC, {
-      method: "GET"
-    })
-      .then((rows) => rows.json())
-      .then((data) => {
-        for (var cont = 0; cont < data.length; cont++) {
-          nombreServicio = data[cont].DESCRIPCIONSERVICIO;
-          idTematica = data[cont].IDTEMATICA + 't';
-          idCapaMapa = data[cont].IDCAPA + 'c';
-          nombreTematica = data[cont].NOMBRETEMATICA;
-          tituloCapa = data[cont].TITULOCAPA;
-          idTematicaPadre = data[cont].IDTEMATICAPADRE;
-          visible = data[cont].VISIBLE;
-          url = data[cont].URL;
-          idCapaDeServicio = data[cont].NOMBRECAPA;
-          urlMetadatoCapa = data[cont].METADATOCAPA;
-
-          if (!idTematicaPadre) {
-            idTematicaPadre = "#";
-          } else {
-            idTematicaPadre = idTematicaPadre + 't';
-          }
-
-          existeTematica = where(jsonSERV, { 'id': idTematica });
-
-          //Cadena JSON de temática
-          newTematica = {
-            "id": idTematica,
-            "text": nombreTematica,
-            "type": "tematica",
-            "parent": idTematicaPadre
-          };
-
-          //Cadena JSON de Capa
-          newCapa = {
-            "id": idCapaMapa.replace("c", ""),
-            "idCapaMapa": idCapaMapa,
-            "text": tituloCapa,
-            "type": "capa",
-            "parent": idTematica,
-            "url": url + "/" + idCapaDeServicio,
-            "idCapaDeServicio": idCapaDeServicio,
-            "urlMetadatoCapa": urlMetadatoCapa
-          };
-          if (existeTematica.length !== 0) {
-            jsonSERV.push(newCapa);
-          }
-          else {
-            jsonSERV.push(newTematica);
-            if (data[cont].IDCAPA) {
+    
+    try {
+      const urlServicioTOC = servicios.urls.tablaContenido;
+      var nombreServicio, idTematica, idCapaMapa, idCapaDeServicio, nombreTematica, tituloCapa, urlMetadatoCapa, url: string;
+      var idTematicaPadre: any;
+      var visible: Boolean;
+      var existeTematica: [];
+      var newTematica, newCapa: object;
+      
+      fetch(urlServicioTOC, {
+        method: "GET"
+      })
+        .then((rows) => rows.json())
+        .then((data) => {
+          for (var cont = 0; cont < data.length; cont++) {
+            nombreServicio = data[cont].DESCRIPCIONSERVICIO;
+            idTematica = data[cont].IDTEMATICA + 't';
+            idCapaMapa = data[cont].IDCAPA + 'c';
+            nombreTematica = data[cont].NOMBRETEMATICA;
+            tituloCapa = data[cont].TITULOCAPA;
+            idTematicaPadre = data[cont].IDTEMATICAPADRE;
+            visible = data[cont].VISIBLE;
+            url = data[cont].URL;
+            idCapaDeServicio = data[cont].NOMBRECAPA;
+            urlMetadatoCapa = data[cont].METADATOCAPA;
+  
+            if (!idTematicaPadre) {
+              idTematicaPadre = "#";
+            } else {
+              idTematicaPadre = idTematicaPadre + 't';
+            }
+  
+            existeTematica = where(jsonSERV, { 'id': idTematica });
+  
+            //Cadena JSON de temática
+            newTematica = {
+              "id": idTematica,
+              "text": nombreTematica,
+              "type": "tematica",
+              "parent": idTematicaPadre
+            };
+  
+            //Cadena JSON de Capa
+            newCapa = {
+              "id": idCapaMapa.replace("c", ""),
+              "idCapaMapa": idCapaMapa,
+              "text": tituloCapa,
+              "type": "capa",
+              "parent": idTematica,
+              "url": url + "/" + idCapaDeServicio,
+              "idCapaDeServicio": idCapaDeServicio,
+              "urlMetadatoCapa": urlMetadatoCapa
+            };
+            if (existeTematica.length !== 0) {
               jsonSERV.push(newCapa);
             }
+            else {
+              jsonSERV.push(newTematica);
+              if (data[cont].IDCAPA) {
+                jsonSERV.push(newCapa);
+              }
+            }
           }
-        }
-        //console.log("Contenido json SERV en petición =>", jsonSERV);
-
-        //Invocación al método para obtener la información sobre el campo Temas
-        if (jsonSERV != undefined) {
-          setJsonSERV(jsonSERV);
-          getTemas(jsonSERV);
-        }
-      })
+          //if (utilsModule?.logger()) console.log("Contenido json SERV en petición =>", jsonSERV);
+  
+          //Invocación al método para obtener la información sobre el campo Temas
+          if (jsonSERV != undefined) {
+            setJsonSERV(jsonSERV);
+            getTemas(jsonSERV);
+          }
+        })
+    } catch (error) {
+      console.error({error});
+      
+    }
   }
 
   /* Método getTemas()=> obtiene temáticas desde el objeto jsonData
@@ -163,7 +169,7 @@ const Consulta_Avanzada = (props: AllWidgetProps<any>) => {
         });
       }
     }
-    //console.log("Lista Temas =>", opcArr);      
+    //if (utilsModule?.logger()) console.log("Lista Temas =>", opcArr);      
     setTemas(opcArr);
   }
 
@@ -189,8 +195,8 @@ const Consulta_Avanzada = (props: AllWidgetProps<any>) => {
     var capasArr: Array<string> = [];
 
     const idPRoc = parseInt(temas.target.value);
-    console.log("Tema value =>", parseInt(temas.target.value));
-    console.log("Array Admin Serv JSON =>", jsonSERV);
+    if (utilsModule?.logger()) console.log("Tema value =>", parseInt(temas.target.value));
+    if (utilsModule?.logger()) console.log("Array Admin Serv JSON =>", jsonSERV);
 
     //Inicialización de controles
     setselTema(temas.target.value); //Tema: Seleccionando el item del control
@@ -233,12 +239,12 @@ const Consulta_Avanzada = (props: AllWidgetProps<any>) => {
 
     //Cargue de subtemas, cuando se conoce tema
     if (subtemasArr.length >= 0) {
-      console.log("Subtemas Array=>", subtemasArr);
+      if (utilsModule?.logger()) console.log("Subtemas Array=>", subtemasArr);
       setSubtemas(subtemasArr);
     }
     //Cargue de capas de un tema, cuando éste no tiene subtemas
     if (capasArr.length >= 0) {
-      console.log("Capas Array Sin duplic =>", capasArr);
+      if (utilsModule?.logger()) console.log("Capas Array Sin duplic =>", capasArr);
       setselCapas(undefined);
       setCapas(capasArr);
     }
@@ -299,13 +305,13 @@ const Consulta_Avanzada = (props: AllWidgetProps<any>) => {
 
     //Cargue de subtemas, cuando se conoce subtema
     if (subtemasArr.length >= 0) {
-      console.log("Subtemas Array=>", subtemasArr);
+      if (utilsModule?.logger()) console.log("Subtemas Array=>", subtemasArr);
       setGrupos(subtemasArr);
       setselGrupo(undefined);
     }
     //Cargue de capas de un subtema, cuando éste no tiene grupos
     if (capasArr.length >= 0) {
-      console.log("Capas Array Sin duplic =>", capasArr);
+      if (utilsModule?.logger()) console.log("Capas Array Sin duplic =>", capasArr);
       setCapas(capasArr);
       setselCapas(undefined);
     }
@@ -367,7 +373,7 @@ const Consulta_Avanzada = (props: AllWidgetProps<any>) => {
 
     //Cargue de capas de un grupo
     if (capasArr.length >= 0) {
-      console.log("Capas Array Sin duplic =>", capasArr);
+      if (utilsModule?.logger()) console.log("Capas Array Sin duplic =>", capasArr);
       setCapas(capasArr);
       setselCapas(undefined);
     }
@@ -399,7 +405,7 @@ const Consulta_Avanzada = (props: AllWidgetProps<any>) => {
     removeLayerDeployed(LayerSelectedDeployed);
     dibujaCapasSeleccionadas(urlCapa);
     urlCapaJson = urlCapa + "?f=json";
-    console.log("URL capa =>", urlCapaJson);
+    if (utilsModule?.logger()) console.log("URL capa =>", urlCapaJson);
 
     setCapasAttr([]);
     setselCapas(urlCapaJson);
@@ -419,7 +425,7 @@ const Consulta_Avanzada = (props: AllWidgetProps<any>) => {
           };
           AtrCapaArr.push(JsonAtrCapa);
         }
-        console.log("Obj Attr Capas =>", AtrCapaArr);
+        if (utilsModule?.logger()) console.log("Obj Attr Capas =>", AtrCapaArr);
         setCapasAttr(AtrCapaArr);
         setTimeout(() => { // para esperar que la capacargue
           setIsLoading(false);          
@@ -435,7 +441,7 @@ const Consulta_Avanzada = (props: AllWidgetProps<any>) => {
     @remarks Deseleccionar item en campo Tema en https://stackoverflow.com/questions/48357787/how-to-deselect-option-on-selecting-option-of-another-select-in-react
   */
   const limpiarFormulario = (evt) => {
-    console.log("Handle Evt en limpiar =>", evt.target.value);
+    if (utilsModule?.logger()) console.log("Handle Evt en limpiar =>", evt.target.value);
     setCapas([]);
     setCondicionBusqueda('');
     setValores([]);
@@ -446,8 +452,8 @@ const Consulta_Avanzada = (props: AllWidgetProps<any>) => {
     setCapasAttr([]);
     setSubtemaselected(undefined);
     setCampo(undefined);
-    console.log(graphicsLayerDeployed)
-    console.log(featuresLayersDeployed)
+    if (utilsModule?.logger()) console.log(graphicsLayerDeployed)
+    if (utilsModule?.logger()) console.log(featuresLayersDeployed)
     removeLayer(LayerSelectedDeployed);
     setLayerSelectedDeployed(null);    
     jimuMapView.view.map.removeAll()
@@ -462,7 +468,7 @@ const Consulta_Avanzada = (props: AllWidgetProps<any>) => {
 
   //https://developers.arcgis.com/experience-builder/guide/add-layers-to-a-map/
   const activeViewChangeHandler = (jmv: JimuMapView) => {
-    console.log("Ingresando al evento objeto JimuMapView...");
+    if (utilsModule?.logger()) console.log("Ingresando al evento objeto JimuMapView...");
     if (jmv) {
       setJimuMapView(jmv);
       setInitialExtent(jmv.view.extent); // Guarda el extent inicial
@@ -571,12 +577,12 @@ const Consulta_Avanzada = (props: AllWidgetProps<any>) => {
   }
 
   const consultarValores = async () => {
-    console.log("consultarValores")
+    if (utilsModule?.logger()) console.log("consultarValores")
     setIsLoading(true);
     const url = selCapas.replace("?f=json", "") + "/query"
     let where = "1=1", getGeometry = false;    
     const response = await realizarConsulta(campo, url, getGeometry, where);
-    console.log(response)
+    if (utilsModule?.logger()) console.log(response)
     if (response) {
       if (response.error) {
         console.error(`${response.error.code} - ${response.error.message}`);
@@ -588,6 +594,7 @@ const Consulta_Avanzada = (props: AllWidgetProps<any>) => {
         });
       }else{
         const ordenarDatos: string[] = getOrdenarDatos(response, campo);
+        if (utilsModule?.logger()) console.log({ordenarDatos})
         if (ordenarDatos[0]==null) {
           setValores([])
 
@@ -607,7 +614,7 @@ const Consulta_Avanzada = (props: AllWidgetProps<any>) => {
   }
 
   const handleCampos = ({ target }): void => {
-    console.log(target.value)
+    if (utilsModule?.logger()) console.log(target.value)
     //State del control Atributo
     // setValores([])
     const campo = target.value;
@@ -629,13 +636,13 @@ const Consulta_Avanzada = (props: AllWidgetProps<any>) => {
   }
 
   const _RealizarConsulta = async() => {
-    console.log("RealizarConsulta");
+    if (utilsModule?.logger()) console.log("RealizarConsulta");
     setIsLoading(true);
-    console.log(condicionBusqueda)
+    if (utilsModule?.logger()) console.log(condicionBusqueda)
     const where = condicionBusqueda;
     const url = selCapas.replace("?f=json", "") + "/query"
     const response: InterfaceResponseConsulta = await realizarConsulta("*", url, true, where);
-    console.log(response)
+    if (utilsModule?.logger()) console.log(response)
     if (response.error) {
       console.error(`${response.error.code} - ${response.error.message}`);
       setMensajeModal({
@@ -669,7 +676,7 @@ const Consulta_Avanzada = (props: AllWidgetProps<any>) => {
   }
 
   const onChangeCapa = ({target}) => {    
-    console.log(target.value)
+    if (utilsModule?.logger()) console.log(target.value)
     setIsLoading(true);
     if(graphicsLayerDeployed?.graphics.items.length > 0){
       jimuMapView.view.map.removeAll()
@@ -714,14 +721,14 @@ const Consulta_Avanzada = (props: AllWidgetProps<any>) => {
         }
         {
           campo &&
-          <div className="align-items-center mt-1">            
+          <div className="align-items-center mt-1" style={{ paddingBottom: '5px', paddingTop:'5px'}}>            
             {widgetModules?.INPUT_TEXTAREA(condicionBusqueda, handleChangeTextArea, "Condición de búsqueda")}
-            <div className="w-100 text-center">
+            <div className="w-100 text-center" style={{backgroundColor:'rgb(0 0 0 / 70%)', padding:'5px'}}>
               <Button
                 // size="sm"
                 type="primary"
                 onClick={() => setCondicionBusqueda('')}
-                className="mb-4"
+                
               >
                 Borrar condición de busqueda
               </Button>
@@ -731,7 +738,7 @@ const Consulta_Avanzada = (props: AllWidgetProps<any>) => {
         }
         {
           campo &&
-          <div className="condition-buttons text-center bg-dark pt-1">
+          <div className="condition-buttons text-center pt-1" style={{backgroundColor:'rgb(0 0 0 / 70%)', padding:'5px'}}>
             <Button type="primary" size="sm" className="mr-1 mb-1 color-deep-purple-100" onClick={() => asignarSimbolCondicionBusqueda('=')}>=</Button>
             <Button type="primary" size="sm" className="mr-1 mb-1 color-deep-purple-100" onClick={() => asignarSimbolCondicionBusqueda('BETWEEN')}>{"<>"}</Button>
             <Button type="primary" size="sm" className="mr-1 mb-1 color-deep-purple-100" onClick={() => asignarSimbolCondicionBusqueda('>')}>&gt;</Button>
@@ -749,7 +756,7 @@ const Consulta_Avanzada = (props: AllWidgetProps<any>) => {
         }
         {
           (condicionBusqueda && valores.length > 0) &&
-          <div className="fila">
+          <div className="fila" style={{backgroundColor:'rgb(0 0 0 / 70%)', height:'40px', padding:'5px', marginTop:'5px'}}>
             <Button
               htmlType="button"
               size="sm"
@@ -777,13 +784,13 @@ const Consulta_Avanzada = (props: AllWidgetProps<any>) => {
    * Forma el objeto de columnas y filas
    */
   useEffect(() => {    
-    console.log("effect responseConsulta")
+    if (utilsModule?.logger()) console.log("effect responseConsulta")
     if(!responseConsulta)return
     const {features} = responseConsulta;
     const dataGridColumns = Object.keys(features[0].attributes).map(key => ({ key: key, name: key }));
     const filas = features.map(({ attributes, geometry }) => ({ ...attributes, geometry }));    
-    console.log(dataGridColumns)
-    console.log(filas)
+    if (utilsModule?.logger()) console.log(dataGridColumns)
+    if (utilsModule?.logger()) console.log(filas)
     setColumns(dataGridColumns)
     setRows(filas);    
     setTimeout(() => {
@@ -816,7 +823,7 @@ const Consulta_Avanzada = (props: AllWidgetProps<any>) => {
       import('../../../api/servicios').then(modulo => setServicios(modulo));   
       return () => {
         // Acción a realizar cuando el widget se cierra.
-        console.log('El widget se cerrará');
+        if (utilsModule?.logger()) console.log('El widget se cerrará');
       };
   }, []);
 
@@ -864,9 +871,7 @@ const realizarConsulta = async (campo: string, url: string, returnGeometry: bool
         signal: controller.signal,
         redirect: "follow"
       });
-    console.log({ response })
     const _responseConsulta = await response.text();
-    console.log(JSON.parse(_responseConsulta))
     return JSON.parse(_responseConsulta);
   } catch (error) {
     console.error({ error });
@@ -876,7 +881,6 @@ const realizarConsulta = async (campo: string, url: string, returnGeometry: bool
 }
 
 const getOrdenarDatos = (response: InterfaceResponseConsulta, campo: string) => {
-  console.log("getOrdenarDatos")
   const { features } = response;
   const justDatos = []
   features.forEach(feature => {
@@ -898,7 +902,6 @@ const getOrdenarDatos = (response: InterfaceResponseConsulta, campo: string) => 
     return 0; // En caso de mezclar tipos, no hacer nada
   }
 });
-console.log(sortedArray)
 const sortedArrayObjet = []
 sortedArray.forEach(e => sortedArrayObjet.push({value:e,label:e}))
 return sortedArrayObjet;

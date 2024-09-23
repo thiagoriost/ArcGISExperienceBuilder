@@ -94,7 +94,6 @@ const DialogsCS = function({setAlertDial, mensModal, setMensModal}){
         <div>
             <Modal          
             toggle={function (e){
-                console.log("Haciendo clic por fuera del modal...=>",e);
                 setMensModal({...mensModal, deployed:false})
             }}
             isOpen={mensModal.deployed}

@@ -6,7 +6,7 @@
     @chanegs Importar componente url que asocia las URIS de consumo de servicios web (API).
 */
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Button, Label, Select, TextInput } from 'jimu-ui'; // import components
 
 //Importación interfaces
@@ -22,8 +22,13 @@ import { urls } from '../../../../api/servicios';
  * @param param0 
  * @returns (HTML)
  */
-const FiltersCS = function({jsonSERV, setJsonSERV, temas, setTemas, subtemas, setSubtemas, capas, setCapas, urlCapa, setUrlCapa, grupos, setGrupos, capasAttr, setCapasAttr, txtValorState, setValorState, txtValor, setValor, selTema, setselTema, selSubtema, setselSubtema, selGrupo, setselGrupo, selCapas, setselCapas, selAttr, setselAttr, ResponseConsultaSimple, setResponseConsultaSimple, view, setView, jimuMapView, lastGeometriDeployed, condic, setCond, setRenderMap, setAlertDial, mensModal, setMensModal}){
+const FiltersCS = function({jsonSERV, setJsonSERV, temas, setTemas, subtemas, setSubtemas, capas, setCapas, urlCapa, setUrlCapa, grupos,
+  setGrupos, capasAttr, setCapasAttr, txtValorState, setValorState, txtValor, setValor, selTema, setselTema, selSubtema, setselSubtema,
+  selGrupo, setselGrupo, selCapas, setselCapas, selAttr, setselAttr, ResponseConsultaSimple, setResponseConsultaSimple, view, setView,
+  jimuMapView, lastGeometriDeployed, condic, setCond, setRenderMap, setAlertDial, mensModal, setMensModal, setIsLoading}){
  
+
+  
     /**
     Cargue del contenido alusivo a las temáticas, subtemáticas, grupos y capas desde el servidor de contenidos
     @date 2024-05-22
@@ -104,7 +109,7 @@ const FiltersCS = function({jsonSERV, setJsonSERV, temas, setTemas, subtemas, se
             }
           }
         }
-        //console.log("Contenido json SERV en petición =>", jsonSERV);
+        //if (utilsModule?.logger()) console.log("Contenido json SERV en petición =>", jsonSERV);
   
         //Invocación al método para obtener la información sobre el campo Temas
         if (jsonSERV != undefined) {          
@@ -156,7 +161,7 @@ const FiltersCS = function({jsonSERV, setJsonSERV, temas, setTemas, subtemas, se
                 });
             }
         }
-        //console.log("Lista Temas =>", opcArr);      
+        //if (utilsModule?.logger()) console.log("Lista Temas =>", opcArr);      
         setTemas(opcArr);
     }
     
@@ -185,8 +190,8 @@ const FiltersCS = function({jsonSERV, setJsonSERV, temas, setTemas, subtemas, se
       var capasArr: Array<string> = []; 
 
       const idPRoc    = parseInt(temas.target.value);
-      console.log("Tema value =>", parseInt(temas.target.value));
-      console.log("Array Admin Serv JSON =>",jsonSERV);
+      if (utilsModule?.logger()) console.log("Tema value =>", parseInt(temas.target.value));
+      if (utilsModule?.logger()) console.log("Array Admin Serv JSON =>",jsonSERV);
 
       //Inicialización de controles
       setselTema(temas.target.value); //Tema: Seleccionando el item del control
@@ -198,7 +203,7 @@ const FiltersCS = function({jsonSERV, setJsonSERV, temas, setTemas, subtemas, se
       setValor("");     //Valor
       setValorState(true);//Valor al actualizarlo el usuario            
       //Validación de inicialización array local
-      console.log("Longitud array capas =>",capasArr.length);
+      if (utilsModule?.logger()) console.log("Longitud array capas =>",capasArr.length);
       if (capasArr.length > 0)
       {
         capasArr.length = 0;
@@ -226,19 +231,19 @@ const FiltersCS = function({jsonSERV, setJsonSERV, temas, setTemas, subtemas, se
       }
       
       //Procesar para remover duplicados
-      console.log("Sin duplic prueba =>",procesaDuplic(capasArr));
+      if (utilsModule?.logger()) console.log("Sin duplic prueba =>",procesaDuplic(capasArr));
 
       //Cargue de subtemas, cuando se conoce tema
       if (subtemasArr.length >= 0)
       {
-        console.log("Subtemas Array=>", subtemasArr);        
+        if (utilsModule?.logger()) console.log("Subtemas Array=>", subtemasArr);        
         setselSubtema(undefined);
         setSubtemas(subtemasArr);
       }
       //Cargue de capas de un tema, cuando éste no tiene subtemas
       if (capasArr.length >= 0)
       {        
-        console.log("Capas Array Sin duplic =>", capasArr);
+        if (utilsModule?.logger()) console.log("Capas Array Sin duplic =>", capasArr);
         setselCapas(undefined);
         //Procesar para remover duplicados
         setCapas(procesaDuplic(capasArr));
@@ -291,7 +296,7 @@ const FiltersCS = function({jsonSERV, setJsonSERV, temas, setTemas, subtemas, se
   
         const idPRoc    = parseInt(subtemas.target.value);
   
-        console.log("Subtema asociado =>",idPRoc);
+        if (utilsModule?.logger()) console.log("Subtema asociado =>",idPRoc);
   
         //Inicialización controles
         setselSubtema(idPRoc);
@@ -303,7 +308,7 @@ const FiltersCS = function({jsonSERV, setJsonSERV, temas, setTemas, subtemas, se
         limpiarCapaMapa();
 
         //Validación de inicialización array local
-        console.log("Longitud array capas =>",capasArr.length);
+        if (utilsModule?.logger()) console.log("Longitud array capas =>",capasArr.length);
         if (capasArr.length > 0)
         {
           capasArr.length = 0;
@@ -334,14 +339,14 @@ const FiltersCS = function({jsonSERV, setJsonSERV, temas, setTemas, subtemas, se
         //Cargue de subtemas, cuando se conoce subtema
         if (subtemasArr.length >= 0)
         {
-          console.log("Subtemas Array=>", subtemasArr);
+          if (utilsModule?.logger()) console.log("Subtemas Array=>", subtemasArr);
           setGrupos(subtemasArr);
           setselGrupo(undefined);
         }
         //Cargue de capas de un subtema, cuando éste no tiene grupos
         if (capasArr.length >= 0)
         {
-          console.log("Capas Array Sin duplic =>", capasArr);
+          if (utilsModule?.logger()) console.log("Capas Array Sin duplic =>", capasArr);
           setCapas(procesaDuplic(capasArr));
           setselCapas(undefined);
         }
@@ -373,7 +378,7 @@ const FiltersCS = function({jsonSERV, setJsonSERV, temas, setTemas, subtemas, se
       var capasArr: Array<string> = []; 
       const idPRoc    = parseInt(grupos.target.value);
 
-      console.log("Grupo asociado =>",idPRoc);
+      if (utilsModule?.logger()) console.log("Grupo asociado =>",idPRoc);
 
       setselGrupo(grupos.target.value);
 
@@ -386,7 +391,7 @@ const FiltersCS = function({jsonSERV, setJsonSERV, temas, setTemas, subtemas, se
       limpiarCapaMapa();
 
       //Validación de inicialización array local 
-      console.log("Longitud array capas =>",capasArr.length);
+      if (utilsModule?.logger()) console.log("Longitud array capas =>",capasArr.length);
       if (capasArr.length > 0)
       {
         capasArr.length = 0;
@@ -417,7 +422,7 @@ const FiltersCS = function({jsonSERV, setJsonSERV, temas, setTemas, subtemas, se
       //Cargue de capas de un grupo
       if (capasArr.length >= 0)
       {
-        console.log("Capas Array Sin duplic =>", capasArr);
+        if (utilsModule?.logger()) console.log("Capas Array Sin duplic =>", capasArr);
         setCapas(procesaDuplic(capasArr));
         setselCapas(undefined);
       }
@@ -445,17 +450,17 @@ const FiltersCS = function({jsonSERV, setJsonSERV, temas, setTemas, subtemas, se
         let AtrCapaArr: any     = []; 
         let urlCapaJson: string;
         
-        console.log("Capa asociada =>",capa.target.value);
+        if (utilsModule?.logger()) console.log("Capa asociada =>",capa.target.value);
         //Construcción de la URL del servicio, a partir del identificador de capa traido desde el campo Capa
         urlCapa     = getUrlFromCapa(capa.target.value, capas);
         urlCapaJson = urlCapa+"?f=json";
-        console.log("URL capa =>",urlCapaJson);
+        if (utilsModule?.logger()) console.log("URL capa =>",urlCapaJson);
   
         //Inicialización controles
         setCapasAttr([]);
         setValor("");
         setValorState(true);
-  
+        setselAttr(undefined)
         setselCapas(capa.target.value);
         setUrlCapa(urlCapaJson);
   
@@ -469,14 +474,16 @@ const FiltersCS = function({jsonSERV, setJsonSERV, temas, setTemas, subtemas, se
           .then((rows) => rows.json())
           .then((data) => {
             //Rearmado estructura datos de atributos: name, alias          
-            for (var cont = 0; cont < data.fields.length; cont++){            
-              JsonAtrCapa = {
-                "name":data.fields[cont].name,
-                "alias":data.fields[cont].alias
-              };
-              AtrCapaArr.push(JsonAtrCapa);
+            for (var cont = 0; cont < data.fields.length; cont++){        
+              if (data.fields[cont].name !== "shape" && data.fields[cont].name !== "elemento") {
+                JsonAtrCapa = {
+                  "name":data.fields[cont].name,
+                  "alias":data.fields[cont].alias
+                };
+                AtrCapaArr.push(JsonAtrCapa);                
+              }    
             }
-            console.log("Obj Attr Capas =>",AtrCapaArr);
+            if (utilsModule?.logger()) console.log("Obj Attr Capas =>",AtrCapaArr);
             setCapasAttr(AtrCapaArr);
           });
       }
@@ -530,7 +537,7 @@ const FiltersCS = function({jsonSERV, setJsonSERV, temas, setTemas, subtemas, se
       @remarks FUENTE => https://www.geeksforgeeks.org/how-to-handle-input-forms-with-usestate-hook-in-react/
     */
       const handleChangevalorTxt = function (event) {
-        //console.log("Estado actual =>",txtValorState);
+        //if (utilsModule?.logger()) console.log("Estado actual =>",txtValorState);
         setValor(event.target.value);
       }
 
@@ -549,7 +556,7 @@ const FiltersCS = function({jsonSERV, setJsonSERV, temas, setTemas, subtemas, se
     */
     function limpiarCons(evt){
       //State del control Tema
-      console.log("Handle Evt en limpiar =>",evt.target.value);
+      if (utilsModule?.logger()) console.log("Handle Evt en limpiar =>",evt.target.value);
       setselTema({selected:evt.target.value});
       setTemas(temas);
       setSubtemas([]);
@@ -558,11 +565,11 @@ const FiltersCS = function({jsonSERV, setJsonSERV, temas, setTemas, subtemas, se
       setCapasAttr([]);
       setValor("");
       setValorState(true);
-      setselAttr([]);
+      setselAttr(undefined);
 
       //Rutina para limpiar capa del mapa
      /*  setResponseConsultaSimple(null);      
-      console.log("Obj Geometria =>",view);      
+      if (utilsModule?.logger()) console.log("Obj Geometria =>",view);      
       jimuMapView.view.map.remove(view); */
 
       limpiarCapaMapa();
@@ -589,28 +596,29 @@ const FiltersCS = function({jsonSERV, setJsonSERV, temas, setTemas, subtemas, se
       @author IGAC - DIP
     */
       function consultaSimple(evt: { preventDefault: () => void; }){
-        //console.log("En pruebas...");
+        //if (utilsModule?.logger()) console.log("En pruebas...");
+        setIsLoading(true)
         evt.preventDefault();
         setRenderMap(false);
         var cond = "";
        
         //Cargue valores filtros
         /* //Tema
-        console.log("Tema valor =>",selTema);
+        if (utilsModule?.logger()) console.log("Tema valor =>",selTema);
         //Subtema
-        console.log("Subtema valor =>",selSubtema);
+        if (utilsModule?.logger()) console.log("Subtema valor =>",selSubtema);
         //Grupo
-        console.log("Grupo valor =>",selGrupo);
+        if (utilsModule?.logger()) console.log("Grupo valor =>",selGrupo);
         //Capa
-        console.log("Capa valor =>",selCapas);
+        if (utilsModule?.logger()) console.log("Capa valor =>",selCapas);
         //Atributo
-        console.log("Atributo valor =>",selAttr);   */    
+        if (utilsModule?.logger()) console.log("Atributo valor =>",selAttr);   */    
   
         //Condición campos alfanuméricos
         //const cond = selAttr + "=" +"'"+txtValor+"'";
   
         //Validación prueba (2024-06-17)
-        if (selAttr == "SHAPE.AREA" || selAttr == "SHAPE.LEN" || selAttr == "AREA_HA")
+        if (selAttr == "SHAPE.AREA" || selAttr == "SHAPE.LEN" || selAttr == "AREA_HA" || selAttr == "objectid"|| selAttr == "st_area(shape)"|| selAttr == "st_perimeter(shape)")
         {
           cond = selAttr + "=" +txtValor;
         }
@@ -619,7 +627,7 @@ const FiltersCS = function({jsonSERV, setJsonSERV, temas, setTemas, subtemas, se
           cond = selAttr + "=" +"'"+txtValor+"'";
         }
         //return tstDrawMap(urlCapa, cond);        
-        console.log("Asigna cond =>",cond);
+        if (utilsModule?.logger()) console.log("Asigna cond =>",cond);
         setCond(cond);
         if (selAttr && txtValor){
           setRenderMap(true);
@@ -657,7 +665,7 @@ const FiltersCS = function({jsonSERV, setJsonSERV, temas, setTemas, subtemas, se
     function limpiarCapaMapa()
     {
         setResponseConsultaSimple(null);      
-        console.log("Obj Geometria =>",view);      
+        if (utilsModule?.logger()) console.log("Obj Geometria =>",view);      
         if (view){
             jimuMapView.view.map.remove(view);
             //Definición del extent centrado al dpto de Quindio
@@ -679,113 +687,134 @@ const FiltersCS = function({jsonSERV, setJsonSERV, temas, setTemas, subtemas, se
      * @remarks FUENTE: https://www.pluralsight.com/resources/blog/guides/how-to-get-selected-value-from-a-mapped-select-input-in-react#:~:text=To%20fetch%20the%20selected%20value,state%20to%20pass%20the%20value.
      * @remarks Estructura de las opciones en objeto selOptions = [{label:"Tema_11", value: "11"},{label:"Tema_22", value: "22"},{label:"Tema_3",value:"3"}];    
      */
+    const [utilsModule, setUtilsModule] = useState(null);
     
     useEffect(() =>
     {      
       getJSONContenido(jsonSERV);      
+      import('../../../../utils/module').then(modulo => setUtilsModule(modulo));
     }, []);
+
     
     return (        
-          <form onSubmit={consultaSimple}>        
-              <div className="mb-1">
-                <Label size="default"> Tema </Label>
-                <Select
-                    onChange={getSubtemas}
-                    placeholder="Seleccione tema..."
-                    value={selTema}
-                  >             
-                  {temas.map(
-                      (option) => (
-                        <option value={option.value}>{option.label}</option>
-                      )
-                  )}
-                </Select>
-              </div>
-              <div className="mb-1">
-              <Label size="default"> Subtema </Label>
+        <form onSubmit={consultaSimple}>        
+            <div className="mb-1">
+              <Label size="default"> Tema </Label>
               <Select
-                onChange={getGrupoOrCapa}
-                placeholder="Seleccione subtema..."
-                value={selSubtema}>
-                {
-                  subtemas.map(
+                  onChange={getSubtemas}
+                  placeholder="Seleccione tema..."
+                  value={selTema}
+                >             
+                {temas.map(
                     (option) => (
-                      <option value={option.idTematica}>{option.nombreTematica}</option>
+                      <option value={option.value}>{option.label}</option>
                     )
-                  )
-                }
+                )}
               </Select>
-              </div>
-              <div className="mb-1">
-                <Label size="default"> Grupo </Label>
-                <Select
-                  onChange={getCapaByGrupo}
-                  placeholder="Seleccione grupo..."
-                  value={selGrupo}
-                >
-                {
-                  grupos.map(
-                    (option) =>
-                    <option value={option.idTematica}>{option.nombreTematica}</option>
-                  )
-                }
-                </Select>
-              </div>
-              <div className="mb-1">
-                <Label size="default"> Capa </Label>
-                <Select
-                  onChange={getAtributosCapa}
-                  placeholder="Seleccione una capa:"
-                  value={selCapas}
+            </div>
+            {
+              subtemas.length > 0 &&
+                <div className="mb-1">
+                  <Label size="default"> Subtema </Label>
+                  <Select
+                    onChange={getGrupoOrCapa}
+                    placeholder="Seleccione subtema..."
+                    value={selSubtema}>
+                    {
+                      subtemas.map(
+                        (option) => (
+                          <option value={option.idTematica}>{option.nombreTematica}</option>
+                        )
+                      )
+                    }
+                  </Select>
+                </div>
+            }            
+            {
+              grupos.length > 0 &&
+                <div className="mb-1">
+                  <Label size="default"> Grupo </Label>
+                  <Select
+                    onChange={getCapaByGrupo}
+                    placeholder="Seleccione grupo..."
+                    value={selGrupo}
                   >
                   {
-                    capas.map(
-                      (option) => 
-                      <option value={option.idCapa}>{option.nombreCapa}</option>
-                    )
-                  } 
-                </Select>
-              </div>
-              <div className="mb-1">
-                <Label size="default"> Atributo </Label>
-                <Select
-                  onChange={enableValor}
-                  placeholder="Seleccione un atributo:"
-                  value={selAttr}
-                >
-                  {
-                    capasAttr.map(
+                    grupos.map(
                       (option) =>
-                        <option value={option.alias}>{option.name}</option>
+                      <option value={option.idTematica}>{option.nombreTematica}</option>
                     )
                   }
-                </Select>
-              </div>
-              <div className="mb-1">
-                <Label size="default"> Valor</Label>
-                <TextInput placeholder="Escriba patrón de búsqueda" 
-                onAcceptValue={function noRefCheck(){}}
-                type="search" className="mb-4" required readOnly={txtValorState}
-                value={txtValor} onChange={handleChangevalorTxt}></TextInput>
-              </div>
-              <div className="btns">
-                <Button
-                  htmlType="submit"              
-                  size="default"
-                  type="default"              
-                >
-                  Consultar
-                </Button>
-                <Button
-                  htmlType="button"
-                  onClick={limpiarCons}
-                  size="default"
-                  type="default"
-                >
-                  Limpiar
-                </Button>
-              </div>
-            </form>        
+                  </Select>
+                </div>
+            }
+            {
+              capas.length > 0 &&
+                <div className="mb-1">
+                  <Label size="default"> Capa </Label>
+                  <Select
+                    onChange={getAtributosCapa}
+                    placeholder="Seleccione una capa:"
+                    value={selCapas}
+                    >
+                    {
+                      capas.map(
+                        (option) => 
+                        <option value={option.idCapa}>{option.nombreCapa}</option>
+                      )
+                    } 
+                  </Select>
+                </div>
+            }
+            {
+              capasAttr.length > 0 &&
+                <div className="mb-1">
+                  <Label size="default"> Atributo </Label>
+                  <Select
+                    onChange={enableValor}
+                    placeholder="Seleccione un atributo:"
+                    value={selAttr}
+                  >
+                    {
+                      capasAttr.map(
+                        (option) =>
+                          <option value={option.alias}>{option.name}</option>
+                      )
+                    }
+                  </Select>
+                </div>
+            }  
+            {
+              selAttr &&
+              <>
+                <div className="mb-1">
+                  <Label size="default"> Valor</Label>
+                  <TextInput placeholder="Escriba patrón de búsqueda" 
+                  onAcceptValue={function noRefCheck(){}}
+                  type="search" className="mb-4" required readOnly={txtValorState}
+                  value={txtValor} onChange={handleChangevalorTxt}></TextInput>
+                </div>
+                <div className="btns">
+                  <Button
+                    htmlType="submit"              
+                    size="default"
+                    type="default"              
+                  >
+                    Consultar
+                  </Button>
+                  <Button
+                    htmlType="button"
+                    onClick={limpiarCons}
+                    size="default"
+                    type="default"
+                  >
+                    Limpiar
+                  </Button>
+                </div>
+              </>
+            }    
+                  
+        </form>       
     );
     
 }

@@ -54,6 +54,7 @@ import _ from "lodash";
 
 //Importación interfaces
 import { InterfaceResponseConsultaSimple, InterfaceMensajeModal, typeMSM } from "../types/interfaceResponseConsultaSimple";
+import { Loading } from "jimu-ui";
 
 //Definición objetos
 const { useState } = React
@@ -108,7 +109,6 @@ const Widget = (props: AllWidgetProps<any>) => {
     @dateUpdated 2024-06-21
     @changes Adicionar objeto spatialReference para permitir almacenar el objeto spatialReference
   */
-  console.log("Iniciando Widget...");
     //Para componente FiltersCS
     const [jsonSERV, setJsonSERV]     = useState ([]);
     const [temas, setTemas]           = useState ([]);
@@ -128,6 +128,11 @@ const Widget = (props: AllWidgetProps<any>) => {
     //2024-06-13 - DataGrid
     const [rows, setRows]             = useState([]);
     const [columns, setColumns]       = useState([]);
+    const [utilsModule, setUtilsModule] = useState(null);
+
+  const [isLoading, setIsLoading] = useState(false);
+
+
     
     //To add the layer to the Map, a reference to the Map must be saved into the component state.
     //Mapa
@@ -641,16 +646,15 @@ const Widget = (props: AllWidgetProps<any>) => {
      * @changes Mantenimiento cargue información componente DataGrid, especificando un tiempo de 10 ms para visualizar el cambio de estado en la constante controlForms
      */
     useEffect(() => {
-      if (!ResponseConsultaSimple)
-        return;
+      if (!ResponseConsultaSimple) return;
       const {features} = ResponseConsultaSimple;
       //Data Grid
       const DgridCol = Object.keys(features[0].attributes).map(key => ({key: key, name: key}));
       const DgridRows= features.map(({ attributes, geometry}) => ({ ...attributes, geometry}));
 
       //Depuración
-      console.log("Data Grid Cols =>",DgridCol);
-      console.log("Data Grid Rows =>",DgridRows);
+      if (utilsModule?.logger()) console.log("Data Grid Cols =>",DgridCol);
+      if (utilsModule?.logger()) console.log("Data Grid Rows =>",DgridRows);
 
       //Seteo de los resultados al DataGrid
       setColumns(DgridCol);
@@ -660,6 +664,7 @@ const Widget = (props: AllWidgetProps<any>) => {
       
       setTimeout(() => {
         setControlForms(true);
+        setIsLoading(false)
       },10);
 
     },[ResponseConsultaSimple]);
@@ -678,27 +683,31 @@ const Widget = (props: AllWidgetProps<any>) => {
     // {}      
 
     useEffect(() => {
-      console.log("Control asociado al Alert =>",alertDial);
-      // console.log("Control asociado al Modal =>", mensModal.deployed);
-      console.log("controlForms (Filter y DG) =>",controlForms);
-      console.log("Control renderMap =>",renderMap);
-      console.log("Asigna cond desde state =>",cond);
+      if (utilsModule?.logger()) console.log("Control asociado al Alert =>",alertDial);
+      // if (utilsModule?.logger()) console.log("Control asociado al Modal =>", mensModal.deployed);
+      if (utilsModule?.logger()) console.log("controlForms (Filter y DG) =>",controlForms);
+      if (utilsModule?.logger()) console.log("Control renderMap =>",renderMap);
+      if (utilsModule?.logger()) console.log("Asigna cond desde state =>",cond);
     },[renderMap])
 
     //https://developers.arcgis.com/experience-builder/guide/add-layers-to-a-map/
     const activeViewChangeHandler = (jmv: JimuMapView) => {
-      console.log("Ingresando al evento objeto JimuMapView...");
+      if (utilsModule?.logger()) console.log("Ingresando al evento objeto JimuMapView...");
       if (jmv) {
         setJimuMapView(jmv);        
       }
     };
 
     {
-      // console.log("Control asociado al Alert =>",alertDial);
-      // // console.log("Control asociado al Modal =>", mensModal.deployed);
-      // console.log("controlForms (Filter y DG) =>",controlForms);
-      // console.log("Control renderMap =>",renderMap);
+      // if (utilsModule?.logger()) console.log("Control asociado al Alert =>",alertDial);
+      // // if (utilsModule?.logger()) console.log("Control asociado al Modal =>", mensModal.deployed);
+      // if (utilsModule?.logger()) console.log("controlForms (Filter y DG) =>",controlForms);
+      // if (utilsModule?.logger()) console.log("Control renderMap =>",renderMap);
     }
+
+    useEffect(() => {
+      import('../../../utils/module').then(modulo => setUtilsModule(modulo));
+    }, []);
     
     return (
       <div className="w-100 p-3 bg-primary text-white">
@@ -774,6 +783,7 @@ const Widget = (props: AllWidgetProps<any>) => {
           setAlertDial={setAlertDial}
           mensModal={mensModal}
           setMensModal={setMensModal}
+          setIsLoading={setIsLoading}
           ></FiltersCS>
         }
         {renderMap &&
@@ -798,7 +808,11 @@ const Widget = (props: AllWidgetProps<any>) => {
           cond={cond}
           setCond={setCond}
           props={props}          
+          setIsLoading={setIsLoading}
           ></DrawMap>
+        }
+        {
+          isLoading && <Loading />
         }
       </div>      
     );

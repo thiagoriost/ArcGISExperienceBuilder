@@ -12,7 +12,7 @@ const Widget = (props: AllWidgetProps<any>) => {
   
     
   const activeViewChangeHandler = (jmv: JimuMapView) => {
-    console.log(props)
+    // console.log(props)
     // console.log(11111111111)
     if (jmv) {
       setJimuMapView(jmv);

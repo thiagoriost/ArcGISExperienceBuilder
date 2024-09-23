@@ -194,7 +194,8 @@ const Widget_Tree: React.FC<Widget_Tree_Props> = ({ dataTablaContenido, varJimuM
      * @param dataTablaContenido 
      * @returns componente Nodo donde renderizara, tematica padre, tematicas y/o capas hijas, tematicas y/o capas nietas y capas bisnietas
      */
-    const renderTree = (dataTablaContenido: CapasTematicas[]) => {        
+    const renderTree = (dataTablaContenido: CapasTematicas[]) => {   
+        if(dataTablaContenido.length < 1) return
         const filteredDataTablaContenido = filterdataTablaContenido(dataTablaContenido);
         return filteredDataTablaContenido.map((capa: Tematicas) => (
             <Nodo key={capa.IDTEMATICA} capa={capa} />
