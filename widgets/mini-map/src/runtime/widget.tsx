@@ -14,7 +14,6 @@ const Widget = (props: AllWidgetProps<any>) => {
   
     
   const activeViewChangeHandler = (jmv: JimuMapView) => {
-    console.log(11111)
     if (jmv) {
       setJimuMapView(jmv);
       // setInitialExtent(jmv.view.extent); // Guarda el extent inicial
@@ -22,12 +21,10 @@ const Widget = (props: AllWidgetProps<any>) => {
   };
 
   useEffect(() => {
-    console.log(22222, utilsModule)
     if (utilsModule?.logger()) console.log("useEffect =>",{mapView, miniMapDiv});
     if (mapView && miniMapDiv.current) {
       loadModules(['esri/views/MapView', 'esri/WebMap', 'esri/Graphic', 'esri/geometry/Extent','esri/Map',])
       .then(([MapView, WebMap, Graphic, Extent, Map]) => {
-        console.log(888888)
         const webMap = new WebMap({
           portalItem: {
             id: mapView.view.map.portalItem.id // Utiliza el mismo WebMap que el mapa principal
@@ -52,8 +49,8 @@ const Widget = (props: AllWidgetProps<any>) => {
         });
 
         miniView.when(() => {
-          console.log(99999)
           const updateMiniMap = () => {
+            if (miniView.map.basemap !== mapView.view.map.basemap) miniView.map.basemap = mapView.view.map.basemap;
             miniView.graphics.removeAll();
             const extent = mapView.view.extent;
             const graphic = new Graphic({
@@ -82,7 +79,6 @@ const Widget = (props: AllWidgetProps<any>) => {
 
 
 useEffect(() => {
-  console.log(3333,utilsModule)
   if (utilsModule?.logger()) console.log("useEffect =>",{mapView, miniMapDiv});
 
   return () => {}
@@ -91,7 +87,6 @@ useEffect(() => {
   
 
   useEffect(() => {
-    console.log(4444,utilsModule)
   if (utilsModule?.logger()) console.log("useEffect =>",{mapView, miniMapDiv});
     import('../../../utils/module').then(modulo => setUtilsModule(modulo));
   }, []);
@@ -101,7 +96,6 @@ useEffect(() => {
         {props.useMapWidgetIds && props.useMapWidgetIds.length === 1 && (
           <JimuMapViewComponent useMapWidgetId={props.useMapWidgetIds?.[0]} onActiveViewChange={activeViewChangeHandler} />
         )}
-        <h1>5555555555</h1>
         <div ref={miniMapDiv} className="containerOverview" ></div>
         
       </div>

@@ -1,5 +1,5 @@
 {
-    "name": "OverView",
+    "name": "mini-map",
     "label":"Mapa de localización",
     "type": "OverView",
     "version": "1.14.0",
