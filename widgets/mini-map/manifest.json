@@ -1,5 +1,6 @@
 {
-    "name": "mini-map",
+    "name": "OverView",
+    "label":"Mapa de localización",
     "type": "OverView",
     "version": "1.14.0",
     "dependency": ["jimu-arcgis"],

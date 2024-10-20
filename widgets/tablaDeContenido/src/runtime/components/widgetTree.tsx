@@ -35,6 +35,8 @@ const Widget_Tree: React.FC<Widget_Tree_Props> = ({ dataTablaContenido, varJimuM
     const [contextMenu, setContextMenu] = useState<InterfaceContextMenu>(null); // controla el despliegue y data a mostrar en el contextMenu
     const [featuresLayersDeployed, setFeaturesLayersDeployed] = useState<InterfaceFeaturesLayersDeployed[]>([]); // almacena los features y su metadata pintados en el mapa
     const [banderaRefreshCapas, setBanderaRefreshCapas] = useState<boolean>(false); // bandera empleada para actualizar en el mapa el orden de las capas
+    const [utilsModule, setUtilsModule] = useState<any>(null);
+
 
     /**
      * Metodo que prende o apaga la capa a la que se le de click en el check y actualiza capasSelectd, checkedItems
@@ -45,6 +47,7 @@ const Widget_Tree: React.FC<Widget_Tree_Props> = ({ dataTablaContenido, varJimuM
         const capaToDeployContextmenu = capa.URL ? capa : capa.capasNietas ? capa.capasNietas.length == 1 ? capa.capasNietas[0] : undefined : undefined;
         setCheckedItems(prevState => ({ ...prevState, [IDCAPA]: target.checked }));
         capaToDeployContextmenu.VISIBLE = target.checked;
+        if (utilsModule?.logger()) console.log("handleCheck =>",{capa, target, IDCAPA, capaToDeployContextmenu});
         if (capasSelectd.length > 0 || target.checked) {
             setCapasSelectd(prevState => {
                 const newState = prevState.includes(capaToDeployContextmenu) ? prevState.filter(item => item !== capaToDeployContextmenu) : [...prevState, capaToDeployContextmenu];
@@ -209,6 +212,7 @@ const Widget_Tree: React.FC<Widget_Tree_Props> = ({ dataTablaContenido, varJimuM
      * @param varJimuMapView 
      */
     const dibujaCapasSeleccionadas = (capasToRender: ItemResponseTablaContenido[], varJimuMapView: JimuMapView) => {
+        if (utilsModule?.logger()) console.log("dibujaCapasSeleccionadas:",{capasToRender});
         capasToRender.forEach(capa =>{
             const url = capa.URL?capa.URL:capa.capasNietas[0].URL;
             const nombreCapa = capa.NOMBRECAPA?capa.NOMBRECAPA:capa.capasNietas[0].NOMBRECAPA
@@ -216,9 +220,12 @@ const Widget_Tree: React.FC<Widget_Tree_Props> = ({ dataTablaContenido, varJimuM
                 url: `${url}/${nombreCapa}`
             });
             varJimuMapView.view.map.add(layer);
+            /* 
+            // se encarga de ajustar el extend del mapa con la capa renderizada
             layer.when(()=>{
                 varJimuMapView.view.goTo(layer.fullExtent)
-            })
+            });
+ */
             setFeaturesLayersDeployed(features => [...features,{capa: capa.IDCAPA ? capa : capa.capasNietas[0], layer}]);
             // const testLayer = varJimuMapView.view.map.layers.getItemAt(0) 
         });
@@ -251,17 +258,10 @@ const Widget_Tree: React.FC<Widget_Tree_Props> = ({ dataTablaContenido, varJimuM
         varJimuMapView.view.zoom = varJimuMapView.view.zoom - 0.00000001;
         renderTree(dataTablaContenido);
         setSearchQuery('');
+        setCheckedItems({});// con esto se descelecciona los check activos
+        setExpandedItems({}); // con esto se cierran todos los item abiertes, se descolacza el arbol
+        // renderTree(dataTablaContenido);
     };
-
-    /**
-     * Recorre la tabla de contenido en buscas de capas a dibujar por el parametro VISIBLE = true y las dibuja
-     */
-    useEffect(() => {
-        const {capasVisibles} = recorreTodasLasCapasTablaContenido(dataTablaContenido);
-        setCapasSelectd( capasVisibles );
-        dibujaCapasSeleccionadas(capasVisibles, varJimuMapView);     
-        return () => {}
-    }, [dataTablaContenido])    
 
     /**
      * Se encarga de reordenar las capas dibujadas en el mapa segun lo modificado en el tab Orden Capas
@@ -305,6 +305,28 @@ const Widget_Tree: React.FC<Widget_Tree_Props> = ({ dataTablaContenido, varJimuM
         view.zoom = view.zoom -0.00000001
     }
 
+    const showState = () => {
+        console.log({
+            expandedItems,
+            checkedItems,
+            searchQuery,
+            capasSelectd,
+            contextMenu,
+            featuresLayersDeployed,
+            banderaRefreshCapas
+        });
+    }
+
+    /**
+     * Recorre la tabla de contenido en buscas de capas a dibujar por el parametro VISIBLE = true y las dibuja
+     */
+    useEffect(() => {
+        const {capasVisibles} = recorreTodasLasCapasTablaContenido(dataTablaContenido);
+        setCapasSelectd( capasVisibles );
+        dibujaCapasSeleccionadas(capasVisibles, varJimuMapView);     
+        return () => {}
+    }, [dataTablaContenido])    
+
     /**
      * Detecta cambio en banderaRefreshCapas y ejecuta la logia reorderLayers siempre y cuando exista la referencia del mapa
      */
@@ -317,8 +339,13 @@ const Widget_Tree: React.FC<Widget_Tree_Props> = ({ dataTablaContenido, varJimuM
       return () => {}
     }, [banderaRefreshCapas])
     
+    useEffect(() => {
+        import('../../../../utils/module').then(modulo => setUtilsModule(modulo));
+    }, []);
+
     return (
         <div style={{height:'inherit'}}>
+             {/* <button type="button" onClick={showState}>GetState</button> */}
             <Tabs>
                 <TabList>
                     <Tab>Lista de Capas</Tab>
@@ -366,6 +393,7 @@ const Widget_Tree: React.FC<Widget_Tree_Props> = ({ dataTablaContenido, varJimuM
                 }
             </Tabs>            
             <ContexMenu contextMenu={contextMenu} setContextMenu={setContextMenu} varJimuMapView={varJimuMapView}/>
+           
         </div>
     );
 };

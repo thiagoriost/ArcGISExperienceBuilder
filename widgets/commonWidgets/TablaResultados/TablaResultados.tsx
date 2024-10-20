@@ -66,9 +66,13 @@ const TablaResultados = ({
       const extent = geometryType === 'point' ? targetGeometry : graphic.geometry.extent.expand(1.5);
 
       jimuMapView.view.goTo({ target: extent, zoom: zoomLevel }, { duration: 3000 });
-
+      
+      
       setLastGeometriDeployed(graphicsLayer);
-      setTimeout(() => setIsLoading(false), 3000);
+      setTimeout(() => {
+        jimuMapView.view.extent = targetGeometry.extent;
+        setIsLoading(false)
+      }, 5000);
     });
   };
 

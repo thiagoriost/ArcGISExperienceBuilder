@@ -1,11 +1,4 @@
-﻿/** 
-    Sección de importación
-    @date 2024-06-11
-    @author IGAC - DIP
-    @dateUpdated 2024-06-27
-    @chanegs Importar componente url que asocia las URIS de consumo de servicios web (API).
-*/
-
+﻿
 import React, { useEffect, useState } from 'react';
 import { Button, Label, Select, TextInput } from 'jimu-ui'; // import components
 
@@ -457,6 +450,7 @@ const FiltersCS = function({jsonSERV, setJsonSERV, temas, setTemas, subtemas, se
         if (utilsModule?.logger()) console.log("URL capa =>",urlCapaJson);
   
         //Inicialización controles
+        setCond(undefined);
         setCapasAttr([]);
         setValor("");
         setValorState(true);
