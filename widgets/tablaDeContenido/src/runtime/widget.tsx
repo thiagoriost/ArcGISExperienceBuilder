@@ -77,6 +77,7 @@ export const getDataTablaContenido = async (servicios: { urls: { tablaContenido:
   let responseTablaDeContenido: TablaDeContenidoInterface[] = [];
   // let responseTablaDeContenido: any[] = [];
   try {
+    // const response = await fetch(url);
     const response = await fetch(url);
     if (!response.ok) {
       throw new Error(`HTTP error! Status: ${response.status}`);

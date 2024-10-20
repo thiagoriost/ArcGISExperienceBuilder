@@ -37,8 +37,6 @@ const tiposGraficos: Grafico[] = [
   { label: "Bubble Chart", value: 3 },
 ];
 
-
-
 const Indicadores = (props: AllWidgetProps<any>) => {
   const [jimuMapView, setJimuMapView] = useState<JimuMapView>();
   const [initialExtent, setInitialExtent] = useState(null);
@@ -190,82 +188,88 @@ const Indicadores = (props: AllWidgetProps<any>) => {
     logica([/* "DEPARTAMEN"  ,*/ "MUNICIPIO"/*, "VEREDA", "PCC" */]);
   }
 
+  const generateChartData = (data, fieldlabel, fieldValue, leyenda, departmentSelect) => {
+    // const parsedData = JSON.parse(data);
+    const labels = [];
+    const metaData = {};
+    if (!data) {
+      if (utilsModule.logger())console.error("El poligono seleccionada no presenta atributos");
+      return {
+        labels: ["Sin data"], // Ordenar etiquetas para asegurar consistencia
+        datasets: [
+          {
+            label: "El municipio seleccionado no presenta información",
+            // label: 'Cantidad de Predios',
+            data: [0],
+            backgroundColor: getRandomRGBA(),
+          },
+        ],
+      };
+    }else if(!departmentSelect){ // para la grafica a nivel nacional
+
+      const ajusteLeyenda = (leyenda =="Cantidad de predios por tipo" || leyenda =='Cantidad de área por tipo') ? 
+      leyenda.replace("por tipo", "").trim()
+      :leyenda;
+      return {
+        labels:[fieldValue],//: labels.sort(), // Ordenar etiquetas para asegurar consistencia
+        datasets: [
+          {
+            label: fieldValue,
+            // label: 'Cantidad de Predios',
+            data: [data[fieldValue]],
+            backgroundColor: getRandomRGBA(),
+          },
+        ],
+      };
+    }else{
+      data.forEach(item => {
+        // const { tipo_predio, cantidad_predios } = item.attributes;
+        // const { fieldlabel, fieldValue } = item.attributes;
+        const findLabel = item.attributes[fieldlabel];
+        const findValues = item.attributes[fieldValue];
+    
+        // Añadir fieldlabel a las etiquetas si no está presente
+        if (!labels.includes(findLabel)) {
+          labels.push(findLabel);
+          metaData[findLabel] = 0;
+        }
+    
+        // Sumar findValues al findLabel correspondiente
+        metaData[findLabel] += findValues;
+      });
+    
+      const dataValues = labels.map(label => metaData[label]);
+      
+
+      return {
+        labels,//: labels.sort(), // Ordenar etiquetas para asegurar consistencia
+        datasets: [
+          {
+            label: leyenda,
+            // label: 'Cantidad de Predios',
+            data: dataValues,
+            backgroundColor: getRandomRGBA(),
+          },
+        ],
+      };
+    }
+  
+    /* return {
+      labels: labels.sort(), // Ordenar etiquetas para asegurar consistencia
+      datasets,
+    }; */
+  };
+
+  /**
+   * 
+   * @param param0 Ajusta data para renderizar la grafica estadistica a nivel municipal
+   */
   const _fixDataToRenderGrafig = ({poligonoSeleccionado, selectIndicadores, departmentSelect }) => {
     
     const {geometry, symbol, attributes, popupTemplate}=poligonoSeleccionado;
-    const {fieldlabel, fieldValue, leyenda, descricion } = selectIndicadores;
-    if (utilsModule.logger())console.log({fieldlabel, fieldValue, leyenda, descricion, geometry, symbol, attributes, popupTemplate});
-    const generateChartData = (data, fieldlabel, fieldValue, leyenda) => {
-      // const parsedData = JSON.parse(data);
-      const labels = [];
-      const metaData = {};
-      if (!data) {
-        if (utilsModule.logger())console.error("El poligono seleccionada no presenta atributos");
-        return {
-          labels: ["Sin data"], // Ordenar etiquetas para asegurar consistencia
-          datasets: [
-            {
-              label: "El municipio seleccionado no presenta información",
-              // label: 'Cantidad de Predios',
-              data: [0],
-              backgroundColor: getRandomRGBA(),
-            },
-          ],
-        };
-      }else if(!departmentSelect){ // para la grafica a nivel nacional
-
-        const ajusteLeyenda = (leyenda =="Cantidad de predios por tipo" || leyenda =='Cantidad de área por tipo') ? 
-        leyenda.replace("por tipo", "").trim()
-        :leyenda;
-        return {
-          labels:[fieldValue],//: labels.sort(), // Ordenar etiquetas para asegurar consistencia
-          datasets: [
-            {
-              label: fieldValue,
-              // label: 'Cantidad de Predios',
-              data: [data[fieldValue]],
-              backgroundColor: getRandomRGBA(),
-            },
-          ],
-        };
-      }else{
-        data.forEach(item => {
-          // const { tipo_predio, cantidad_predios } = item.attributes;
-          // const { fieldlabel, fieldValue } = item.attributes;
-          const findLabel = item.attributes[fieldlabel];
-          const findValues = item.attributes[fieldValue];
-      
-          // Añadir fieldlabel a las etiquetas si no está presente
-          if (!labels.includes(findLabel)) {
-            labels.push(findLabel);
-            metaData[findLabel] = 0;
-          }
-      
-          // Sumar findValues al findLabel correspondiente
-          metaData[findLabel] += findValues;
-        });
-      
-        const dataValues = labels.map(label => metaData[label]);
-        
-  
-        return {
-          labels,//: labels.sort(), // Ordenar etiquetas para asegurar consistencia
-          datasets: [
-            {
-              label: leyenda,
-              // label: 'Cantidad de Predios',
-              data: dataValues,
-              backgroundColor: getRandomRGBA(),
-            },
-          ],
-        };
-      }
+    const {fieldlabel, fieldValue, leyenda, descripcion } = selectIndicadores;
+    if (utilsModule.logger())console.log({fieldlabel, fieldValue, leyenda, descripcion, geometry, symbol, attributes, popupTemplate});
     
-      /* return {
-        labels: labels.sort(), // Ordenar etiquetas para asegurar consistencia
-        datasets,
-      }; */
-    };
     setTotalPage(departmentSelect?fieldlabel.length:0)
     /* 
       const chartData = generateChartData(attributes.dataIndicadores, fieldlabel[0], fieldValue, leyenda[0]);
@@ -278,11 +282,11 @@ const Indicadores = (props: AllWidgetProps<any>) => {
     const dataToRenderGraphics = [];
     fieldlabel.forEach((fl, i) => {
       if (fl.includes("anio")) {
-        dataToRenderGraphics.push(ordenarDatos(generateChartData(attributes.dataIndicadores, fl, fieldValue, leyenda[i])));
+        dataToRenderGraphics.push(ordenarDatos(generateChartData(attributes.dataIndicadores, fl, fieldValue, leyenda[i],departmentSelect)));
       } else if(attributes.dataIndicadores){
-        dataToRenderGraphics.push(generateChartData(attributes.dataIndicadores, fl, fieldValue, leyenda[i]));
+        dataToRenderGraphics.push(generateChartData(attributes.dataIndicadores, fl, fieldValue, leyenda[i], departmentSelect));
       }else if(!departmentSelect){ // cuando es nacional
-        dataToRenderGraphics.push(generateChartData(attributes, fl, fieldValue, leyenda[i]));
+        dataToRenderGraphics.push(generateChartData(attributes, fl, fieldValue, leyenda[i], departmentSelect));
       }else{
         if (utilsModule.logger())console.log("el municipio no presenta data estadistica",
           {poligonoSeleccionado, selectIndicadores, departmentSelect, attributes, fl, fieldValue, leyenda})
@@ -296,7 +300,7 @@ const Indicadores = (props: AllWidgetProps<any>) => {
         legend: { position: 'top' as const, },
         title: {
           display: true,
-          text: `${descricion} ${poligonoSeleccionado.attributes.mpnombre} - ${departmentSelect?.label?departmentSelect.label:poligonoSeleccionado.attributes.depto}`,
+          text: `${descripcion} - Mncpio:${poligonoSeleccionado.attributes.mpnombre} - Dpto: ${departmentSelect?.label?departmentSelect.label:poligonoSeleccionado.attributes.depto}`,
         },
         tooltip: {
           enabled: true
@@ -316,6 +320,75 @@ const Indicadores = (props: AllWidgetProps<any>) => {
         }
       },
     });
+  }
+
+  /**
+   * 
+   * @param param0 Ajusta data para renderizar la grafica estadistica a nivel departamental y nacional
+   */
+  const fixDataToRenderStadisticGraphic = (fieldlabelNal, fieldValueNal, features, leyendaNal, descripcion ) => {
+
+    const DATASET = [];
+    // 1. Agrupar por 'tipo_predio' y 'anio'
+    const groupBy = (arr, key) => arr.reduce((acc, obj) => {
+      const value = obj.attributes[key];
+      acc[value] = acc[value] || [];
+      acc[value].push(obj.attributes);
+      return acc;
+    }, {});
+
+    fieldlabelNal.forEach( (FL, i) => {
+      const groupedByLabel = groupBy(features, FL);
+      if(groupedByLabel.undefined){
+        console.error("Uno de los campos no coincide con algun ajuste de campos en el servicio", {fieldlabelNal, fieldValueNal, features, leyendaNal, descripcion});
+        return
+      }
+      const labels = Object.keys(groupedByLabel);
+      const data = labels.map(label => {
+        return groupedByLabel[label].reduce((sum, item) => sum + item[fieldValueNal], 0);
+      });
+
+
+      DATASET.push({
+        datasets:[{
+          backgroundColor: getRandomRGBA(),
+          data,
+          label: leyendaNal[i]
+        }],
+        labels
+      });
+
+    });
+
+    setDataGrafico(DATASET);
+    if (utilsModule.logger())console.log({DATASET})
+    setOptions({
+      responsive: true,
+      plugins: {
+        legend: { position: 'top' as const, },
+        title: {
+          display: true,
+          text: `${descripcion}`,
+        },
+        tooltip: {
+          enabled: true
+        },
+        datalabels: {
+          anchor: 'end',
+          align: 'top',
+          formatter: Math.round,
+          font: {
+            weight: 'bold'
+          }
+        },
+        scales: {
+          y: {
+            beginAtZero: true
+          }
+        }
+      },
+    });
+    setTotalPage(fieldlabelNal.length)
   }
 
   useEffect(() => {
@@ -358,18 +431,37 @@ const Indicadores = (props: AllWidgetProps<any>) => {
 
   useEffect(() => {
     if (props.hasOwnProperty("stateProps")) {
-      const dataFromDispatch = JSON.parse(props.stateProps.poligonoSeleccionado)
+      // const {nacional, poligonoSeleccionado} = props.stateProps;
+      // const {dataFromDispatch} = props.stateProps;
+      const dataFromDispatch = JSON.parse(props.stateProps.dataFromDispatch)
       if (utilsModule?.logger()) console.log({props, id:props.id, dataFromDispatch});
+     
+      
       if (dataFromDispatch?.clear) {
         if (utilsModule?.logger()) console.log("clearing graphic")
         setDataGrafico([])
         setOptions(null)
-      }else {
+      }else if (dataFromDispatch?.municipal) {
         // const data = JSON.parse(props.stateProps.poligonoSeleccionado);
-        setPoligonoSeleccionado(dataFromDispatch)      
-        _fixDataToRenderGrafig(dataFromDispatch);
-        setCurrentpage(1);
-      }      
+        setPoligonoSeleccionado(dataFromDispatch.municipal)      
+        _fixDataToRenderGrafig(dataFromDispatch.municipal);        
+      }else if(dataFromDispatch?.nacional){
+        if (utilsModule?.logger()) console.log(dataFromDispatch.nacional);
+        const {dataAlfanuemricaNal, indiSelected} = dataFromDispatch.nacional;
+        const {features} = dataAlfanuemricaNal;
+        const {fieldlabelNal, fieldValueNal, leyendaNal, descripcion } = indiSelected;
+        fixDataToRenderStadisticGraphic(fieldlabelNal, fieldValueNal, features, leyendaNal, descripcion + " a nivel nacional");
+      }else if(dataFromDispatch?.departamental){
+        if (utilsModule?.logger()) console.log(dataFromDispatch.departamental);
+        const { itemSelected, selectIndicadores, filtroSoloFeaturesDelDepartaSeleccionado} = dataFromDispatch.departamental;
+        const {fieldlabelDepartal, fieldValueDepartal, leyendaDepartal, descripcion } = selectIndicadores;
+        fixDataToRenderStadisticGraphic(fieldlabelDepartal, fieldValueDepartal, filtroSoloFeaturesDelDepartaSeleccionado, leyendaDepartal, descripcion + " - Dpto: " + itemSelected.denombre );
+      }else{
+        if (utilsModule?.logger()) console.error("Upss" , {props, id:props.id, dataFromDispatch});
+      }
+      setCurrentpage(1);
+      
+      
     }
   
     return () => {}
@@ -384,14 +476,14 @@ const Indicadores = (props: AllWidgetProps<any>) => {
   }, []);
 
   return (
-    <div className="w-100 p-3  text-white">
+    <div className="w-100 p-3  text-white" style={{display:'flex', flexDirection:'row', justifyContent:'center'}}>
       {props.useMapWidgetIds && props.useMapWidgetIds.length === 1 && (
         <JimuMapViewComponent useMapWidgetId={props.useMapWidgetIds[0]} onActiveViewChange={activeViewChangeHandler} />
       )}
       <>
         { 
-          (dataGrafico.length > 0 && poligonoSeleccionado.departmentSelect) && (
-            <div style={{ padding: '10px', width:'500px', height:'300px', border:'solid', borderRadius:'10px' }}>
+          (dataGrafico.length > 0/*  && poligonoSeleccionado.departmentSelect */) && (
+            <div style={{ padding: '10px', width:'500px', height:'300px', border:'solid', borderRadius:'10px', backgroundColor: "white" }}>
               {
                 totalPage > 1 && 
                   <Pagination
