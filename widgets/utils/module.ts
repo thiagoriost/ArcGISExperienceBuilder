@@ -210,8 +210,7 @@ const pintarFeatureLayer = async ({ url, jimuMapView, colorOutline = "white", co
         features, jimuMapView, setPoligonoSeleccionado,
         setClickHandler, fieldValueToSetRangeCoropletico, setLastLayerDeployed, lastLayerDeployed,
         setRangosLeyenda, Polygon, Graphic, GraphicsLayer, SimpleFillSymbol
-      }
-      )
+      })
 
       // Esperar a que la capa esté lista
       layer.when();
@@ -309,7 +308,7 @@ const calculoValoresQuintiles = (features, fieldValueToSetRangeCoropletico) => {
     if (featu.attributes.dataIndicadores) { //este aplica para el coropletico municipal
       featu.attributes.dataIndicadores.forEach(indicadore => tempValue += indicadore.attributes[fieldValueToSetRangeCoropletico]);
       featu.attributes[fieldValueToSetRangeCoropletico] = tempValue
-    } else if (!featu.attributes[fieldValueToSetRangeCoropletico]) {
+    } else if (!featu.attributes[fieldValueToSetRangeCoropletico] && isNaN(featu.attributes[fieldValueToSetRangeCoropletico])) {
       if (logger()) console.error("Sin match para el campo => ", { fieldValueToSetRangeCoropletico, features })
     } else if (featu.attributes[fieldValueToSetRangeCoropletico]) {//este aplica para el coropletico nacional
       tempValue = featu.attributes[fieldValueToSetRangeCoropletico];
@@ -420,7 +419,7 @@ const calculoValoresQuintiles = (features, fieldValueToSetRangeCoropletico) => {
     [parseFloat((quintiles[2] + 0.01).toFixed(2)), parseFloat((quintiles[3]).toFixed(2))],
     [parseFloat((quintiles[3] + 0.01).toFixed(2)), maxValue],
   ]
-  if (logger()) console.log({ values, quintiles, rangos, minValue, maxValue });
+  if (logger()) console.log({ filtro, values, quintiles, rangos, minValue, maxValue });
   return { rangos };
 }
 
