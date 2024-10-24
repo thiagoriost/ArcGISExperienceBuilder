@@ -39,12 +39,12 @@ const urls = {
         v_predios_entregados_ft_nacmun:`${mapServerNal}/9`,
         v_predios_formalizados_nacmun:`${mapServerNal}/10`,
         v_predios_for_mujeres_nacmun:`${mapServerNal}/11`,
-        v_predios_uaf_nacmun:`${mapServerNal}/12`,
+        v_predios_uaf_nacmun:`${mapServerNal}/38`,
         v_predios_restierras_nacmun:`${mapServerNal}/13`,
-        v_predios_zrc_nacmun:`${mapServerNal}/14`,
+        v_predios_zrc_nacmun:`${mapServerNal}/39`,
         v_indice_gini_ids_nacmun:`${mapServerNal}/15`,
         v_predios_conflicto_nacmun:`${mapServerNal}/16`,
-        v_predios_ley2da_nacmun:`${mapServerNal}/17`,
+        v_predios_ley2da_nacmun:`${mapServerNal}/12`,
         v_predios_etnicos_nacmun:`${mapServerNal}/18`,
     },
     indicadoresDepartal:{ // Departamentales
@@ -59,10 +59,10 @@ const urls = {
         v_predios_formal_mujeres_dpto:`${mapServerDepartal}/11`,
         v_predios_uaf_depto:`${mapServerDepartal}/12`,
         v_predios_restierras_depto:`${mapServerDepartal}/13`,
-        v_predios_zrc_depto:`${mapServerDepartal}/14`,
+        v_predios_ley2da_depto:`${mapServerDepartal}/14`,
         v_indice_gini_ids_depto:`${mapServerDepartal}/15`,
         v_predios_conflicto_depto:`${mapServerDepartal}/16`,
-        v_predios_ley2da_depto:`${mapServerDepartal}/17`,
+        v_predios_zrc_depto:`${mapServerDepartal}/18`,
         v_predios_etnicos_depto:`${mapServerDepartal}/20`,
     },
     indicadoresNaciAlfanumerica:{ // nacionales para graficas estadisticas
@@ -79,8 +79,10 @@ const urls = {
         v_predios_restierras_sumnac:`${mapServerNal}/29`,
         v_predios_zrc_avgnac:`${mapServerNal}/30`,
         v_predios_ley2da_avgnac:`${mapServerNal}/31`,
-        // v_predios_etnicos_avgnac:`${mapServerNal}/32`,
         v_predios_etnicos_porcnac:`${mapServerNal}/32`,
+        v_predios_uaf_porcnac:`${mapServerNal}/33`,
+        v_predios_zrc_porcnac:`${mapServerNal}/34`,
+        v_predios_ley2da_porcnac:`${mapServerNal}/35`,
         
     }
 }

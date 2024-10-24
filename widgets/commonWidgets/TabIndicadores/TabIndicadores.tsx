@@ -117,7 +117,7 @@ const TabIndicadores: React.FC<any> = ({dispatch, departamentos, jimuMapView}) =
     let url = servicios.urls.indicadoresNaci[indiSelected.urlNal];
     let responseIndicadorNacional;
     let layer;
-    if(!url){
+    if(!url /* || !servicios.urls.indicadoresNaciAlfanumerica[indiSelected.urlNalDataAlfanumerica] */){
       setIsLoading(false);
       setMensajeModal({
         deployed: true,
@@ -129,6 +129,7 @@ const TabIndicadores: React.FC<any> = ({dispatch, departamentos, jimuMapView}) =
       setSelectIndicadores(undefined)
       return
     }
+    
     url = `${url}/query`;
     const existeQuery = dataTempQueryNal.find(d => (d.id == indiSelected.label && d.url == url));
     if (existeQuery) {
@@ -234,16 +235,27 @@ const TabIndicadores: React.FC<any> = ({dispatch, departamentos, jimuMapView}) =
       setIsLoading(false)
     }, 500);
     //consultar data alfanumerica para renderizar grafico a nivel nacional
-    const urlAlfanumericaNal = `${servicios.urls.indicadoresNaciAlfanumerica[indiSelected.urlNalDataAlfanumerica]}/query`
     
-    if (!servicios.urls.indicadoresNaciAlfanumerica[indiSelected.urlNalDataAlfanumerica]) return
-
+    const urlAlfanumericaNal = `${servicios.urls.indicadoresNaciAlfanumerica[indiSelected.urlNalDataAlfanumerica]}/query`    
     const dataAlfanuemricaNal = await utilsModule.realizarConsulta("*", urlAlfanumericaNal, false, `1=1`);
     if (utilsModule.logger()) console.log({"INDICADOR":target.value,indiSelected, url, responseIndicadorNacional,fieldValueToSetRangeCoropletico
       ,layer, dataTempQueryNal, dataAlfanuemricaNal})
     // enviar data al widget indicadores para pintar graficos estaditicos a nivel nacional
+    if(!dataAlfanuemricaNal){
+      setIsLoading(false);
+      setMensajeModal({
+      // console.log({
+        deployed: true,
+        type: typeMSM.warning,
+        tittle: 'Info',
+        body: "Sin Data alfanumerica nacional para este indicador, continuar para ver data por municipio",
+        subBody:''
+      });
+      return
+    }
+    // con lo siguiente se envia la data al widget indicadores para renderizar la grafica de barras
     const dataToRender = JSON.stringify({nacional:{dataAlfanuemricaNal, indiSelected, responseIndicadorNacional, url, fieldValueToSetRangeCoropletico}})
-    dispatch(appActions.widgetStatePropChange(widgetID_Indicadores, "dataFromDispatch", dataToRender))
+    dispatch(appActions.widgetStatePropChange(widgetID_Indicadores, "dataFromDispatch", dataToRender))      
 
   }
   /**
