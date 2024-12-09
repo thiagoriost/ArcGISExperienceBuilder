@@ -1,11 +1,11 @@
-import React, { useEffect, useState, useRef, useCallback } from 'react'
+import React, { useEffect, useState, useRef/* , useCallback */ } from 'react'
 import { type AllWidgetProps } from 'jimu-core'
-import { JimuMapViewComponent, type JimuMapView, loadArcGISJSAPIModules } from 'jimu-arcgis'
+import { JimuMapViewComponent, type JimuMapView/* , loadArcGISJSAPIModules */ } from 'jimu-arcgis'
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, PointElement, LineElement, Filler } from 'chart.js'
-import { Bar, Bubble, Line } from 'react-chartjs-2'
-import { loadModules } from 'esri-loader'
+import { Bar/* , Bubble, Line  */ } from 'react-chartjs-2'
+// import { loadModules } from 'esri-loader'
 import { type InterfaceFeatureSelected } from '../types/interfacesIndicadores'
-import { PieChart } from 'jimu-ui/advanced/lib/chart/pie'
+// import { PieChart } from 'jimu-ui/advanced/lib/chart/pie'
 import '../styles/style.css'
 import { Pagination } from 'jimu-ui'
 
@@ -47,11 +47,11 @@ const Indicadores = (props: AllWidgetProps<any>) => {
   const [initialExtent, setInitialExtent] = useState(null)
   const [utilsModule, setUtilsModule] = useState<any>(null)
   // const [widgetModules, setWidgetModules] = useState<any>(null)
-  const [graficoSeleccionado, setGraficoSeleccionado] = useState<number | null>(null)
+  // const [graficoSeleccionado, setGraficoSeleccionado] = useState<number | null>(null)
   const [dataGrafico, setDataGrafico] = useState<any>([])
-  const [dataGraficByAnnual, setDataGraficByAnnual] = useState(undefined)
+  // const [dataGraficByAnnual, setDataGraficByAnnual] = useState(undefined)
   const [options, setOptions] = useState<any>(null)
-  const [selectedData, setSelectedData] = useState<any>(null)
+  // const [selectedData, setSelectedData] = useState<any>(null)
   /* const [chartData, setChartData] = useState({
     labels: [],
     datasets: [
@@ -62,10 +62,10 @@ const Indicadores = (props: AllWidgetProps<any>) => {
       }
     ]
   }) */
-  const [featureSelected, setFeatureSelected] = useState<InterfaceFeatureSelected>(null)
+  // const [featureSelected, setFeatureSelected] = useState<InterfaceFeatureSelected>(null)
   const [responseQueryCapa, setResponseQueryCapa] = useState(null)
-  const [contador, setContador] = useState()
-  const [poligonoSeleccionado, setPoligonoSeleccionado] = useState(undefined)
+  // const [contador, setContador] = useState()
+  // const [poligonoSeleccionado, setPoligonoSeleccionado] = useState(undefined)
   const [currentpage, setCurrentpage] = useState(1)
   const [totalPage, setTotalPage] = useState(0)
   const [mensajeModal, setMensajeModal] = useState({
@@ -194,7 +194,7 @@ const Indicadores = (props: AllWidgetProps<any>) => {
           }
         }
         setOptions(options)
-        setGraficoSeleccionado(0)
+        // setGraficoSeleccionado(0)
       })
     }
     logica(['MUNICIPIO'/*, "VEREDA", "PCC" */])
@@ -213,14 +213,13 @@ const Indicadores = (props: AllWidgetProps<any>) => {
             label: 'El municipio seleccionado no presenta información',
             // label: 'Cantidad de Predios',
             data: [0],
-            backgroundColor: getRandomRGBA()
+            backgroundColor: utilsModule.getRandomRGBA()
           }
         ]
       }
     } else if (!departmentSelect) { // para la grafica a nivel nacional
-      const ajusteLeyenda = (leyenda === 'Cantidad de predios por tipo' || leyenda === 'Cantidad de área por tipo')
-        ? leyenda.replace('por tipo', '').trim()
-        : leyenda
+      // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+      (leyenda === 'Cantidad de predios por tipo' || leyenda === 'Cantidad de área por tipo') ? leyenda.replace('por tipo', '').trim() : leyenda
       return {
         labels: [fieldValue], //: labels.sort(), // Ordenar etiquetas para asegurar consistencia
         datasets: [
@@ -228,7 +227,7 @@ const Indicadores = (props: AllWidgetProps<any>) => {
             label: fieldValue,
             // label: 'Cantidad de Predios',
             data: [data[fieldValue]],
-            backgroundColor: getRandomRGBA()
+            backgroundColor: utilsModule.getRandomRGBA()
           }
         ]
       }
@@ -236,8 +235,9 @@ const Indicadores = (props: AllWidgetProps<any>) => {
       data.forEach(item => {
         // const {  tipo_predio, cantidad_predios  } = item.attributes
         // const {  fieldlabel, fieldValue  } = item.attributes
-        const findLabel = item.attributes[fieldlabel]
-        const findValues = item.attributes[fieldValue]
+        const att = item.attributes ? item.attributes : item
+        const findLabel = att[fieldlabel]
+        const findValues = att[fieldValue]
 
         // Añadir fieldlabel a las etiquetas si no está presente
         if (!labels.includes(findLabel)) {
@@ -258,7 +258,7 @@ const Indicadores = (props: AllWidgetProps<any>) => {
             label: leyenda,
             // label: 'Cantidad de Predios',
             data: dataValues,
-            backgroundColor: getRandomRGBA()
+            backgroundColor: utilsModule.getRandomRGBA()
           }
         ]
       }
@@ -290,21 +290,26 @@ const Indicadores = (props: AllWidgetProps<any>) => {
      */
     const dataToRenderGraphics = []
     fieldlabel.forEach((fl, i) => {
+      let attr = attributes.dataIndicadores ? attributes.dataIndicadores : attributes
+      if (attr !== 'object' && !attr.length) {
+        attr = [attr]
+      }
       if (fl.includes('anio')) {
-        dataToRenderGraphics.push(ordenarDatos(generateChartData(attributes.dataIndicadores, fl, fieldValue, leyenda[i], departmentSelect)))
-      } else if (attributes.dataIndicadores) {
-        dataToRenderGraphics.push(generateChartData(attributes.dataIndicadores, fl, fieldValue, leyenda[i], departmentSelect))
-      } else if (!departmentSelect) { // cuando es nacional
-        dataToRenderGraphics.push(generateChartData(attributes, fl, fieldValue, leyenda[i], departmentSelect))
+        dataToRenderGraphics.push(ordenarDatos(generateChartData(attr, fl, fieldValue, leyenda[i], departmentSelect)))
+      } else if (attr) {
+        dataToRenderGraphics.push(generateChartData(attr, fl, fieldValue, leyenda[i], departmentSelect))
+      } else if (!departmentSelect || attributes[fieldValue]) { // cuando es nacional o municipal
+        const atr = attributes[fieldValue] ? [attributes] : attributes
+        dataToRenderGraphics.push(generateChartData(atr, fl, fieldValue, leyenda[i], departmentSelect))
       } else {
         if (utilsModule.logger()) {
           console.log('el municipio no presenta data estadistica',
-            { poligonoSeleccionado, selectIndicadores, departmentSelect, attributes, fl, fieldValue, leyenda })
+            { poligonoSeleccionado, selectIndicadores, departmentSelect, attributes, fl, fieldValue, leyenda, attr })
         }
       }
     })
     setDataGrafico(dataToRenderGraphics)
-    if (utilsModule.logger())console.log({ dataToRenderGraphics })
+
     setOptions({
       responsive: true,
       plugins: {
@@ -331,13 +336,14 @@ const Indicadores = (props: AllWidgetProps<any>) => {
         }
       }
     })
+    if (utilsModule.logger())console.log({ dataToRenderGraphics })
   }
 
   /**
    *
    * @param param0 Ajusta data para renderizar la grafica estadistica a nivel departamental y nacional
    */
-  const fixDataToRenderStadisticGraphic = (fieldlabelNal, fieldValueNal, features, leyendaNal, descripcion) => {
+  const fixDataToRenderStadisticGraphic = (fieldlabelNal, fieldValueNal, features, leyenda, descripcion) => {
     const DATASET = []
     // 1. Agrupar por 'tipo_predio' y 'anio'
     const groupBy = (arr, key) => arr.reduce((acc, obj) => {
@@ -350,7 +356,7 @@ const Indicadores = (props: AllWidgetProps<any>) => {
     fieldlabelNal.forEach((FL, i) => {
       const groupedByLabel = groupBy(features, FL)
       if (groupedByLabel.undefined) {
-        console.error('Uno de los campos no coincide con algun ajuste de campos en el servicio', { fieldlabelNal, fieldValueNal, features, leyendaNal, descripcion })
+        console.error('Uno de los campos no coincide con algun ajuste de campos en el servicio', { fieldlabelNal, fieldValueNal, features, leyenda, descripcion })
         return
       }
       const labels = Object.keys(groupedByLabel)
@@ -360,9 +366,9 @@ const Indicadores = (props: AllWidgetProps<any>) => {
 
       DATASET.push({
         datasets: [{
-          backgroundColor: getRandomRGBA(),
+          backgroundColor: utilsModule.getRandomRGBA(),
           data,
-          label: leyendaNal[i]
+          label: leyenda[i]
         }],
         labels
       })
@@ -405,7 +411,7 @@ const Indicadores = (props: AllWidgetProps<any>) => {
     if (utilsModule.logger()) console.log('effect => responseQueryCapa')
     jimuMapView.view.on('click', async (event) => {
       try {
-        setSelectedData(null)
+        // setSelectedData(null)
         const screenPoint = {
           x: event.x,
           y: event.y
@@ -419,7 +425,7 @@ const Indicadores = (props: AllWidgetProps<any>) => {
           const att = hitTestResult.results[0].graphic.attributes
           const _featureSelected = responseQueryCapa.features.find(e => e.attributes.OBJECTID_1 === att.OBJECTID_1)
           if (utilsModule.logger()) console.log(_featureSelected)
-          setFeatureSelected(_featureSelected)
+          // setFeatureSelected(_featureSelected)
           getDataLayerToRenderGrafic(_featureSelected)
         }
       } catch (error) {
@@ -451,7 +457,7 @@ const Indicadores = (props: AllWidgetProps<any>) => {
         setOptions(null)
       } else if (dataFromDispatch?.municipal) {
         // const data = JSON.parse(props.stateProps.poligonoSeleccionado)
-        setPoligonoSeleccionado(dataFromDispatch.municipal)
+        // setPoligonoSeleccionado(dataFromDispatch.municipal)
         _fixDataToRenderGrafig(dataFromDispatch.municipal)
       } else if (dataFromDispatch?.nacional) {
         if (utilsModule?.logger()) console.log(dataFromDispatch.nacional)
@@ -466,9 +472,43 @@ const Indicadores = (props: AllWidgetProps<any>) => {
           })
           return
         }
-        const { features } = dataAlfanuemricaNal
-        const { fieldlabelNal, fieldValueNal, leyendaNal, descripcion } = indiSelected
-        fixDataToRenderStadisticGraphic(fieldlabelNal, fieldValueNal, features, leyendaNal, descripcion + ' a nivel nacional')
+        const { fieldlabelNal, descripcion/* fieldValueNal, leyendaNal,  */ } = indiSelected
+        setDataGrafico(dataAlfanuemricaNal)
+        setOptions({
+          responsive: true,
+          plugins: {
+            legend: { position: 'top' as const },
+            title: {
+              display: true,
+              text: `${descripcion}`
+            },
+            tooltip: {
+              enabled: true
+            },
+            datalabels: {
+              anchor: 'end',
+              align: 'top',
+              formatter: Math.round,
+              font: {
+                weight: 'bold'
+              }
+            },
+            scales: {
+              y: {
+                beginAtZero: true
+              }
+            }
+          }
+        })
+        setTotalPage(fieldlabelNal.length)
+        setTimeout(() => {
+          // console.log(5555555555555, { zoom: jimuMapView.view.zoom })
+          // setInitialExtent(jmv.view.extent)
+          jimuMapView.view.extent = initialExtent
+          // jimuMapView.view.zoom = jimuMapView.view.zoom - 1.5
+          // jimuMapView.view.zoom = 5
+        }, 1000)
+        // fixDataToRenderStadisticGraphic(fieldlabelNal, fieldValueNal, features, leyendaNal, descripcion + ' a nivel nacional')
       } else if (dataFromDispatch?.departamental) {
         if (utilsModule?.logger()) console.log(dataFromDispatch.departamental)
         const { itemSelected, selectIndicadores, filtroSoloFeaturesDelDepartaSeleccionado } = dataFromDispatch.departamental
@@ -490,6 +530,92 @@ const Indicadores = (props: AllWidgetProps<any>) => {
       if (modulo.logger()) console.log(props, props.id)
     })
     import('../../../commonWidgets/widgetsModule').then(modulo => { setWidgetModules(modulo) })
+    /* // este codigo sirve para probar los tipos de graficos
+    setTimeout(() => {
+      console.log(5555555)
+      setDataGrafico([
+        {
+          datasets: [
+            {
+              backgroundColor: 'rgba(131, 66, 181, 0.5)',
+              data: [0.017, 0.003],
+              showLine: true,
+              label: 'Porcentaje de área por año'
+            }],
+          labels: ['Procesos De Titulación De Baldíos Y Bienes Fiscales Patrimoniales Con Ocupación Previa A Persona Natural', 'Hectáreas Formalizadas Mediante Reconocimiento De Sentencias En Cumplimiento A La Sentencia De Unificación Su – 288']
+          // labels: ['Procesos De Titulación De Baldíos Y Bienes Fiscales ', 'Procesos De Formalización De Propiedad Privada Rural']
+        }])
+      setOptions(
+        {
+          responsive: true,
+          plugins: {
+            legend: {
+              position: 'top'
+            }
+          },
+          scales: {
+            x: {
+              ticks: {
+                callback: function (value, index, values) {
+                  // Abreviar las etiquetas si son demasiado largas
+                  const label = this.getLabelForValue(value)
+                  return label.length > 10 ? label.slice(0, 10) + '...' : label
+                }
+              }
+            }
+          }
+        }
+        {
+          responsive: true,
+          scales: {
+            x: {
+              ticks: {
+                maxRotation: 45, // Rotación máxima de las etiquetas
+                minRotation: 30 // Rotación mínima de las etiquetas
+              }
+            }
+          }
+        }
+        {
+          responsive: true,
+          scales: {
+            x: {
+              ticks: {
+                font: {
+                  size: 10 // Ajustar tamaño de fuente
+                }
+              }
+            }
+          }
+        }
+        {
+          indexAxis: 'y', // Cambia la orientación de las barras a horizontal
+          responsive: true,
+          plugins: {
+            legend: {
+              position: 'top'
+            },
+            tooltip: {
+              enabled: true
+            }
+          },
+          scales: {
+            x: {
+              beginAtZero: true // Asegúrate de que el eje x comience en 0
+            },
+            y: {
+              ticks: {
+                callback: function (value) {
+                  // Puedes ajustar la visibilidad o abreviar etiquetas largas si es necesario
+                  return value.length > 10 ? value.slice(0, 10) + '...' : value
+                }
+              }
+            }
+          }
+        }
+      )
+    }, 6000)
+ */
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
@@ -501,7 +627,7 @@ const Indicadores = (props: AllWidgetProps<any>) => {
       <>
         {
           (dataGrafico.length > 0/*  && poligonoSeleccionado.departmentSelect */) && (
-            <div style={{ padding: '10px', width: '500px', height: '300px', border: 'solid', borderRadius: '10px', backgroundColor: 'white' }}>
+            <div style={{ padding: '10px', width: '100%', height: '400px', border: 'solid', borderRadius: '10px', backgroundColor: 'white', display: 'flex', justifyContent: 'center' }}>
               {
                 totalPage > 1 &&
                   <Pagination
@@ -513,7 +639,7 @@ const Indicadores = (props: AllWidgetProps<any>) => {
               }
               {
                   dataGrafico.map((d, i) => (
-                    currentpage == (i + 1) &&
+                    currentpage === (i + 1) &&
                     <Bar options={options} data={d} ref={chartRef} onClick={handleChartClick} />
                   ))
               }
@@ -528,20 +654,6 @@ const Indicadores = (props: AllWidgetProps<any>) => {
 }
 
 export default Indicadores
-
-function getRandomRGBA () {
-  // Generar valores aleatorios para rojo, verde y azul
-  const r = Math.floor(Math.random() * 256) // Valores entre 0 y 255
-  const g = Math.floor(Math.random() * 256)
-  const b = Math.floor(Math.random() * 256)
-
-  // Generar un valor aleatorio para la opacidad (alpha)
-  // const a = Math.random().toFixed(2) // Valores entre 0 y 1, con dos decimales
-  const a = 0.5 // Valores entre 0 y 1, con dos decimales
-
-  // Formatear el resultado como rgba
-  return `rgba(${r}, ${g}, ${b}, ${a})`
-}
 
 const ordenarDatos = (data) => {
   // Combinar las etiquetas y los valores correspondientes en un solo array de objetos

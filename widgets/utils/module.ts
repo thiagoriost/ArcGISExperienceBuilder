@@ -184,7 +184,7 @@ const pintarFeatureLayer = async (
     const layer = new FeatureLayer({
       url,
       outFields,
-      definitionExpression, /* renderer:classBreaksRenderer, */
+      definitionExpression, //renderer:classBreaksRenderer,
       editingEnabled: true,
       objectIdField: 'objectid'
     })
@@ -202,7 +202,7 @@ const pintarFeatureLayer = async (
       features.map(f => {
         const codigoMunicipio = f.attributes.mpcodigo ? f.attributes.mpcodigo : f.attributes.cod_municipio
         _dataCoropletico.forEach(dc => {
-          if (codigoMunicipio === dc.attributes.cod_municipio) {
+          if (codigoMunicipio === dc.attributes.cod_municipio || f.attributes.decodigo === dc.attributes.cod_departamento) {
             // if(f.attributes.mpcodigo === dc.attributes.cod_municipio){
             f.attributes.dataIndicadores
               ? f.attributes.dataIndicadores.push(dc)
@@ -232,7 +232,9 @@ const pintarFeatureLayer = async (
         Graphic,
         GraphicsLayer,
         SimpleFillSymbol,
-        indiSelected
+        indiSelected,
+        setIsLoading,
+        layer
       })
 
       // Esperar a que la capa esté lista
@@ -241,7 +243,7 @@ const pintarFeatureLayer = async (
       // Hacer zoom a la extensión completa de la capa
       setTimeout(() => {
         if (doZoom) jimuMapView.view.goTo(layer.fullExtent)
-      }, 500)
+      }, 1000)
 
       // Determine symbol type based on layer geometry type
       let symbol
@@ -324,20 +326,26 @@ const pintarFeatureLayer = async (
 
 const calculoValoresQuintiles = (features, fieldValueToSetRangeCoropletico) => {
   const values = [] // guarda los acumulados totales del valor de indicador para el campo fieldValueToSetRangeCoropletico, para cada feature
-  const filtro = features.filter(e => e.attributes.dataIndicadores)// filtra los features que tienen data alfanumerica
+  const filtro = features.filter(e => e.attributes?.dataIndicadores)// filtra los features que tienen data alfanumerica
   if (filtro.length > 0) features = filtro
   features.forEach(featu => {
     let tempValue = 0
-    if (featu.attributes.dataIndicadores) { //este aplica para el coropletico municipal
-      // eslint-disable-next-line no-return-assign
-      featu.attributes.dataIndicadores.forEach(indicadore => tempValue += indicadore.attributes[fieldValueToSetRangeCoropletico])
-      featu.attributes[fieldValueToSetRangeCoropletico] = tempValue
-    } else if (!featu.attributes[fieldValueToSetRangeCoropletico] && isNaN(featu.attributes[fieldValueToSetRangeCoropletico])) {
-      if (logger()) console.error('Sin match para el campo => ', { fieldValueToSetRangeCoropletico, features })
-    } else if (featu.attributes[fieldValueToSetRangeCoropletico]) { //este aplica para el coropletico nacional
-      tempValue = featu.attributes[fieldValueToSetRangeCoropletico]
+    if (featu.label !== 'Seleccione ...') {
+      if (featu.dataIndicadores) {
+        // eslint-disable-next-line no-return-assign
+        featu.dataIndicadores.forEach(indicadore => tempValue += indicadore.attributes[fieldValueToSetRangeCoropletico])
+        featu[fieldValueToSetRangeCoropletico] = tempValue
+      } else if (featu.attributes?.dataIndicadores) { //este aplica para el coropletico municipal
+        // eslint-disable-next-line no-return-assign
+        featu.attributes.dataIndicadores.forEach(indicadore => tempValue += indicadore.attributes[fieldValueToSetRangeCoropletico])
+        featu.attributes[fieldValueToSetRangeCoropletico] = tempValue
+      } else if (!featu.attributes[fieldValueToSetRangeCoropletico] && isNaN(featu.attributes[fieldValueToSetRangeCoropletico])) {
+        if (logger()) console.error('Sin match para el campo => ', { fieldValueToSetRangeCoropletico, features })
+      } else if (featu.attributes[fieldValueToSetRangeCoropletico]) { //este aplica para el coropletico nacional
+        tempValue = featu.attributes[fieldValueToSetRangeCoropletico]
+      }
+      values.push(tempValue)
     }
-    values.push(tempValue)
   })
 
   values.sort((a, b) => a - b)
@@ -483,11 +491,24 @@ const ajustarDataToRender = (data: any, valueField, labelField) => {
  * Dibija poligonos segun los features obtenidos
  * @param param0
  */
-const dibujarPoligono = (
+const dibujarPoligono = async (
   {
-    features, fieldValueToSetRangeCoropletico, wkid = 4326, jimuMapView,
-    setRangosLeyenda, setClickHandler, setLastLayerDeployed, setPoligonoSeleccionado, lastLayerDeployed,
-    Polygon, Graphic, GraphicsLayer, SimpleFillSymbol, indiSelected
+    features,
+    jimuMapView,
+    setPoligonoSeleccionado,
+    setClickHandler,
+    fieldValueToSetRangeCoropletico,
+    setLastLayerDeployed,
+    lastLayerDeployed,
+    setRangosLeyenda,
+    Polygon,
+    Graphic,
+    GraphicsLayer,
+    SimpleFillSymbol,
+    indiSelected,
+    setIsLoading,
+    layer,
+    wkid = 4326
   }) => {
   const graphicsLayer = new GraphicsLayer()
   let tempLastLayerDeployed = lastLayerDeployed
@@ -500,6 +521,9 @@ const dibujarPoligono = (
     // [ (interval*4)+1  , 5*interval  ]
     [ (interval*4)+1  , maxValue  ]
   ] */
+  if (fieldValueToSetRangeCoropletico === '') {
+    console.error({ fieldValueToSetRangeCoropletico })
+  }
   const rangos = indiSelected.quintiles.length > 1
     ? indiSelected.quintiles
     : calculoValoresQuintiles(features, fieldValueToSetRangeCoropletico).rangos
@@ -529,6 +553,7 @@ const dibujarPoligono = (
       let color = [51, 51, 204, 0.5] // Color por defecto
       if (!fieldToFixRange) {
         color = [255, 255, 255, 0.1]
+        if (logger()) console.log({ fieldToFixRange })
       // } else if (rangos[0][0] <= fieldToFixRange && fieldToFixRange <= rangos[0][1]) {
       } else if (fieldToFixRange <= rangos[0][1]) {
         color = coloresMapaCoropletico[0].value
@@ -579,6 +604,14 @@ const dibujarPoligono = (
   })
 
   setLastLayerDeployed(tempLastLayerDeployed)
+  if (layer) {
+    await layer?.load()
+  }
+  // layer.when()
+  setTimeout(() => {
+    // jimuMapView.view.goTo(layer.fullExtent)
+    setIsLoading(false)
+  }, 5000)
 
   // Manejar evento de clic para capturar la información del polígono seleccionado
   const handler = jimuMapView.view.on('click', (event) => {
@@ -695,6 +728,37 @@ const dibujarPoligonoToResaltar = async ({ rings, wkid, attributes, jimuMapView,
   }, 1500) // Intervalo de 1.5 segundo
 }
 
+const getRandomRGBA = () => {
+  // Generar valores aleatorios para rojo, verde y azul
+  const r = Math.floor(Math.random() * 256) // Valores entre 0 y 255
+  const g = Math.floor(Math.random() * 256)
+  const b = Math.floor(Math.random() * 256)
+
+  // Generar un valor aleatorio para la opacidad (alpha)
+  // const a = Math.random().toFixed(2) // Valores entre 0 y 1, con dos decimales
+  const a = 0.5 // Valores entre 0 y 1, con dos decimales
+
+  // Formatear el resultado como rgba
+  return `rgba(${r}, ${g}, ${b}, ${a})`
+}
+
+const discriminarRepetidos = (data, campo) => {
+  const filteredData = []
+  const codMunicipiosSet = new Set()
+  data.forEach(item => {
+    const valueKey = item[campo] ? item[campo] : item.attributes[campo]
+
+    // Si el valueKey no está en el set, agregarlo al set y a filteredData
+    if (!codMunicipiosSet.has(valueKey)) {
+      codMunicipiosSet.add(valueKey)
+      filteredData.push(item)
+    }
+  })
+
+  if (logger()) console.log({ data, filteredData })
+  return filteredData
+}
+
 export {
   moduleExportToCSV,
   loadEsriModules,
@@ -710,6 +774,8 @@ export {
   removeLayer,
   goToOneExtentAndZoom,
   dibujarPoligonoToResaltar,
-  dibujarPoligono
+  dibujarPoligono,
+  getRandomRGBA,
+  discriminarRepetidos
   // rangosCoropleticos
 }
