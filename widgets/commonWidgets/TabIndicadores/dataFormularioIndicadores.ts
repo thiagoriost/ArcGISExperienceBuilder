@@ -23,15 +23,15 @@ export const dataFuenteIndicadores = [
                 urlNal: '', // data a nivel nacional
                 fieldValueDepartal: '', antidad_predio // data a nivel depatamentals',
                 urlNalDataAlfanumerica: '', // para alguna data adicional alfanuemrica
-                leyendaNal: ['Cantidad de área por año', 'Tipos de predios'], // labels a nivel municipal
+                leyendaNal: ['Cantidad de Área por año (ha)', 'Tipos de predios'], // labels a nivel municipal
                 fieldlabelNal: ['anio', 'tipo_predio'], // labels a nivel nacional
                 fieldValueNal: 'total_area_ha', // labels a nivel departamental
-                leyenda: ['Cantidad de área por tipo', 'Cantidad de área por año'], // las leyendas para cada label // leyenda a nivel dapartamental
+                leyenda: ['Cantidad de área por tipo', 'Cantidad de Área por año (ha)'], // las leyendas para cada label // leyenda a nivel dapartamental
                 fieldlabelDepartal: ['anio', 'tipo_predio'], // leyenda a nivel nacional
                 url: '',
                 fieldValue: 'total_area_ha',
                 urlDepartal: 'v_predios_fondo_tierras_dpto',
-                leyendaDepartal: ['Cantidad de área por año', 'Tipos de predios'],
+                leyendaDepartal: ['Cantidad de Área por año (ha)', 'Tipos de predios'],
                 quintiles: [
                   'porDefinir'
                 ]
@@ -45,15 +45,15 @@ export const dataFuenteIndicadores = [
                 urlNal: '', // data a nivel nacional
                 fieldValueDepartal: 'cantidad_predio // data a nivel depatamentals',
                 urlNalDataAlfanumerica: 'v_predios_fondo_tierras_sumnac', // para alguna data adicional alfanuemrica
-                leyendaNal: ['Cantidad de área por año', 'Tipos de predios'], // labels a nivel municipal
+                leyendaNal: ['Cantidad de Área por año (ha)', 'Tipos de predios'], // labels a nivel municipal
                 fieldlabelNal: ['anio', 'tipo_predio'], // labels a nivel nacional
                 fieldValueNal: 'total_area_ha', // labels a nivel departamental
-                leyenda: ['Cantidad de área por tipo', 'Cantidad de área por año'], // las leyendas para cada label // leyenda a nivel dapartamental
+                leyenda: ['Cantidad de área por tipo', 'Cantidad de Área por año (ha)'], // las leyendas para cada label // leyenda a nivel dapartamental
                 fieldlabelDepartal: ['anio', 'tipo_predio'], // leyenda a nivel nacional
                 url: 'v_predios_fondo_tierras_mun',
                 fieldValue: 'total_area_ha',
                 urlDepartal: 'v_predios_fondo_tierras_dpto',
-                leyendaDepartal: ['Cantidad de área por año', 'Tipos de predios'],
+                leyendaDepartal: ['Cantidad de Área por año (ha)', 'Tipos de predios'],
                 quintiles: [
                   'porDefinir'
                 ]
@@ -142,7 +142,7 @@ export const dataFuenteIndicadores = [
               {
                 value: 2,
                 label: '1.5.2 Área de predios entregados a campesinos con registro en ORIP',
-                descripcion: 'Área de predios entregados a campesinos con registro en ORIP',
+                descripcion: 'Área de predios entregados a campesinos con registro en ORIP (ha)',
                 url: 'v_predios_campesinos_orip_mun', // trae info a nivel municipal
                 urlNal: 'v_predios_campesinos_orip_mun', //para data coropletica a nivel municipal // data a nivel nacional
                 urlDepartal: 'v_predios_campesinos_orip_mun', // data a nivel depatamental
@@ -150,9 +150,9 @@ export const dataFuenteIndicadores = [
                 fieldlabel: ['anio', 'modo_entrega', 'genero_beneficiario'], // con esto se especifica la cantidad de graficas q se desplegaran segun la data de cada feature // leyenda a nivel dapartamental
                 fieldlabelNal: ['anio', 'modo_entrega', 'genero_beneficiario'], // con esto se especifica la cantidad de graficas q se desplegaran segun la data de cada feature // labels a nivel departamental
                 fieldlabelDepartal: ['anio', 'modo_entrega', 'genero_beneficiario'], // con esto se especifica la cantidad de graficas q se desplegaran segun la data de cada feature
-                leyenda: ['Área por año', 'Modo entrega de Área', 'Genero beneficiario del área'], // las leyendas para cada label
-                leyendaNal: ['Área por año', 'Modo entrega de Área', 'Genero beneficiario del área'], // las leyendas para cada label // leyenda a nivel nacional
-                leyendaDepartal: ['Área por año', 'Modo entrega de Área', 'Genero beneficiario del área'], // data a nivel municipal
+                leyenda: ['Área por año (ha)', 'Modo entrega de Área (ha)', 'Genero beneficiario del área (ha)'], // las leyendas para cada label
+                leyendaNal: ['Área por año (ha)', 'Modo entrega de Área (ha)', 'Genero beneficiario del área (ha)'], // las leyendas para cada label // leyenda a nivel nacional
+                leyendaDepartal: ['Área por año (ha)', 'Modo entrega de Área (ha)', 'Genero beneficiario del área (ha)'], // data a nivel municipal
                 fieldValue: 'total_area_ha', // estees el valor que tomara generar las cantidades para cada label
                 fieldValueNal: 'total_area_ha', // estees el valor que tomara generar las cantidades para cada label // labels a nivel municipal
                 fieldValueDepartal: 'total_area_ha', // estees el valor que tomara generar las cantidades para cada label
@@ -192,7 +192,7 @@ export const dataFuenteIndicadores = [
               {
                 value: 4,
                 label: '1.5.4 Área de predios entregados a campesinos a través de procesos de adjudicación con registro de ORIP',
-                descripcion: 'Cantidad de área de predios adjudicados',
+                descripcion: 'Cantidad de área de predios adjudicados (ha)',
                 url: 'v_predios_campesinos_adj_mun',
                 urlNal: 'v_predios_campesinos_adj_mun', // data a nivel nacional
                 urlDepartal: 'v_predios_campesinos_adj_mun',
@@ -200,9 +200,9 @@ export const dataFuenteIndicadores = [
                 fieldlabel: ['anio', 'genero_beneficiario'], // data a nivel municipal
                 fieldlabelNal: ['anio', 'genero_beneficiario'], // labels a nivel nacional
                 fieldlabelDepartal: ['anio', 'genero_beneficiario'], // leyenda a nivel nacional
-                leyenda: ['Área por año', 'Área por tipo de género'], // las leyendas para cada label // leyenda a nivel dapartamental
-                leyendaNal: ['Área por año', 'Área por tipo de género'], // labels a nivel municipal
-                leyendaDepartal: ['Área por año', 'Área por tipo de género'],
+                leyenda: ['Área por año (ha)', 'Área por tipo de género (ha)'], // las leyendas para cada label // leyenda a nivel dapartamental
+                leyendaNal: ['Área por año (ha)', 'Área por tipo de género (ha)'], // labels a nivel municipal
+                leyendaDepartal: ['Área por año (ha)', 'Área por tipo de género (ha)'],
                 fieldValue: 'total_area_ha',
                 fieldValueNal: 'total_area_ha', // labels a nivel departamental
                 fieldValueDepartal: 'total_area_ha', // data a nivel depatamental
@@ -242,7 +242,7 @@ export const dataFuenteIndicadores = [
               {
                 value: 6,
                 label: '1.5.6 Área de predios entregados através de subsidios integrales para la compra de tierras',
-                descripcion: 'Cantidad de área de predios beneficiarios de subsidios integrales para la compra de tierras',
+                descripcion: 'Cantidad de área de predios beneficiarios de subsidios integrales para la compra de tierras (ha)',
                 url: 'v_predios_sub_integrales_mun',
                 urlNal: 'v_predios_sub_integrales_mun', // data a nivel nacional
                 urlDepartal: 'v_predios_sub_integrales_mun',
@@ -250,9 +250,9 @@ export const dataFuenteIndicadores = [
                 fieldlabel: ['rango_subsidio_compra', 'genero_beneficiario'], // data a nivel municipal
                 fieldlabelNal: ['rango_subsidio_compra', 'genero_beneficiario'], // labels a nivel nacional
                 fieldlabelDepartal: ['rango_subsidio_compra', 'genero_beneficiario'], // leyenda a nivel nacional
-                leyenda: ['Área por rango de subsidio', 'Área por beneficiario'], // las leyendas para cada label // leyenda a nivel dapartamental
-                leyendaNal: ['Área por rango de subsidio', 'Área por beneficiario'], // labels a nivel municipal
-                leyendaDepartal: ['Área por rango de subsidio', 'Área por beneficiario'],
+                leyenda: ['Área por rango de subsidio (ha)', 'Área por beneficiario (ha)'], // las leyendas para cada label // leyenda a nivel dapartamental
+                leyendaNal: ['Área por rango de subsidio (ha)', 'Área por beneficiario (ha)'], // labels a nivel municipal
+                leyendaDepartal: ['Área por rango de subsidio (ha)', 'Área por beneficiario (ha)'],
                 fieldValue: 'total_area_ha',
                 fieldValueNal: 'total_area_ha', // labels a nivel departamental
                 fieldValueDepartal: 'total_area_ha', // data a nivel depatamental
@@ -306,7 +306,7 @@ export const dataFuenteIndicadores = [
               {
                 value: 2,
                 label: '1.6.2 Área de predios titulados  a campesinos y registrados en ORIP',
-                descripcion: 'Cantidad de área de predios formalizados',
+                descripcion: 'Cantidad de área de predios formalizados (ha)',
                 url: 'v_predios_campesinos_tit_mun',
                 urlNal: 'v_predios_campesinos_tit_mun', // data a nivel nacional
                 urlDepartal: 'v_predios_campesinos_tit_mun',
@@ -314,9 +314,9 @@ export const dataFuenteIndicadores = [
                 fieldlabel: ['anio', 'proceso', 'genero_beneficiario'], // data a nivel municipal
                 fieldlabelNal: ['anio', 'proceso', 'genero_beneficiario'], // labels a nivel nacional
                 fieldlabelDepartal: ['anio', 'proceso', 'genero_beneficiario'], // leyenda a nivel nacional
-                leyenda: ['Área por año', 'Área por proceso', 'Área geenero beneficiario'], // las leyendas para cada label // leyenda a nivel dapartamental
-                leyendaNal: ['Área por año', 'Área por proceso', 'Área geenero beneficiario'], // labels a nivel municipal
-                leyendaDepartal: ['Área por año', 'Área por proceso', 'Área geenero beneficiario'],
+                leyenda: ['Área por año (ha)', 'Área por proceso (ha)', 'Área genero beneficiario (ha)'], // las leyendas para cada label // leyenda a nivel dapartamental
+                leyendaNal: ['Área por año (ha)', 'Área por proceso (ha)', 'Área genero beneficiario (ha)'], // labels a nivel municipal
+                leyendaDepartal: ['Área por año (ha)', 'Área por proceso (ha)', 'Área genero beneficiario (ha)'],
                 fieldValue: 'total_area_ha',
                 fieldValueNal: 'total_area_ha', // labels a nivel departamental
                 fieldValueDepartal: 'total_area_ha', // data a nivel depatamental
@@ -356,7 +356,7 @@ export const dataFuenteIndicadores = [
               {
                 value: 4,
                 label: '1.6.4 Área de predios titulados a mujeres y registrados en ORIP',
-                descripcion: 'Cantidad de área de predios formalizados a mujeres',
+                descripcion: 'Cantidad de área de predios formalizados a mujeres (ha)',
                 url: 'v_predios_titulados_muj_mun',
                 urlNal: 'v_predios_titulados_muj_mun', // data a nivel nacional
                 urlDepartal: 'v_predios_titulados_muj_mun',
@@ -364,9 +364,9 @@ export const dataFuenteIndicadores = [
                 fieldlabel: ['anio', 'proceso'], // data a nivel municipal
                 fieldlabelNal: ['anio', 'proceso'], // labels a nivel nacional
                 fieldlabelDepartal: ['anio', 'proceso'], // leyenda a nivel nacional
-                leyenda: ['Área por año', 'Área por proceso'], // las leyendas para cada label // leyenda a nivel dapartamental
-                leyendaNal: ['Área por año', 'Área por proceso'], // labels a nivel municipal
-                leyendaDepartal: ['Área por año', 'Área por proceso'],
+                leyenda: ['Área por año (ha)', 'Área por proceso (ha)'], // las leyendas para cada label // leyenda a nivel dapartamental
+                leyendaNal: ['Área por año (ha)', 'Área por proceso (ha)'], // labels a nivel municipal
+                leyendaDepartal: ['Área por año (ha)', 'Área por proceso (ha)'],
                 fieldValue: 'total_area_ha',
                 fieldValueNal: 'total_area_ha', // labels a nivel departamental
                 fieldValueDepartal: 'total_area_ha', // data a nivel depatamental
@@ -577,7 +577,7 @@ export const dataFuenteIndicadores = [
                 fieldlabelNal: ['anio'], // labels a nivel nacional
                 fieldlabelDepartal: ['anio'], // leyenda a nivel nacional
                 leyenda: ['Porcentaje de área ZRC por año'], // las leyendas para cada label // leyenda a nivel dapartamental
-                leyendaNal: ['Porcentaje de área por año'], // labels a nivel municipal
+                leyendaNal: ['Porcentaje de Área por año (ha)'], // labels a nivel municipal
                 leyendaDepartal: ['Porcentaje área ZRC por año'],
                 fieldValue: 'porcentaje_area',
                 fieldValueNal: 'porcentaje_area', // labels a nivel departamental
@@ -687,7 +687,7 @@ export const dataFuenteIndicadores = [
               {
                 value: 4,
                 label: '3.1.4 Porcentaje de área de predios por debajo de la UAF mínima municipal',
-                descripcion: 'Porcentaje de área de predios por encima de la UAF mínima municipal',
+                descripcion: 'Porcentaje de área de predios por encima de la UAF mínima municipal (ha)',
                 url: 'v_predios_uaf_mun', // data municipal
                 urlNal: 'v_predios_uaf_mun', // data a nivel nacaional
                 urlDepartal: 'v_predios_uaf_mun',
@@ -695,9 +695,9 @@ export const dataFuenteIndicadores = [
                 fieldlabel: ['anio'],
                 fieldlabelNal: ['anio'],
                 fieldlabelDepartal: ['anio'],
-                leyenda: ['Porcentaje de área UAF'], // las leyendas para cada label
-                leyendaNal: ['Porcetanje área UAF'],
-                leyendaDepartal: ['Porcetanje área UAF'],
+                leyenda: ['Porcentaje de área UAF (ha)'], // las leyendas para cada label
+                leyendaNal: ['Porcetanje área UAF (ha)'],
+                leyendaDepartal: ['Porcetanje área UAF (ha)'],
                 fieldValue: 'porcentaje_area',
                 fieldValueNal: 'porcentaje_area',
                 fieldValueDepartal: 'porcentaje_area',
@@ -813,7 +813,7 @@ export const dataFuenteIndicadores = [
               {
                 value: 2,
                 label: '8.1.2 Porcentaje de área de predios titulados y registrados en ORIP a grupos étnicos',
-                descripcion: 'Porcentaje de área de predios en territorios títulados a grupos étnicos',
+                descripcion: 'Porcentaje de área de predios en territorios títulados a grupos étnicos (ha)',
                 url: 'v_predios_etnicos_por_mun', // data municipal
                 urlNal: 'v_predios_etnicos_por_nacmun', // data a nivel nacaional
                 urlDepartal: 'v_predios_etnicos_por_nacmun',
@@ -821,9 +821,9 @@ export const dataFuenteIndicadores = [
                 fieldlabel: ['anio'],
                 fieldlabelNal: ['anio'],
                 fieldlabelDepartal: ['anio'],
-                leyenda: ['Porcentaje área títulados por año'], // las leyendas para cada label
-                leyendaNal: ['Porcentaje de área predios titulados por año'],
-                leyendaDepartal: ['Porcentaje de área predios titulados por año'],
+                leyenda: ['Porcentaje área títulados por año (ha)'], // las leyendas para cada label
+                leyendaNal: ['Porcentaje área títulados por año (ha)'],
+                leyendaDepartal: ['Porcentaje área títulados por año (ha)'],
                 fieldValue: 'porcentaje_area',
                 fieldValueNal: 'porcentaje_area',
                 fieldValueDepartal: 'porcentaje_area',
@@ -863,7 +863,7 @@ export const dataFuenteIndicadores = [
               {
                 value: 4,
                 label: '8.1.4 Área titulada a grupos étnicos con registro en ORIP',
-                descripcion: 'Área titulada a grupos étnicos con registro en ORIP',
+                descripcion: 'Área titulada a grupos étnicos con registro en ORIP (ha)',
                 url: 'v_predios_etnicos_mun', // data municipal
                 urlNal: 'v_predios_etnicos_nacmun', // data a nivel nacaional
                 urlDepartal: 'v_predios_etnicos_nacmun',
@@ -871,9 +871,9 @@ export const dataFuenteIndicadores = [
                 fieldlabel: ['cat_anio'],
                 fieldlabelNal: ['cat_anio'],
                 fieldlabelDepartal: ['cat_anio'],
-                leyenda: ['Cantidad de área por año'], // las leyendas para cada label
-                leyendaNal: ['Cantidad de área por año'],
-                leyendaDepartal: ['Cantidad de área por año'],
+                leyenda: ['Cantidad de Área por año (ha)'], // las leyendas para cada label
+                leyendaNal: ['Cantidad de Área por año (ha)'],
+                leyendaDepartal: ['Cantidad de Área por año (ha)'],
                 fieldValue: 'total_area_ha',
                 fieldValueNal: 'total_area_ha',
                 fieldValueDepartal: 'total_area_ha',
