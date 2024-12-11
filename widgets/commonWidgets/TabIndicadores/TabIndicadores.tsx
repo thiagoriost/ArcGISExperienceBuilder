@@ -459,6 +459,17 @@ const TabIndicadores: React.FC<any> = ({ dispatch, departamentos, jimuMapView })
 
       const respIndiNal = respuestas.responseIndicadorNacional
       const filterRespIndiNal = respIndiNal.filter(rin => rin.attributes.decodigo === targetDepartment)
+      if (filterRespIndiNal.length < 1) {
+        setMensajeModal({
+          deployed: true,
+          type: typeMSM.warning,
+          tittle: '! Ups ¡',
+          body: `Sin información a nivel departamental para ${itemSelected.denombre} `,
+          subBody: ''
+        })
+        setIsLoading(false)
+        return
+      }
       // const dataOrdenada = utilsModule.ajustarDataToRender({ features: filterRespIndiNal }, '', 'mpnombre').filter(e => e.dataIndicadores)
       const dataOrdenada = utilsModule.ajustarDataToRender({ features: filterRespIndiNal }, '', 'mpnombre')
       const eliminaRegistrosRepetidos = utilsModule.discriminarRepetidos(dataOrdenada, 'label')

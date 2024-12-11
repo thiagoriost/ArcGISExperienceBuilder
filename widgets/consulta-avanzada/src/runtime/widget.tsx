@@ -711,10 +711,10 @@ const ConsultaAvanzada = (props: AllWidgetProps<any>) => {
           <div className='condition-buttons text-center pt-1' style={{ backgroundColor: 'rgb(0 0 0 / 70%)', padding: '5px' }}>
             <Button type='primary' size='sm' className='mr-1 mb-1 color-deep-purple-100' onClick={() => { asignarSimbolCondicionBusqueda('=') }}>=</Button>
             <Button type='primary' size='sm' className='mr-1 mb-1 color-deep-purple-100' onClick={() => { asignarSimbolCondicionBusqueda('BETWEEN') }}>{'<>'}</Button>
-            <Button type='primary' size='sm' className='mr-1 mb-1 color-deep-purple-100' onClick={() => { asignarSimbolCondicionBusqueda('>') }}>&gt</Button>
-            <Button type='primary' size='sm' className='mr-1 mb-1 color-deep-purple-100' onClick={() => { asignarSimbolCondicionBusqueda('<') }}>&lt</Button>
-            <Button type='primary' size='sm' className='mr-1 mb-1 color-deep-purple-100' onClick={() => { asignarSimbolCondicionBusqueda('>=') }}>&gt=</Button>
-            <Button type='primary' size='sm' className='mr-1 mb-1 color-deep-purple-100' onClick={() => { asignarSimbolCondicionBusqueda('<=') }}>&lt=</Button>
+            <Button type='primary' size='sm' className='mr-1 mb-1 color-deep-purple-100' onClick={() => { asignarSimbolCondicionBusqueda('>') }}>{'>'}</Button>
+            <Button type='primary' size='sm' className='mr-1 mb-1 color-deep-purple-100' onClick={() => { asignarSimbolCondicionBusqueda('<') }}>{'<'}</Button>
+            <Button type='primary' size='sm' className='mr-1 mb-1 color-deep-purple-100' onClick={() => { asignarSimbolCondicionBusqueda('>=') }}>{'>='}</Button>
+            <Button type='primary' size='sm' className='mr-1 mb-1 color-deep-purple-100' onClick={() => { asignarSimbolCondicionBusqueda('<=') }}>{'<='}</Button>
             <Button type='primary' size='sm' className='mr-1 mb-1 color-deep-purple-100' onClick={() => { asignarSimbolCondicionBusqueda('LIKE') }}>LIKE</Button>
             <Button type='primary' size='sm' className='mr-1 mb-1 color-deep-purple-100' onClick={() => { asignarSimbolCondicionBusqueda('AND') }}>AND</Button>
             <Button type='primary' size='sm' className='mr-1 mb-1 color-deep-purple-100' onClick={() => { asignarSimbolCondicionBusqueda('OR') }}>OR</Button>
