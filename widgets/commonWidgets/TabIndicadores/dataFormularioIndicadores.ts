@@ -289,9 +289,9 @@ export const dataFuenteIndicadores = [
                 fieldlabel: ['anio', 'proceso', 'genero_beneficiario'], // data a nivel municipal
                 fieldlabelNal: ['anio', 'proceso', 'genero_beneficiario'], // labels a nivel nacional
                 fieldlabelDepartal: ['anio', 'proceso', 'genero_beneficiario'], // leyenda a nivel nacional
-                leyenda: ['Predios por año', 'Predios por proceso', 'Predios geenero beneficiario'], // las leyendas para cada label // leyenda a nivel dapartamental
-                leyendaNal: ['Predios por año', 'Predios por proceso', 'Predios geenero beneficiario'], // labels a nivel municipal
-                leyendaDepartal: ['Predios por año', 'Predios por proceso', 'Predios geenero beneficiario'],
+                leyenda: ['Predios por año', 'Predios por proceso', 'Predios genero beneficiario'], // las leyendas para cada label // leyenda a nivel dapartamental
+                leyendaNal: ['Predios por año', 'Predios por proceso', 'Predios genero beneficiario'], // labels a nivel municipal
+                leyendaDepartal: ['Predios por año', 'Predios por proceso', 'Predios genero beneficiario'],
                 fieldValue: 'cantidad_predios',
                 fieldValueNal: 'cantidad_predios', // labels a nivel departamental
                 fieldValueDepartal: 'cantidad_predios', // data a nivel depatamental

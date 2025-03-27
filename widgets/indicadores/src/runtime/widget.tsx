@@ -28,6 +28,7 @@ interface Grafico {
   value: number
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const tiposGraficos: Grafico[] = [
   { label: 'Vertical Bar Chart', value: 0 },
   { label: 'Horizontal Bar Chart', value: 1 },
@@ -63,6 +64,7 @@ const Indicadores = (props: AllWidgetProps<any>) => {
     ]
   }) */
   // const [featureSelected, setFeatureSelected] = useState<InterfaceFeatureSelected>(null)
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [responseQueryCapa, setResponseQueryCapa] = useState(null)
   // const [contador, setContador] = useState()
   // const [poligonoSeleccionado, setPoligonoSeleccionado] = useState(undefined)
@@ -316,7 +318,7 @@ const Indicadores = (props: AllWidgetProps<any>) => {
         legend: { position: 'top' as const },
         title: {
           display: true,
-          text: `${descripcion} - Mncpio:${poligonoSeleccionado.attributes.mpnombre} - Dpto: ${departmentSelect?.label ? departmentSelect.label : poligonoSeleccionado.attributes.depto}`
+          text: `${descripcion} - Mncpio:${poligonoSeleccionado.attributes.mpnombre ? poligonoSeleccionado.attributes.mpnombre : poligonoSeleccionado.attributes[0].attributes.mpnombre} - Dpto: ${departmentSelect?.label ? departmentSelect.label : poligonoSeleccionado.attributes.depto}`
         },
         tooltip: {
           enabled: true

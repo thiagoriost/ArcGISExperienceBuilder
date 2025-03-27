@@ -5,6 +5,7 @@ import './style.css'
 import { dataFuenteIndicadores } from './dataFormularioIndicadores'
 
 const widgetIdIndicadores = 'widget_48' // se genera al ingresar al widget objetivo y generarlo en el effect de inicio con props.id
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const constantesTabIndicadores = {
   decodigo: 'decodigo',
   mpcodigo: 'mpcodigo'
@@ -51,7 +52,7 @@ const TabIndicadores: React.FC<any> = ({ dispatch, departamentos, jimuMapView })
   const [municipioSelect, setMunicipioSelect] = useState(undefined)
   const [rangosLeyenda, setRangosLeyenda] = useState([])
   const [esriModules, setEsriModules] = useState(undefined)
-  const [dataTempQueryNal, setDataTempQueryNal] = useState([])
+  // const [dataTempQueryNal, setDataTempQueryNal] = useState([])
   // eslint-disable-next-line @typescript-eslint/naming-convention, @typescript-eslint/no-unused-vars
   const [respuestas, setRespuestas] = useState(null)
 
@@ -116,11 +117,11 @@ const TabIndicadores: React.FC<any> = ({ dispatch, departamentos, jimuMapView })
     }, 1000)
   }
   const handleIndicadorSelectedContinua = async ({ indiSelected, target }) => {
-    const { FeatureLayer, SimpleFillSymbol, Polygon, Graphic, GraphicsLayer } = esriModules
+    const { /* FeatureLayer, */ SimpleFillSymbol, Polygon, Graphic, GraphicsLayer } = esriModules
 
     let urlIndicadorNacionalMunicipal = servicios.urls.indicadoresNaci[indiSelected.urlNal]
     let responseIndicadorNacional
-    let layer
+    // let layer
     if (!urlIndicadorNacionalMunicipal /* || !servicios.urls.indicadoresNaciAlfanumerica[indiSelected.urlNalDataAlfanumerica] */) {
       setIsLoading(false)
       setMensajeModal({
@@ -135,28 +136,28 @@ const TabIndicadores: React.FC<any> = ({ dispatch, departamentos, jimuMapView })
       // return
     } else {
       urlIndicadorNacionalMunicipal = `${urlIndicadorNacionalMunicipal}/query`
-      const existeQuery = dataTempQueryNal.find(d => (d.id === indiSelected.label && d.url === urlIndicadorNacionalMunicipal))
-      if (existeQuery) {
+      // const existeQuery = dataTempQueryNal.find(d => (d.id === indiSelected.label && d.url === urlIndicadorNacionalMunicipal))
+      /* if (existeQuery) {
         responseIndicadorNacional = existeQuery.responseIndicadorNacional
         layer = existeQuery.layer
-      } else {
-        responseIndicadorNacional = await utilsModule.realizarConsulta('*', urlIndicadorNacionalMunicipal, false, '1=1')
+      } else { */
+      responseIndicadorNacional = await utilsModule.realizarConsulta('*', urlIndicadorNacionalMunicipal, false, '1=1')
 
-        if (!responseIndicadorNacional.features || responseIndicadorNacional?.features.length < 1) {
-          if (utilsModule.logger()) console.error('Sin data en el responseIndicadorNacional => ', { responseIndicadorNacional, urlIndicadorNacionalMunicipal })
-          setMensajeModal({
-            deployed: true,
-            type: typeMSM.warning,
-            tittle: 'Info',
-            body: 'Sin información nacional para el indicador seleccionado',
-            subBody: ''
-          })
-          setIsLoading(false)
-          return
-        }
-        // obtiene las geometrias para cada feature de las geometrias municipios previamente cargadas
-        /*  */
-        /* let responseGeometriasMunicipios = { features: [] }
+      if (!responseIndicadorNacional.features || responseIndicadorNacional?.features.length < 1) {
+        if (utilsModule.logger()) console.error('Sin data en el responseIndicadorNacional => ', { responseIndicadorNacional, urlIndicadorNacionalMunicipal })
+        setMensajeModal({
+          deployed: true,
+          type: typeMSM.warning,
+          tittle: 'Info',
+          body: 'Sin información nacional para el indicador seleccionado',
+          subBody: ''
+        })
+        setIsLoading(false)
+        return
+      }
+      // obtiene las geometrias para cada feature de las geometrias municipios previamente cargadas
+      /*  */
+      /* let responseGeometriasMunicipios = { features: [] }
 
         if (geometriaMunicipios) {
           responseGeometriasMunicipios = geometriaMunicipios
@@ -193,16 +194,16 @@ const TabIndicadores: React.FC<any> = ({ dispatch, departamentos, jimuMapView })
           setIsLoading(false)
         } */
 
-        /** Extrae la geometria del servicio municipal q coinciden con el cod_municipio y fuciona los atributos del servicio de datos con la geometria*/
-        responseIndicadorNacional = responseIndicadorNacional.features.map(RIN => {
-          const geome = geometriaMunicipios.features.find(GM => GM.attributes.mpcodigo === RIN.attributes.cod_municipio)
-          return { attributes: { ...RIN.attributes, ...geome.attributes }, geometry: geome.geometry }
-        })
+      /** Extrae la geometria del servicio municipal q coinciden con el cod_municipio y fuciona los atributos del servicio de datos con la geometria*/
+      responseIndicadorNacional = responseIndicadorNacional.features.map(RIN => {
+        const geome = geometriaMunicipios.features.find(GM => GM.attributes.mpcodigo === RIN.attributes.cod_municipio? RIN.attributes.cod_municipio : RIN.attributes.mpcodigo)
+        return { attributes: { ...RIN.attributes, ...geome.attributes }, geometry: geome.geometry }
+      })
 
-        layer = new FeatureLayer({ url: `${urlIndicadorNacionalMunicipal}` })
-        const guardarConsultaIndicadorNacional = { url: urlIndicadorNacionalMunicipal, responseIndicadorNacional, layer, id: indiSelected.label }
-        setDataTempQueryNal([...dataTempQueryNal, guardarConsultaIndicadorNacional])
-      }
+      // layer = new FeatureLayer({ url: `${urlIndicadorNacionalMunicipal}` })
+      // const guardarConsultaIndicadorNacional = { url: urlIndicadorNacionalMunicipal, responseIndicadorNacional, layer, id: indiSelected.label }
+      // setDataTempQueryNal([...dataTempQueryNal, guardarConsultaIndicadorNacional])
+      // }
 
       // Datos para configurar los rangos del coropletico
       const fieldValueToSetRangeCoropletico = indiSelected.fieldValueNal
@@ -226,26 +227,68 @@ const TabIndicadores: React.FC<any> = ({ dispatch, departamentos, jimuMapView })
         setRangosLeyenda,
         setLastLayerDeployed,
         setIsLoading,
-        indiSelected,
-        layer
+        indiSelected
+        // layer
       })
       // const layer = new FeatureLayer({ url:`https://pruebassig.igac.gov.co/server/rest/services/Indicadores_nacionales_municipales/MapServer/0` })
 
       //consultar data alfanumerica para renderizar grafico a nivel nacional
       // const urlAlfanumericaNal = servicios.urls.indicadoresNaciAlfanumerica[indiSelected.urlNalDataAlfanumerica] ? `${servicios.urls.indicadoresNaciAlfanumerica[indiSelected.urlNalDataAlfanumerica]}/query` : `${servicios.urls.indicadoresNaci[indiSelected.urlNalDataAlfanumerica]}/query`
       // const start = performance.now() // Inicio de medición
-      const urlAlfanumericaNal = `${urlIndicadorNacionalMunicipal}/query`
+      // const urlAlfanumericaNal = `${urlIndicadorNacionalMunicipal}`
       // const outFields =
       const onStatisticField = indiSelected.fieldValueNal
-      const fetchPromises = indiSelected.fieldlabelNal.map(async (field) => {
-        const urln = `${urlAlfanumericaNal}?where=1%3D1&text=&objectIds=&time=&timeRelation=esriTimeRelationOverlaps&geometry=&geometryType=esriGeometryEnvelope&inSR=&spatialRel=esriSpatialRelIntersects&distance=&units=esriSRUnit_Foot&relationParam=&outFields=${field}&returnGeometry=false&returnTrueCurves=false&maxAllowableOffset=&geometryPrecision=&outSR=&havingClause=&returnIdsOnly=false&returnCountOnly=false&orderByFields=&groupByFieldsForStatistics=${field}&outStatistics=%5B%7B%0D%0A++%22statisticType%22%3A+%22sum%22%2C%0D%0A++%22onStatisticField%22%3A+%22${onStatisticField}%22%2C%0D%0A++%22outStatisticFieldName%22%3A+%22suma%22%0D%0A%7D%5D&returnZ=false&returnM=false&gdbVersion=&historicMoment=&returnDistinctValues=false&resultOffset=&resultRecordCount=&returnExtentOnly=false&sqlFormat=none&datumTransformation=&parameterValues=&rangeValues=&quantizationParameters=&featureEncoding=esriDefault&f=pjson`
+      // realiza las consultas segun los fieldlabelNal para cada indicador
+
+      // codigo comentariado para evitar quw realice todas las peticiones al tiempo, se cambia por una detras de la otra
+      /* const fetchPromises = indiSelected.fieldlabelNal.map(async (field) => {
+        const urln = `${urlIndicadorNacionalMunicipal}?where=1%3D1&text=&objectIds=&time=&timeRelation=esriTimeRelationOverlaps&geometry=&geometryType=esriGeometryEnvelope&inSR=&spatialRel=esriSpatialRelIntersects&distance=&units=esriSRUnit_Foot&relationParam=&outFields=${field}&returnGeometry=false&returnTrueCurves=false&maxAllowableOffset=&geometryPrecision=&outSR=&havingClause=&returnIdsOnly=false&returnCountOnly=false&orderByFields=&groupByFieldsForStatistics=${field}&outStatistics=%5B%7B%0D%0A++%22statisticType%22%3A+%22sum%22%2C%0D%0A++%22onStatisticField%22%3A+%22${onStatisticField}%22%2C%0D%0A++%22outStatisticFieldName%22%3A+%22suma%22%0D%0A%7D%5D&returnZ=false&returnM=false&gdbVersion=&historicMoment=&returnDistinctValues=false&resultOffset=&resultRecordCount=&returnExtentOnly=false&sqlFormat=none&datumTransformation=&parameterValues=&rangeValues=&quantizationParameters=&featureEncoding=esriDefault&f=pjson`
         const respon = await fetch(urln)
         const res = await respon.json()
         return res
       })
-      // const fetchPromises = urls.map((url) => fetch(url).then((res) => res.json()));
-      const results = await Promise.allSettled(fetchPromises) // info para las grafica estadistica
+      const results = await Promise.allSettled(fetchPromises) // info para las grafica estadistica */
+      const groupAndSumData = (data, fieldValue, fieldLabels) => {
+        // Helper function to group data by a key and sum values
+        const groupBy = (key) => {
+          const grouped = data.reduce((acc, item) => {
+            const groupKey = item.attributes[key]
+            // acc[groupKey] = (acc[groupKey] || 0) + item.attributes.cantidad_predios
+            acc[groupKey] = (acc[groupKey] || 0) + item.attributes[fieldValue]
+            return acc
+          }, {})
+
+          return {
+            status: 'fulfilled',
+            value: {
+              displayFieldName: '',
+              fieldAliases: {
+                [key]: key,
+                suma: 'suma'
+              },
+              fields: [
+                { name: key, type: typeof key === 'string' ? 'esriFieldTypeString' : 'esriFieldTypeSmallInteger', alias: key, length: 100 },
+                { name: 'suma', type: 'esriFieldTypeDouble', alias: 'suma' }
+              ],
+              features: Object.entries(grouped).map(([groupKey, suma]) => ({
+                attributes: {
+                  [key]: typeof groupKey === 'string' ? groupKey : Number(groupKey),
+                  suma
+                }
+              }))
+            }
+          }
+        }
+
+        // Generate results for each key
+        // return ['anio', 'modo_entrega', 'genero_beneficiario'].map((key) =>
+        return fieldLabels.map((key) =>
+          groupBy(key as keyof any)
+        )
+      }
+      const results = groupAndSumData(responseIndicadorNacional, indiSelected.fieldValueNal, indiSelected.fieldlabelNal)
       // const end = performance.now() // Fin de medición
+      // console.log({ results })
       setRespuestas({ ...respuestas, responseIndicadorNacional, results })
       /* const myHeaders = new Headers()
       const response = await fetch(urlStadistic, {
@@ -260,11 +303,11 @@ const TabIndicadores: React.FC<any> = ({ dispatch, departamentos, jimuMapView })
           INDICADOR: target.value,
           indiSelected,
           urlIndicadorNacionalMunicipal,
-          urlAlfanumericaNal,
+          // urlAlfanumericaNal,
           responseIndicadorNacional,
           fieldValueToSetRangeCoropletico,
-          layer,
-          dataTempQueryNal,
+          // layer,
+          // dataTempQueryNal,
           results
         })
         // console.log(`Tiempo transcurrido: ${(end - start).toFixed(2)} ms`) // Muestra el tiempo total
@@ -321,8 +364,10 @@ const TabIndicadores: React.FC<any> = ({ dispatch, departamentos, jimuMapView })
       // Función para procesar resultados y construir dataset
       const processField = (fieldlabelNal: string, legend: string) => {
         const result = results.find(e => {
-          if (!e.value.error) {
+          if (!e.value?.error) {
+          // if (!e.error) {
             return e.value.fields[0].name === fieldlabelNal
+            // return e.fields[0].name === fieldlabelNal
           } else {
             utilsModule.logger() && console.error({ e, results })
             return false
@@ -331,7 +376,9 @@ const TabIndicadores: React.FC<any> = ({ dispatch, departamentos, jimuMapView })
 
         if (result) {
           const data = result.value.features.map(({ attributes }) => attributes.suma)
+          // const data = result.features.map(({ attributes }) => attributes.suma)
           const labels = result.value.features.map(({ attributes }) => attributes[fieldlabelNal])
+          // const labels = result.features.map(({ attributes }) => attributes[fieldlabelNal])
 
           return {
             datasets: [
@@ -373,6 +420,7 @@ const TabIndicadores: React.FC<any> = ({ dispatch, departamentos, jimuMapView })
       // enviar data al widget indicadores para pintar graficos estaditicos a nivel nacional
       // con lo siguiente se envia la data al widget indicadores para renderizar la grafica de barras
       */
+      setIsLoading(false)
     }
   }
   /**
@@ -590,8 +638,8 @@ const TabIndicadores: React.FC<any> = ({ dispatch, departamentos, jimuMapView })
           municipios,
           municipioSelect,
           rangosLeyenda,
-          esriModules,
-          dataTempQueryNal
+          esriModules/* ,
+          dataTempQueryNal */
         }
       )
       setIsLoading(false)
@@ -660,7 +708,7 @@ const TabIndicadores: React.FC<any> = ({ dispatch, departamentos, jimuMapView })
                   </li>
               ))}
             </ul>
-            <p>Quintiles</p>
+            {/* <p>Quintiles</p> */}            
           </div>
         }
       </>

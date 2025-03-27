@@ -233,8 +233,8 @@ const pintarFeatureLayer = async (
         GraphicsLayer,
         SimpleFillSymbol,
         indiSelected,
-        setIsLoading,
-        layer
+        setIsLoading/* ,
+        layer */
       })
 
       // Esperar a que la capa esté lista
@@ -507,7 +507,7 @@ const dibujarPoligono = async (
     SimpleFillSymbol,
     indiSelected,
     setIsLoading,
-    layer,
+    // layer,
     wkid = 4326
   }) => {
   const graphicsLayer = new GraphicsLayer()
@@ -604,9 +604,9 @@ const dibujarPoligono = async (
   })
 
   setLastLayerDeployed(tempLastLayerDeployed)
-  if (layer) {
-    await layer?.load()
-  }
+  // if (layer) {
+  //   await layer?.load()
+  // }
   // layer.when()
   setTimeout(() => {
     // jimuMapView.view.goTo(layer.fullExtent)
