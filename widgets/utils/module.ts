@@ -527,7 +527,7 @@ const dibujarPoligono = async (
   const rangos = indiSelected.quintiles.length > 1
     ? indiSelected.quintiles
     : calculoValoresQuintiles(features, fieldValueToSetRangeCoropletico).rangos
-  // if(logger()) console.log({features, interval, fieldValueToSetRangeCoropletico, wkid, rangos})
+  if(logger()) console.log({features, /* interval, */ fieldValueToSetRangeCoropletico, wkid, rangos})
   setRangosLeyenda(rangos) // se emplea para ajustar la leyenda en el tabIndicadores
   let fieldToFixRange
   features.forEach(feature => {
@@ -540,7 +540,11 @@ const dibujarPoligono = async (
       }
       if (attributes.dataIndicadores) {
         let calculaTotalFieldValue = 0
-        attributes.dataIndicadores.forEach(e => { calculaTotalFieldValue += e.attributes[fieldValueToSetRangeCoropletico] })
+        attributes.dataIndicadores.forEach(e => {
+          const value = e.attributes ? e.attributes[fieldValueToSetRangeCoropletico] : e[fieldValueToSetRangeCoropletico]
+          calculaTotalFieldValue += value
+        })
+        
         attributes[fieldValueToSetRangeCoropletico] = calculaTotalFieldValue
       } //else {
       fieldToFixRange = attributes[fieldValueToSetRangeCoropletico]
@@ -578,7 +582,7 @@ const dibujarPoligono = async (
         }),
         attributes,
         popupTemplate: {
-          title: attributes.mpnombre,
+          title: attributes.mpnombre?attributes.mpnombre:attributes.departamento,
           content: [
             {
               type: 'fields',

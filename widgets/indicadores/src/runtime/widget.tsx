@@ -463,7 +463,7 @@ const Indicadores = (props: AllWidgetProps<any>) => {
         _fixDataToRenderGrafig(dataFromDispatch.municipal)
       } else if (dataFromDispatch?.nacional) {
         if (utilsModule?.logger()) console.log(dataFromDispatch.nacional)
-        const { dataAlfanuemricaNal, indiSelected } = dataFromDispatch.nacional
+        const { dataAlfanuemricaNal, indiSelected, extentAjustado } = dataFromDispatch.nacional
         if (dataAlfanuemricaNal.error) {
           setMensajeModal({
             deployed: true,
@@ -506,7 +506,7 @@ const Indicadores = (props: AllWidgetProps<any>) => {
         setTimeout(() => {
           // console.log(5555555555555, { zoom: jimuMapView.view.zoom })
           // setInitialExtent(jmv.view.extent)
-          jimuMapView.view.extent = initialExtent
+          jimuMapView.view.extent = extentAjustado?extentAjustado:initialExtent
           // jimuMapView.view.zoom = jimuMapView.view.zoom - 1.5
           // jimuMapView.view.zoom = 5
         }, 1000)

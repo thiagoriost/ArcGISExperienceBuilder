@@ -64,7 +64,7 @@ const urls = {
     v_predios_ley2da_porcnac: `${mapServerNal}/16`,
   }, */
   indicadoresDepartal: { // Departamentales Indicadores_departamentos
-    v_predios_campesinos_orip_depto: `${mapServerDepartal}/3`,
+    v_predios_campesinos_orip_mun: `${MapServerMunicipal}/3`,
     v_predios_campesinos_adj_depto: `${mapServerDepartal}/4`,
     v_predios_sub_integrales_dpto: `${mapServerDepartal}/5`,
     v_predios_campesinos_tit_depto: `${mapServerDepartal}/6`,
@@ -75,13 +75,13 @@ const urls = {
     v_predios_conflicto_depto: `${mapServerDepartal}/11`,
     v_predios_etnicos_por_depto: `${mapServerDepartal}/12`,
     v_predios_etnicos_depto: `${mapServerDepartal}/13`,
-    v_predios_etnicos_porcdepto: `${mapServerDepartal}/14`,
-    v_predios_uaf_porcdepto: `${mapServerDepartal}/15`,
-    v_predios_zrc_porcdepto: `${mapServerDepartal}/16`,
-    v_predios_zrc_depto: `${mapServerDepartal}/18`,
-    v_predios_actualizados_depto: `${mapServerDepartal}/19`,
-    v_municipios_actualizados_depto: `${mapServerDepartal}/20`,
-    v_predios_ley2da_depto: `${mapServerDepartal}/21`
+    v_predios_etnicos_porcdepto: `${mapServerDepartal}/18`,
+    v_predios_uaf_porcdepto: `${mapServerDepartal}/19`,
+    v_predios_zrc_porcdepto: `${mapServerDepartal}/20`,
+    v_predios_zrc_depto: `${mapServerDepartal}/14`,
+    v_predios_actualizados_depto: `${mapServerDepartal}/15`,
+    v_municipios_actualizados_depto: `${mapServerDepartal}/16`,
+    v_predios_ley2da_depto: `${mapServerDepartal}/17`
 
   },
   indicadoresNaciAlfanumerica: { // nacionales para graficas estadisticas
