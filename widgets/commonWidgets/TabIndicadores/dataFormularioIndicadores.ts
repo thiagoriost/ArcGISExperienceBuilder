@@ -425,14 +425,14 @@ export const dataFuenteIndicadores = [
                 urlNal: '', //para data coropletica a nivel municipal // data a nivel nacional
                 urlDepartal: 'v_predios_actualizados_depto',
                 urlNalDataAlfanumerica: '', //para data alfanumerica a nivel nacional // para alguna data adicional alfanuemrica
-                fieldlabel: [], // con esto se especifica la cantidad de graficas q se desplegaran segun la data de cada feature // data a nivel municipal
-                fieldlabelNal: [], // con esto se especifica la cantidad de graficas q se desplegaran segun la data de cada feature // labels a nivel nacional
+                fieldlabel: ['anio_vigencia'], // con esto se especifica la cantidad de graficas q se desplegaran segun la data de cada feature // data a nivel municipal
+                fieldlabelNal: ['anio_vigencia'], // con esto se especifica la cantidad de graficas q se desplegaran segun la data de cada feature // labels a nivel nacional
                 fieldlabelDepartal: ['anio_vigencia'], // con esto se especifica la cantidad de graficas q se desplegaran segun la data de cada feature // leyenda a nivel nacional
-                leyenda: [], // las leyendas para cada label // leyenda a nivel dapartamental
-                leyendaNal: [], // las leyendas para cada label // labels a nivel municipal
+                leyenda: ['Año de vigencia'], // las leyendas para cada label // leyenda a nivel dapartamental
+                leyendaNal: ['Año de vigencia'], // las leyendas para cada label // labels a nivel municipal
                 leyendaDepartal: ['Año de vigencia'],
-                fieldValue: '', // estees el valor que tomara generar las cantidades para cada label
-                fieldValueNal: '', // estees el valor que tomara generar las cantidades para cada label // labels a nivel departamental
+                fieldValue: 'porcentaje_area', // estees el valor que tomara generar las cantidades para cada label
+                fieldValueNal: 'porcentaje_area', // estees el valor que tomara generar las cantidades para cada label // labels a nivel departamental
                 fieldValueDepartal: 'porcentaje_area', // estees el valor que tomara generar l // data a nivel depatamentalas cantidades para cada label
                 quintiles: [
                   ['<=', 0,'Sin área actualizada'],
@@ -453,8 +453,8 @@ export const dataFuenteIndicadores = [
                 fieldlabel: [], // con esto se especifica la cantidad de graficas q se desplegaran segun la data de cada feature // data a nivel municipal
                 fieldlabelNal: [], // con esto se especifica la cantidad de graficas q se desplegaran segun la data de cada feature // labels a nivel nacional
                 fieldlabelDepartal: ['anio_vigencia', 'estado_actualizacion'], // con esto se especifica la cantidad de graficas q se desplegaran segun la data de cada feature // leyenda a nivel nacional
-                leyenda: [], // las leyendas para cada label // leyenda a nivel dapartamental
-                leyendaNal: [], // las leyendas para cada label // labels a nivel municipal
+                leyenda: ['Año vigencia', 'Estado de actualización'], // las leyendas para cada label // leyenda a nivel dapartamental
+                leyendaNal: ['Año vigencia', 'Estado de actualización'], // las leyendas para cada label // labels a nivel municipal
                 leyendaDepartal: ['Año vigencia', 'Estado de actualización'],
                 fieldValue: '', // estees el valor que tomara generar las cantidades para cada label
                 fieldValueNal: '', // estees el valor que tomara generar las cantidades para cada label // labels a nivel departamental
@@ -571,7 +571,7 @@ export const dataFuenteIndicadores = [
                 descripcion: 'Porcentaje de área en Zonas de Reserva Campesina',
                 url: 'v_predios_zrc_mun',
                 urlNal: 'v_predios_zrc_nacmun', // data a nivel nacional
-                urlDepartal: 'v_predios_zrc_nacmun',
+                urlDepartal: 'v_predios_zrc_mun',
                 urlNalDataAlfanumerica: '', // para alguna data adicional alfanuemrica
                 fieldlabel: ['anio'], // data a nivel municipal
                 fieldlabelNal: ['anio'], // labels a nivel nacional
@@ -617,7 +617,7 @@ export const dataFuenteIndicadores = [
                 descripcion: 'Índice de Gini de la propiedad',
                 url: 'v_indice_gini_ids_mun',
                 urlNal: 'v_indice_gini_ids_nac_tot', // data a nivel nacional
-                urlDepartal: 'v_indice_gini_ids_depto',
+                urlDepartal: 'v_indice_gini_ids_mun',
                 urlNalDataAlfanumerica: '', // para alguna data adicional alfanuemrica
                 fieldlabel: ['anio_vigencia'/* , 'destino' *//* , 'categoria_gini', 'categoria_ids' */], // data a nivel municipal
                 fieldlabelNal: ['anio_vigencia'/* , 'destino' */], // labels a nivel nacional
@@ -641,7 +641,7 @@ export const dataFuenteIndicadores = [
                 descripcion: 'Índice de Disparidad Superior - IDS',
                 url: 'v_indice_gini_ids_mun', // data a nivel municipal
                 urlNal: 'v_indice_gini_ids_nac_tot', // data a nivel nacional
-                urlDepartal: 'v_indice_gini_ids_depto', // data a nivel depatamental
+                urlDepartal: 'v_indice_gini_ids_mun', // data a nivel depatamental
                 urlNalDataAlfanumerica: '', // para alguna data adicional alfanuemrica
                 fieldlabel: ['anio_vigencia'/*, 'destino' , 'categoria_gini', 'categoria_ids' */], // labels a nivel municipal
                 fieldlabelNal: ['anio_vigencia'/* , 'destino' */], // labels a nivel nacional
@@ -721,12 +721,12 @@ export const dataFuenteIndicadores = [
                 label: '3.1.5 Porcentaje de predios con presunta subutilización en el uso del suelo',
                 descripcion: 'Porcentaje de predios con presunta subutilización en el uso del suelo',
                 url: 'v_predios_conflicto_mun', // data municipal
-                urlNal: 'v_predios_conflicto_nacmun', // data a nivel nacaional
-                urlDepartal: 'v_predios_conflicto_nacmun',
+                urlNal: 'v_predios_conflicto_mun', // data a nivel nacaional
+                urlDepartal: 'v_predios_conflicto_mun',
                 urlNalDataAlfanumerica: '',
                 fieldlabel: ['categoria_conflicto_uso'/* , 'total_predios_mun' */],
                 fieldlabelNal: [/* 'total_predios_mun',  */'categoria_conflicto_uso'],
-                fieldlabelDepartal: [/* 'total_predios_mun',  */],
+                fieldlabelDepartal: ['categoria_conflicto_uso'/* 'total_predios_mun',  */],
                 leyenda: ['Porcentaje de predios por categoria'/* , 'Total predios por municipio' */], // las leyendas para cada label
                 leyendaNal: ['Porcentaje de predios por categoria uso del suelo'],
                 leyendaDepartal: ['Porcentaje de predios por categoria uso del suelo'],
@@ -746,8 +746,8 @@ export const dataFuenteIndicadores = [
                 label: '3.1.6 Porcentaje de predios en Territorios con ley 2da',
                 descripcion: 'Porcentaje de predios en Territorios con ley 2da',
                 url: 'v_predios_ley2da_mun', // data municipal
-                urlNal: 'v_predios_ley2da_nacmun', // data a nivel nacaional
-                urlDepartal: 'v_predios_ley2da_nacmun',
+                urlNal: 'v_predios_ley2da_mun', // data a nivel nacaional
+                urlDepartal: 'v_predios_ley2da_mun',
                 urlNalDataAlfanumerica: '',
                 fieldlabel: ['anio'],
                 fieldlabelNal: ['anio'],
@@ -816,8 +816,8 @@ export const dataFuenteIndicadores = [
                 label: '8.1.2 Porcentaje de área titulada y registrada en ORIP a grupos étnicos',
                 descripcion: 'Porcentaje de área de predios en territorios títulados a grupos étnicos (ha)',
                 url: 'v_predios_etnicos_por_mun', // data municipal
-                urlNal: 'v_predios_etnicos_por_nacmun', // data a nivel nacaional
-                urlDepartal: 'v_predios_etnicos_por_nacmun',
+                urlNal: 'v_predios_etnicos_por_mun', // data a nivel nacaional
+                urlDepartal: 'v_predios_etnicos_por_mun',
                 urlNalDataAlfanumerica: '',
                 fieldlabel: ['anio'],
                 fieldlabelNal: ['anio'],
@@ -841,8 +841,8 @@ export const dataFuenteIndicadores = [
                 label: '8.1.3 Predios titulados a grupos étnicos y registrados en ORIP',
                 descripcion: 'Predios titulados a grupos étnicos y registrados en ORIP',
                 url: 'v_predios_etnicos_mun', // data municipal
-                urlNal: 'v_predios_etnicos_nacmun', // data a nivel nacaional
-                urlDepartal: 'v_predios_etnicos_nacmun',
+                urlNal: 'v_predios_etnicos_mun', // data a nivel nacaional
+                urlDepartal: 'v_predios_etnicos_mun',
                 urlNalDataAlfanumerica: '',
                 fieldlabel: ['cat_anio'],
                 fieldlabelNal: ['cat_anio'],
@@ -866,8 +866,8 @@ export const dataFuenteIndicadores = [
                 label: '8.1.4 Área titulada a grupos étnicos con registro en ORIP',
                 descripcion: 'Área titulada a grupos étnicos con registro en ORIP (ha)',
                 url: 'v_predios_etnicos_mun', // data municipal
-                urlNal: 'v_predios_etnicos_nacmun', // data a nivel nacaional
-                urlDepartal: 'v_predios_etnicos_nacmun',
+                urlNal: 'v_predios_etnicos_mun', // data a nivel nacaional
+                urlDepartal: 'v_predios_etnicos_mun',
                 urlNalDataAlfanumerica: '',
                 fieldlabel: ['cat_anio'],
                 fieldlabelNal: ['cat_anio'],
