@@ -28,6 +28,7 @@ interface Grafico {
   value: number
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const tiposGraficos: Grafico[] = [
   { label: 'Vertical Bar Chart', value: 0 },
   { label: 'Horizontal Bar Chart', value: 1 },
@@ -63,6 +64,7 @@ const Indicadores = (props: AllWidgetProps<any>) => {
     ]
   }) */
   // const [featureSelected, setFeatureSelected] = useState<InterfaceFeatureSelected>(null)
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [responseQueryCapa, setResponseQueryCapa] = useState(null)
   // const [contador, setContador] = useState()
   // const [poligonoSeleccionado, setPoligonoSeleccionado] = useState(undefined)
@@ -316,7 +318,7 @@ const Indicadores = (props: AllWidgetProps<any>) => {
         legend: { position: 'top' as const },
         title: {
           display: true,
-          text: `${descripcion} - Mncpio:${poligonoSeleccionado.attributes.mpnombre} - Dpto: ${departmentSelect?.label ? departmentSelect.label : poligonoSeleccionado.attributes.depto}`
+          text: `${descripcion} - Municipio: ${poligonoSeleccionado.attributes.mpnombre ? poligonoSeleccionado.attributes.mpnombre : poligonoSeleccionado.attributes[0].attributes.mpnombre} - Departamento: ${departmentSelect?.label ? departmentSelect.label : poligonoSeleccionado.attributes.depto}`
         },
         tooltip: {
           enabled: true
@@ -461,7 +463,7 @@ const Indicadores = (props: AllWidgetProps<any>) => {
         _fixDataToRenderGrafig(dataFromDispatch.municipal)
       } else if (dataFromDispatch?.nacional) {
         if (utilsModule?.logger()) console.log(dataFromDispatch.nacional)
-        const { dataAlfanuemricaNal, indiSelected } = dataFromDispatch.nacional
+        const { dataAlfanuemricaNal, indiSelected, extentAjustado } = dataFromDispatch.nacional
         if (dataAlfanuemricaNal.error) {
           setMensajeModal({
             deployed: true,
@@ -504,7 +506,7 @@ const Indicadores = (props: AllWidgetProps<any>) => {
         setTimeout(() => {
           // console.log(5555555555555, { zoom: jimuMapView.view.zoom })
           // setInitialExtent(jmv.view.extent)
-          jimuMapView.view.extent = initialExtent
+          jimuMapView.view.extent = extentAjustado?extentAjustado:initialExtent
           // jimuMapView.view.zoom = jimuMapView.view.zoom - 1.5
           // jimuMapView.view.zoom = 5
         }, 1000)

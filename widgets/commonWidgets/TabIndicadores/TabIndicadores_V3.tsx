@@ -11,6 +11,14 @@ const constantesTabIndicadores = {
   decodigo: 'decodigo',
   mpcodigo: 'mpcodigo'
 }
+/*
+const legendItems = [
+  { color: 'rgb(52, 152, 219, 0.8)', range: '1 - 2' },
+  { color: 'rgb(22, 160, 133, 0.8)', range: '3 - 6' },
+  { color: 'rgb(46, 204, 112, 0.8)', range: '7 - 14' },
+  { color: 'rgb(242, 156, 18, 0.8)', range: '15 - 37' },
+  { color: 'rgb(211, 84, 0, 0.8)', range: '38 - 1868' },
+] */
 const initSelectIndicadores = {
   urlDepartal: '',
   fieldValueDepartal: '',

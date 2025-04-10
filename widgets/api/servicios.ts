@@ -6,7 +6,8 @@ const MapServerMunicipal = 'https://pruebassig.igac.gov.co/server/rest/services/
 const urls = {
 // tablaContenido: 'https://sigquindio.gov.co:8443/ADMINSERV/AdminGeoApplication/AdminGeoWebServices/getTablaContenidoJsTree/public',
   // tablaContenido: 'http://172.17.3.205:8080/ADMINSERV/AdminGeoApplication/AdminGeoWebServices/getTablaContenidoJsTree/public',
-  tablaContenido: 'https://sae.igac.gov.co:8443/ADMINSERV/AdminGeoApplication/AdminGeoWebServices/getTablaContenidoJsTree/public', // REFORMA AGRARIA
+  // tablaContenido: 'https://sae.igac.gov.co:8443/ADMINSERV/AdminGeoApplication/AdminGeoWebServices/getTablaContenidoJsTree/public', // REFORMA AGRARIA
+  tablaContenido: 'https://snra.igac.gov.co/ADMINSERV/AdminGeoApplication/AdminGeoWebServices/getTablaContenidoJsTree/public', // REFORMA AGRARIA
   // tablaContenido: 'https://sae.igac.gov.co:8444/ADMINSERV/AdminGeoApplication/AdminGeoWebServices/getTablaContenidoJsTree/public', // FIRMAS ESPECTRALES
 
   Municipios: `${MapServerMunicipal}/0`,
@@ -38,7 +39,7 @@ const urls = {
     v_indice_gini_ids_mun: `${MapServerMunicipal}/9`,
     v_predios_uaf_mun: `${MapServerMunicipal}/10`,
     v_predios_conflicto_nacmun: `${mapServerNal}/10`,
-    v_predios_conflicto_mun: `${mapServerNal}/11`,
+    v_predios_conflicto_mun: `${MapServerMunicipal}/11`,
     v_predios_etnicos_por_nacmun: `${mapServerNal}/11`,
     v_predios_ley2da_mun: `${MapServerMunicipal}/12`,
     v_predios_etnicos_nacmun: `${mapServerNal}/12`,
@@ -64,7 +65,25 @@ const urls = {
     v_predios_ley2da_porcnac: `${mapServerNal}/16`,
   }, */
   indicadoresDepartal: { // Departamentales Indicadores_departamentos
-    v_predios_campesinos_orip_depto: `${mapServerDepartal}/3`,
+    v_predios_campesinos_orip_mun: `${MapServerMunicipal}/3`,
+    v_predios_campesinos_adj_mun: `${MapServerMunicipal}/4`,
+    v_predios_sub_integrales_mun: `${MapServerMunicipal}/5`,
+    v_predios_campesinos_tit_mun: `${MapServerMunicipal}/6`,
+    v_predios_titulados_muj_mun: `${MapServerMunicipal}/7`,
+    v_predios_restierras_mun: `${MapServerMunicipal}/8`,
+    v_indice_gini_ids_mun: `${MapServerMunicipal}/9`,
+    v_predios_uaf_mun: `${MapServerMunicipal}/10`,
+    v_predios_conflicto_nacmun: `${mapServerNal}/10`,
+    v_predios_conflicto_mun: `${MapServerMunicipal}/11`,
+    v_predios_etnicos_por_nacmun: `${mapServerNal}/11`,
+    v_predios_ley2da_mun: `${MapServerMunicipal}/12`,
+    v_predios_etnicos_nacmun: `${mapServerNal}/12`,
+    v_predios_etnicos_por_mun: `${MapServerMunicipal}/13`,
+    v_predios_etnicos_mun: `${MapServerMunicipal}/14`,
+    v_predios_zrc_mun: `${MapServerMunicipal}/15`,
+    v_indice_gini_ids_nac_tot: `${mapServerNal}/17`,
+    v_predios_ley2da_nacmun: `${mapServerNal}/18`,
+    v_predios_zrc_nacmun: `${mapServerNal}/19`,
     v_predios_campesinos_adj_depto: `${mapServerDepartal}/4`,
     v_predios_sub_integrales_dpto: `${mapServerDepartal}/5`,
     v_predios_campesinos_tit_depto: `${mapServerDepartal}/6`,
@@ -75,13 +94,13 @@ const urls = {
     v_predios_conflicto_depto: `${mapServerDepartal}/11`,
     v_predios_etnicos_por_depto: `${mapServerDepartal}/12`,
     v_predios_etnicos_depto: `${mapServerDepartal}/13`,
-    v_predios_etnicos_porcdepto: `${mapServerDepartal}/14`,
-    v_predios_uaf_porcdepto: `${mapServerDepartal}/15`,
-    v_predios_zrc_porcdepto: `${mapServerDepartal}/16`,
-    v_predios_zrc_depto: `${mapServerDepartal}/18`,
-    v_predios_actualizados_depto: `${mapServerDepartal}/19`,
-    v_municipios_actualizados_depto: `${mapServerDepartal}/20`,
-    v_predios_ley2da_depto: `${mapServerDepartal}/21`
+    v_predios_etnicos_porcdepto: `${mapServerDepartal}/18`,
+    v_predios_uaf_porcdepto: `${mapServerDepartal}/19`,
+    v_predios_zrc_porcdepto: `${mapServerDepartal}/20`,
+    v_predios_zrc_depto: `${mapServerDepartal}/14`,
+    v_predios_actualizados_depto: `${mapServerDepartal}/15`,
+    v_municipios_actualizados_depto: `${mapServerDepartal}/16`,
+    v_predios_ley2da_depto: `${mapServerDepartal}/17`
 
   },
   indicadoresNaciAlfanumerica: { // nacionales para graficas estadisticas

@@ -206,7 +206,7 @@ const TabIndicadores: React.FC<any> = ({ dispatch, departamentos, jimuMapView })
 
       /** Extrae la geometria q coinciden con el cod_municipio y fuciona los atributos del servicio de datos con la geometria*/
       responseIndicadorNacional = responseIndicadorNacional.features.map(RIN => {
-        const geome = responseGeometriasMunicipios.features.find(GM => GM.attributes.mpcodigo === RIN.attributes.cod_municipio)
+        const geome = responseGeometriasMunicipios.features.find(GM => GM.attributes.mpcodigo === RIN.attributes.cod_municipio ? RIN.attributes.cod_municipio : RIN.attributes.mpcodigo)
         return { attributes: { ...RIN.attributes, ...geome.attributes }, geometry: geome.geometry }
       })
 

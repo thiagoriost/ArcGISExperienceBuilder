@@ -4,6 +4,7 @@ import { exportToCSV } from './exportToCSV'
 import { type JimuMapView, loadArcGISJSAPIModules } from 'jimu-arcgis'
 import Polygon from '@arcgis/core/geometry/Polygon'
 import { coloresMapaCoropletico } from './constantes'
+import { OutStatistics } from '../commonWidgets/TabIndicadores/TabIndicadores'
 
 const moduleExportToCSV = (rows, fileName) => { exportToCSV(rows, fileName) }
 
@@ -118,6 +119,8 @@ const renderLayer = async (url: string, jimuMapView: JimuMapView) => {
     if (logger()) console.error(error)
   }
 }
+// https://pruebassig.igac.gov.co/server/rest/services/Indicadores_municipios/MapServer/6/query?where=1%3D1&returnGeometry=false&groupByFieldsForStatistics=mpcodigo&outStatistics=%5B%7B%22statisticType%22%3A%22sum%22%2C%22onStatisticField%22%3A%22cantidad_predios%22%2C%22outStatisticFieldName%22%3A%22Total%22%7D%5D&f=pjson
+// https://pruebassig.igac.gov.co/server/rest/services/Indicadores_municipios/MapServer/6/query?where=1=1&returnGeometry=false&groupByFieldsForStatistics=mpcodigo&outStatistics=[{%22statisticType%22:%22sum%22,%22onStatisticField%22:%22cantidad_predios%22,%22outStatisticFieldName%22:%22Total%22}]&f=pjson
 
 /**
  * Este metodo se emplea para traer los campos u atributos de un layer
@@ -127,24 +130,46 @@ const renderLayer = async (url: string, jimuMapView: JimuMapView) => {
  * @param where '1=1'
  * @returns jsonResponse
  */
-const realizarConsulta = async (campo: string, url: string, returnGeometry: boolean, where: string) => {
-  const controller = new AbortController()
-  const fixUrl = `${url}?where=${where}&geometryType=esriGeometryEnvelope&outFields=${campo}&returnGeometry=${returnGeometry}&f=pjson`
-  // if (logger()) console.log(fixUrl)
-  // 'https://sigquindio.gov.co/arcgis/rest/services/QUINDIO_III/Ambiental_T_Ajustado/MapServer/14/query?where=1=1&geometryType=esriGeometryEnvelope&outFields=VEREDA&returnGeometry=false&f=pjson'
+const realizarConsulta = async ({campo='*', url, returnGeometry=false, where='1=1', outStatistics=''}) => {
+  const controller = new AbortController();
+  
   try {
-    const response = await fetch(fixUrl,
-      {
-        method: 'GET',
-        signal: controller.signal,
-        redirect: 'follow'
-      })
-    // if (logger()) console.log({ response })
-    const _responseConsulta = await response.text()
-    // if (logger()) console.log(JSON.parse(_responseConsulta))
-    return JSON.parse(_responseConsulta)
+    // Construcción de parámetros base
+    const baseParams = new URLSearchParams({
+      where: where,
+      returnGeometry: returnGeometry.toString(),
+      f: 'pjson'
+    });
+
+    // Agregar parámetros específicos según el tipo de consulta
+    if (outStatistics && outStatistics.length > 0) {
+      baseParams.append('groupByFieldsForStatistics', 'mpcodigo');
+      baseParams.append('outStatistics', JSON.stringify(outStatistics));
+    } else if (campo) {
+      baseParams.append('outFields', campo);
+      // baseParams.append('geometryType', 'esriGeometryEnvelope');
+    } else {
+      throw new Error('Debe proporcionar campo o outStatistics');
+    }
+
+    // Construir URL final
+    const finalUrl = `${url}/query?${baseParams.toString()}`;
+    
+    // Realizar la petición
+    const response = await fetch(finalUrl, {
+      method: 'GET',
+      signal: controller.signal,
+      redirect: 'follow'
+    });
+
+    if (!response.ok) {
+      throw new Error(`Error en la petición: ${response.status}`);
+    }
+
+    return await response.json();
   } catch (error) {
-    if (logger()) console.error({ error })
+    if (logger()) console.error('Error en realizarConsulta:', error);
+    throw error; // Re-lanzar el error para manejo superior
   }
 }
 
@@ -233,8 +258,8 @@ const pintarFeatureLayer = async (
         GraphicsLayer,
         SimpleFillSymbol,
         indiSelected,
-        setIsLoading,
-        layer
+        setIsLoading/* ,
+        layer */
       })
 
       // Esperar a que la capa esté lista
@@ -507,7 +532,7 @@ const dibujarPoligono = async (
     SimpleFillSymbol,
     indiSelected,
     setIsLoading,
-    layer,
+    // layer,
     wkid = 4326
   }) => {
   const graphicsLayer = new GraphicsLayer()
@@ -527,7 +552,7 @@ const dibujarPoligono = async (
   const rangos = indiSelected.quintiles.length > 1
     ? indiSelected.quintiles
     : calculoValoresQuintiles(features, fieldValueToSetRangeCoropletico).rangos
-  // if(logger()) console.log({features, interval, fieldValueToSetRangeCoropletico, wkid, rangos})
+  if(logger()) console.log({features, /* interval, */ fieldValueToSetRangeCoropletico, wkid, rangos})
   setRangosLeyenda(rangos) // se emplea para ajustar la leyenda en el tabIndicadores
   let fieldToFixRange
   features.forEach(feature => {
@@ -538,9 +563,13 @@ const dibujarPoligono = async (
       if (!rings || !attributes) {
         if (logger()) console.log({ rings, attributes })
       }
-      if (attributes.dataIndicadores) {
+      if (attributes.dataIndicadores) {// esto aplica cuando es el coropletico municipal nacional
         let calculaTotalFieldValue = 0
-        attributes.dataIndicadores.forEach(e => { calculaTotalFieldValue += e.attributes[fieldValueToSetRangeCoropletico] })
+        attributes.dataIndicadores.forEach(e => {
+          const value = e.attributes ? e.attributes[fieldValueToSetRangeCoropletico] : e[fieldValueToSetRangeCoropletico]
+          calculaTotalFieldValue += value
+        })
+        
         attributes[fieldValueToSetRangeCoropletico] = calculaTotalFieldValue
       } //else {
       fieldToFixRange = attributes[fieldValueToSetRangeCoropletico]
@@ -578,7 +607,7 @@ const dibujarPoligono = async (
         }),
         attributes,
         popupTemplate: {
-          title: attributes.mpnombre,
+          title: attributes.mpnombre?attributes.mpnombre:attributes.departamento,
           content: [
             {
               type: 'fields',
@@ -604,9 +633,9 @@ const dibujarPoligono = async (
   })
 
   setLastLayerDeployed(tempLastLayerDeployed)
-  if (layer) {
-    await layer?.load()
-  }
+  // if (layer) {
+  //   await layer?.load()
+  // }
   // layer.when()
   setTimeout(() => {
     // jimuMapView.view.goTo(layer.fullExtent)
