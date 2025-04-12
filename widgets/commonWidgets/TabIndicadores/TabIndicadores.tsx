@@ -4,6 +4,7 @@ import { appActions } from 'jimu-core'
 import './style.css'
 import { dataFuenteIndicadores } from './dataFormularioIndicadores'
 import { loadModules } from "esri-loader";
+import Extent from "@arcgis/core/geometry/Extent"
 
 const widgetIdIndicadores = 'widget_48' // se genera al ingresar al widget objetivo y generarlo en el effect de inicio con props.id
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -36,6 +37,7 @@ type InitSelectIndicadores = {
   label: string;
   value: number; // Número
   descripcion: string;
+  url: string;
 };
 const initLastLayerDeployed = { graphics: [], graphicsLayers: [] }
 const init_indiSelected={
@@ -75,7 +77,9 @@ const TabIndicadores: React.FC<any> = ({ dispatch, departamentos, jimuMapView })
   const [clickHandler, setClickHandler] = useState(null) // Estado para almacenar el manejador del evento click y capturar las geometrias seleccionadas con un click
   const [poligonoSeleccionado, setPoligonoSeleccionado] = useState(undefined)
   const [geometriaMunicipios, setGeometriaMunicipios] = useState<{ features: { attributes: { mpcodigo: string }; geometry: any }[] } | undefined>(undefined)
-  const [geometriasDepartamentos, setGeometriasDepartamentos] = useState<{ features: { attributes: { mpcodigo: string }; geometry: any }[] } | undefined>(undefined)
+  const [geometriasDepartamentos, setGeometriasDepartamentos] = useState<{ features: { attributes: {
+    decodigo: any mpcodigo: string 
+}; geometry: any }[] } | undefined>(undefined)
   // const [selectSubSistema, setSelectSubSistema] = useState<{ value: number; label: string; descripcion: string; APUESTA_ESTRATEGICA: { value: number; label: string; descripcion: string; CATEGORIA_TEMATICA: { value: number; label: string; descripcion: string; INDICADOR: ({ value: number; label: string } | { value: number; label: string })[]; }[]; }[]; } | undefined>(undefined)
   const [apuestaEstrategica, setApuestaEstrategica] = useState<{ value: number; label: string; descripcion: string; APUESTA_ESTRATEGICA: { value: number; label: string; descripcion: string; CATEGORIA_TEMATICA: { value: number; label: string; descripcion: string; INDICADOR: ({ value: number; label: string } | { value: number; label: string })[]; }[]; }[]; } | null>(null)
   const [selectApuestaEstategica, setSelectApuestaEstategica] = useState<{ value: number; label: string; descripcion: string; CATEGORIA_TEMATICA: { value: number; label: string; descripcion: string; INDICADOR: ({ value: number; label: string } | { value: number; label: string })[]; }[]; } | undefined>(undefined)
@@ -142,14 +146,14 @@ const TabIndicadores: React.FC<any> = ({ dispatch, departamentos, jimuMapView })
     setDepartmentSelect(undefined)
     setRangosLeyenda([])
     let __geometriasDepartamental
-        let outStatistics: OutStatistics = ""
-        let _es_Indicador = "Nacional"
-        let indiSelected: InterfaceIndiSelected = indicadores?.find(e => e.value === target.value) as InterfaceIndiSelected || init_indiSelected
-        let geometrias = geometriaMunicipios
-        let fieldValueToSetRangeCoropletico=indiSelected?.fieldValueNal
-        let label_indicador = indiSelected?.fieldlabelNal
-        let outFields = '*'
-        let urlIndicadorToGetData=servicios?.urls.indicadoresNaci[indiSelected?.urlNal]
+    let outStatistics: string = ''
+    let _es_Indicador = "Nacional"
+    let indiSelected: InterfaceIndiSelected = indicadores?.find(e => e.value === target.value) as InterfaceIndiSelected || init_indiSelected
+    let geometrias = geometriaMunicipios
+    let fieldValueToSetRangeCoropletico=indiSelected?.fieldValueNal
+    let label_indicador = indiSelected?.fieldlabelNal
+    let outFields = '*'
+    let urlIndicadorToGetData=servicios?.urls.indicadoresNaci[indiSelected?.urlNal]
     if (!geometriasDepartamentos) {//esto para traer la geometria de los departamentos solo una vez
       __geometriasDepartamental = await utilsModule?.realizarConsulta({url:servicios?.urls.Departamentos+'/query', returnGeometry:true})
       setGeometriasDepartamentos(__geometriasDepartamental);      
@@ -160,7 +164,7 @@ const TabIndicadores: React.FC<any> = ({ dispatch, departamentos, jimuMapView })
     label_indicador = indiSelected.fieldlabelNal
      _es_Indicador = "Nacional"
     if (indiSelected.label.includes('1.7.')) {
-        setEsIndicador('es=1.7.')
+        // setEsIndicador('es=1.7.')
         _es_Indicador = 'es=1.7.'
         geometrias = __geometriasDepartamental
         urlIndicadorToGetData = servicios?.urls.indicadoresDepartal[indiSelected.urlDepartal]
@@ -172,14 +176,33 @@ const TabIndicadores: React.FC<any> = ({ dispatch, departamentos, jimuMapView })
     }else{
       setEsIndicador("Nacional")
       urlIndicadorToGetData = servicios?.urls.indicadoresNaci[indiSelected.urlNal]
+      outStatistics = JSON.stringify([
+        {
+          "statisticType": "sum",
+          onStatisticField:indiSelected.fieldValueNal,
+          "outStatisticFieldName": `Total`
+        }
+      ])
+      fieldValueToSetRangeCoropletico="total"
     }
     setSelectIndicadores(indiSelected)
-    setMunicipios([])
+    setMunicipios([]) // para deshabilitar el campo municipio
     setTimeout(() => {
-      handleIndicadorSelectedContinua({ indiSelected, target, _es_Indicador, geometrias, urlIndicadorToGetData})
+      handleIndicadorSelectedContinua({ indiSelected, target, _es_Indicador, geometrias, urlIndicadorToGetData, outStatistics, fieldValueToSetRangeCoropletico })
     }, 5000)
   }
-  const handleIndicadorSelectedContinua = async ({ _where='1=1', indiSelected, target, _es_Indicador, geometrias, urlIndicadorToGetData}) => {
+  const handleIndicadorSelectedContinua = async ({
+    _where='1=1',
+    indiSelected,
+    target,
+    _es_Indicador,
+    geometrias,
+    urlIndicadorToGetData,
+    outStatistics='',
+    fieldValueToSetRangeCoropletico,
+    regionSeleccionada=''
+  }) => {
+    const {fieldlabelNal} = indiSelected
     const { /* FeatureLayer, */ SimpleFillSymbol, Polygon, Graphic, GraphicsLayer } = esriModules    
     const [/* FeatureLayer, SimpleFillSymbol, Polygon, Graphic, GraphicsLayer,  */geometryEngine] = await loadModules([
      /*  "esri/layers/FeatureLayer",
@@ -204,10 +227,9 @@ const TabIndicadores: React.FC<any> = ({ dispatch, departamentos, jimuMapView })
       // setSelectIndicadores(initSelectIndicadores)
       // return
     } else {
-      urlIndicadorToGetData = `${urlIndicadorToGetData}/query`
-     let dataToRenderCoropletico = null
-      
-      dataToRenderCoropletico = await utilsModule?.realizarConsulta({url:urlIndicadorToGetData, where:_where, outStatistics})
+
+
+     responseIndicador = await utilsModule?.realizarConsulta({url:urlIndicadorToGetData, where:_where, outStatistics:outStatistics, groupByFieldsForStatistics:'mpcodigo'})
 
       if (!responseIndicador.features || responseIndicador?.features.length < 1) {
         if (utilsModule?.logger()) console.error('Sin data en el responseIndicador => ', { responseIndicador, urlIndicadorToGetData, _where })
@@ -222,10 +244,11 @@ const TabIndicadores: React.FC<any> = ({ dispatch, departamentos, jimuMapView })
         return
       }
       clearGraphigs() // Elimina las geometrias dibujadas previamente      
+      if (geometrias) {
       /** Extrae la geometria del servicio municipal q coinciden con el cod_municipio y fuciona los atributos del servicio de datos con la geometria*/
       responseIndicador = responseIndicador.features.map(RIN => {
-        let geom = null
-        if (_es_Indicador == 'es=1.7.') {
+        let geom: typeGeometria | undefined | null;
+        if (_es_Indicador == 'es=1.7.') { // las geometrias que vienen desde el servicio departamental, solo traen los rings, mas no el exteny demas, en comparacion con el municipal
           geom = geometrias?.features?.find(GM => GM.attributes.decodigo === RIN.attributes.cod_departamento)
         }else if(_es_Indicador == 'Nacional' || _es_Indicador == 'Departamental'){
           const codMun = RIN.attributes.cod_municipio ? RIN.attributes.cod_municipio : RIN.attributes.mpcodigo ? RIN.attributes.mpcodigo : RIN.attributes.cod_departamento
@@ -243,16 +266,21 @@ const TabIndicadores: React.FC<any> = ({ dispatch, departamentos, jimuMapView })
           geometrias?.features?.find(GM => GM.attributes.mpcodigo === RIN.attributes.mpcodigo).geometry.rings[0][0]
         } */
         return { attributes: { ...RIN.attributes, ...(geom?.attributes ?? {}) }, geometry: geom?.geometry ?? null }
-      })      
-      let dataOrdenada = responseIndicador
+      })  
+    }else{
+      console.error('geometrias no definidas', { geometrias})
+      setIsLoading(false)
+      return
+    }    
+      let dataOrdenada: never[] | undefined
       if (_es_Indicador == 'Departamental') {
         dataOrdenada = await poblarMunicipios({features:responseIndicador, targetDepartment:target.value})        
       }
              
-      setTimeout(() => {
+      setTimeout(async() => {
         
         utilsModule?.dibujarPoligono({
-          features: dataOrdenada,
+          features: responseIndicador,
           // minValue: 0, // Removed as it is not a recognized property
           // interval: 0,
           jimuMapView,
@@ -270,164 +298,68 @@ const TabIndicadores: React.FC<any> = ({ dispatch, departamentos, jimuMapView })
           indiSelected
           // layer
         })
-              
-        const groupAndSumData = (data, fieldValue, fieldLabels) => {
-          // Helper function to group data by a key and sum values
-          const groupBy = (key) => {
-            const grouped = data.reduce((acc, item) => {
-              const groupKey = item.attributes[key]
-              // acc[groupKey] = (acc[groupKey] || 0) + item.attributes.cantidad_predios
-              acc[groupKey] = (acc[groupKey] || 0) + item.attributes[fieldValue]
-              return acc
-            }, {})
-  
-            return {
-              status: 'fulfilled',
-              value: {
-                displayFieldName: '',
-                fieldAliases: {
-                  [key]: key,
-                  suma: 'suma'
-                },
-                fields: [
-                  { name: key, type: typeof key === 'string' ? 'esriFieldTypeString' : 'esriFieldTypeSmallInteger', alias: key, length: 100 },
-                  { name: 'suma', type: 'esriFieldTypeDouble', alias: 'suma' }
-                ],
-                features: Object.entries(grouped).map(([groupKey, suma]) => ({
-                  attributes: {
-                    [key]: typeof groupKey === 'string' ? groupKey : Number(groupKey),
-                    suma
-                  }
-                }))
-              }
-            }
-          }
-  
-          // Generate results for each key
-          // return ['anio', 'modo_entrega', 'genero_beneficiario'].map((key) =>
-          return fieldLabels.map((key) =>
-            groupBy(key as keyof any)
-          )
-        }
-        const dataToRenderGraphic = (((indiSelected.label.includes('3.1.1')||indiSelected.label.includes('3.1.2')) && _es_Indicador == 'Nacional')
-        || ((indiSelected.label.includes('3.1.1')||indiSelected.label.includes('3.1.2')) && _es_Indicador == 'Departamental')) ? dataGraficoIndi_311_indice_gini?.features : responseIndicador
+        const dataToRenderGraphic = await getDataToRenderGraficosEstadisticos({indiSelected, _where}) // realiza las consultas teniendo encuenta el fieldLabel en el Output Statistics
+        
+        /**
+         * Logica para ajustar el DATASET para renderizar las graficas de barras
+         */
+        
+        const processChartData = (data: { features: { attributes: Record<string, any> }[] }, labelKey: string, valueKey: string, sortKey = null) => {
+          const sortedData = sortKey
+          ? data.features.sort(
+              (a, b) => a.attributes[sortKey] - b.attributes[sortKey]
+            )
+          : data.features;
 
-        /* if (!dataToRenderGraphic[0].geometry) {
-          dataToRenderGraphic = dataToRenderGraphic.map((item) => {
-            const geometry = responseIndicador.find(e=>e.attributes.cod_departamento == item.attributes.cod_departamento).geometry // Verifica si la geometría está en attributes
-            return { ...item, geometry }
-          })          
-        } */
-        
-        const results = groupAndSumData(dataToRenderGraphic, fieldValueToSetRangeCoropletico, label_indicador)
-        // const end = performance.now() // Fin de medición
-        // console.log({ results })
-        const sr = { ...respuestas, dataToRenderGraphic, results }
-        setRespuestas(sr)
-        
-        if (utilsModule?.logger())  console.log({
-            geometrias,
-            INDICADOR: target.value,
-            indiSelected,
-            urlIndicadorToGetData,
-            // urlAlfanumericaNal,
-            dataToRenderGraphic,
-            fieldValueToSetRangeCoropletico,
-            // layer,
-            // dataTempQueryNal,
-            results
-          })
-          // console.log(`Tiempo transcurrido: ${(end - start).toFixed(2)} ms`) // Muestra el tiempo total
-        
-        if (!results) {
-          setIsLoading(false)
-          setMensajeModal({
-          // console.log({
-            deployed: true,
-            type: typeMSM.warning,
-            tittle: 'Info',
-            body: 'Sin Data alfanumerica nacional para este indicador, continuar para ver data por municipio',
-            subBody: ''
-          })
-          // eslint-disable-next-line no-useless-return
-          return
-        }
-      
-        const DATASET: Array<{ datasets: any[], labels: any[] }> = []
-  
-        // Función para procesar resultados y construir dataset
-        const processField = (fieldlabelNal: string, legend: string) => {
-          const result = results.find(e => {
-            if (!e.value?.error) {
-            // if (!e.error) {
-              return e.value.fields[0].name === fieldlabelNal
-              // return e.fields[0].name === fieldlabelNal
-            } else {
-              utilsModule?.logger() && console.error({ e, results })
-              return false
-            }
-          })
-  
-          if (result) {
-            const data = result.value.features.map(({ attributes }) => attributes.suma)
-            // const data = result.features.map(({ attributes }) => attributes.suma)
-            const labels = result.value.features.map(({ attributes }) => attributes[fieldlabelNal])
-            // const labels = result.features.map(({ attributes }) => attributes[fieldlabelNal])
-  
-            return {
-              datasets: [
-                {
-                  backgroundColor: utilsModule?.getRandomRGBA(),
-                  data,
-                  label: legend
-                }
-              ],
-              labels
-            }
-          }
-  
-          return null // Devuelve null si no hay datos válidos
-        }
-  
-        // Iterar sobre los campos y procesarlos
-        label_indicador.forEach((fieldlabelNal, i) => {
-          const legend = (_es_Indicador == 'Departamental' || _es_Indicador == 'es=1.7.')? indiSelected.leyendaDepartal[i] : indiSelected.leyendaNal[i]
-          const dataset = processField(fieldlabelNal, legend)
-          if (dataset) {
-            DATASET.push(dataset)
-          }
+          const labels: string[] = [];
+          const values: any[] = [];
+
+          sortedData.forEach(({ attributes }) => {
+            labels.push(attributes[labelKey]);
+            values.push(attributes[valueKey]);
+          });
+          return { labels, values };
+        };
+
+
+        const respuestaDataProcesada:Indicador_respuestaDataProcesada[] = []
+        dataToRenderGraphic?.forEach(respuesta => {
+          const resp = processChartData(respuesta, respuesta.fields[0].name, respuesta.fields[1].name)
+          respuestaDataProcesada.push(resp)
         })
-  
+        
+        const DATASET: interface_DATASET[] = [];
+
+        respuestaDataProcesada.forEach((respDatProc, index) => {
+            DATASET.push({
+                labels: respDatProc.labels,
+                datasets: [
+                  {
+                        label: `${indiSelected.leyenda[index]}`,
+                        data: respDatProc.values,
+                        backgroundColor: utilsModule?.getRandomRGBA(),
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        borderWidth: 1,
+                    }
+                    ]
+                  })
+    })
+
+    console.log({DATASET})
+
+
         // logica para ajustar el extend al departamento seleccionado
-        let extentAjustado = undefined
-        if ((_es_Indicador == 'Departamental' || _es_Indicador == 'es=1.7.') && responseIndicador[0].geometry?.extent/* responseIndicador?.features?.length > 0 */) {
+        let extentAjustado : GeographicExtent | undefined = undefined
+        if (_es_Indicador == 'Departamental' && responseIndicador[0].geometry?.extent/* responseIndicador?.features?.length > 0 */) {
           if (utilsModule?.logger()) console.log({
             _es_Indicador,
             dataToRenderGraphic,
             responseIndicador,
             geometryEngine
           })
-          let geometria_featu = dataToRenderGraphic.features ? dataToRenderGraphic.features : dataToRenderGraphic
-          geometria_featu=geometria_featu[0].geometry?geometria_featu:responseIndicador
-          // geometria_featu= responseIndicador//no funcino
-          if (utilsModule?.logger()) console.log({geometria_featu})
-          const geometriaDepto = geometria_featu?.map(feature => feature.geometry);
-          if (geometriaDepto.length > 0) {
-              // Verificar si geometryEngine está definido
-              if (!geometryEngine) {
-                  console.error("geometryEngine no está definido. Verifica la importación.");
-                  return;
-              }
-  
-              // Combina las geometrías en una sola
-              const geometriaUnida = geometryEngine.union(geometriaDepto);
-              if (geometriaUnida) {
-                  const extent = geometriaUnida.extent;
-                  extentAjustado = extent.expand(1.05); 
-                  // const extentAumentado = geometryEngine.buffer(extent, 5000); // Aleja un poco el zoom en metros
-                  // jimuMapView.view.goTo(extentAjustado);
-              }
-          }
+          extentAjustado = setExtend({dataToRenderGraphic, responseIndicador, geometryEngine, extentAjustado})
+        }else if (_es_Indicador == 'es=1.7.' && regionSeleccionada == 'Departamental') {
+          extentAjustado = calculateExtent(responseIndicador[0].geometry.rings)
         }
   
         const dataToRender = JSON.stringify(
@@ -443,17 +375,82 @@ const TabIndicadores: React.FC<any> = ({ dispatch, departamentos, jimuMapView })
           }
         )
         dispatch(appActions.widgetStatePropChange(widgetIdIndicadores, 'dataFromDispatch', dataToRender))
-        //  'https://pruebassig.igac.gov.co/server/rest/services/Indicadores_nacionales_municipales/MapServer/3/query'
-        /* const dataAlfanuemricaNal = await utilsModule?.realizarConsulta('*', urlAlfanumericaNal, false, '1=1')
-        // enviar data al widget indicadores para pintar graficos estaditicos a nivel nacional
-        // con lo siguiente se envia la data al widget indicadores para renderizar la grafica de barras
-        */
-        
-        
+       
         setIsLoading(false)
       }, 5000);
     }
   }
+
+  const setExtend = ({dataToRenderGraphic, responseIndicador, geometryEngine, extentAjustado}) => {
+    
+    let geometria_featu = dataToRenderGraphic?.features ? dataToRenderGraphic?.features : dataToRenderGraphic
+    geometria_featu=geometria_featu[0].geometry?geometria_featu:responseIndicador
+    // geometria_featu= responseIndicador//no funcino
+    if (utilsModule?.logger()) console.log({geometria_featu})
+    const geometriaDepto = geometria_featu?.map(feature => feature.geometry);
+    if (geometriaDepto.length > 0) {
+        // Verificar si geometryEngine está definido
+        if (!geometryEngine) {
+            console.error("geometryEngine no está definido. Verifica la importación.");
+            return;
+        }
+
+        // Combina las geometrías en una sola
+        const geometriaUnida = geometryEngine.union(geometriaDepto);
+        if (geometriaUnida) {
+            const extent = geometriaUnida.extent;
+            extentAjustado = extent.expand(1.05); 
+            // const extentAumentado = geometryEngine.buffer(extent, 5000); // Aleja un poco el zoom en metros
+            // jimuMapView.view.goTo(extentAjustado);
+            return extentAjustado
+        }
+    }
+  }
+  
+  const getDataToRenderGraficosEstadisticos = async ({
+    indiSelected,
+    _where="1=1" }: { indiSelected: IndicadorSeleccionado; _where:string }) => {
+    
+    try {
+      // 1. Validación de datos iniciales
+      if (!indiSelected?.fieldlabelNal?.length || !indiSelected.fieldValueNal || !servicios?.urls.indicadoresNaci[indiSelected.urlNal]) {
+        console.error('Datos requeridos no están disponibles');
+        setIsLoading(false);
+        return;
+      }
+  
+      // 2. Procesamiento en paralelo para mejor rendimiento
+      const dataTorenderGraphics = await Promise.all(
+        indiSelected.fieldlabelNal.map(async (fln) => {
+          const url = servicios.urls.indicadoresNaci[indiSelected.urlNal];
+          const outStatistics: OutStatistics = [{
+            statisticType: 'sum',
+            onStatisticField: indiSelected.fieldValueNal,
+            outStatisticFieldName: `total`
+          }];
+  
+          return utilsModule?.realizarConsulta({
+            url,
+            outStatistics: JSON.stringify(outStatistics),
+            groupByFieldsForStatistics: fln,
+            where: _where
+          });
+        })
+      );
+  
+      // 3. Filtrado de respuestas inválidas
+      const validResponses = dataTorenderGraphics.filter(Boolean);
+      
+      console.log('Datos para gráficos:', validResponses);
+      return validResponses;
+      
+    } catch (error) {
+      console.error('Error al renderizar gráficos:', error);
+      throw error;
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   /**
    * En este metodo se selecciona el departamento al que se va realizar la consulta de indicadores
@@ -472,7 +469,6 @@ const TabIndicadores: React.FC<any> = ({ dispatch, departamentos, jimuMapView })
       tipoConsulta = 'es=1.7.'
       _geometrias=geometriasDepartamentos
     }
-    setEsIndicador(tipoConsulta)
     const urlIndicadorToGetData = servicios?.urls.indicadoresDepartal[selectIndicadores?.urlDepartal]
     if (!urlIndicadorToGetData) {
       console.error(`urlIndicadorToGetData no encontrado, revisar indicador en dataFormulario y servicios`)
@@ -480,16 +476,40 @@ const TabIndicadores: React.FC<any> = ({ dispatch, departamentos, jimuMapView })
       return
     }
     handleIndicadorSelectedContinua({
+      _where:`cod_departamento='${target.value}'`,
       indiSelected:selectIndicadores,
       target,
       _es_Indicador:tipoConsulta,
       geometrias:_geometrias,
       urlIndicadorToGetData,
       fieldValueToSetRangeCoropletico:selectIndicadores?.fieldValueDepartal,
-      label_indicador: selectIndicadores?.fieldlabelDepartal,
-      _where:`cod_departamento='${target.value}'`
+      regionSeleccionada:'Departamental'
+      // label_indicador: selectIndicadores?.fieldlabelDepartal,
     })
   }
+
+  // Calcular el extent
+const calculateExtent = (rings) => {
+  let minX = Number.MAX_VALUE,
+    minY = Number.MAX_VALUE,
+    maxX = -Number.MAX_VALUE,
+    maxY = -Number.MAX_VALUE;
+
+  rings.flat().forEach(([x, y]) => {
+    if (x < minX) minX = x;
+    if (y < minY) minY = y;
+    if (x > maxX) maxX = x;
+    if (y > maxY) maxY = y;
+  });
+
+  return new Extent({
+    xmin: minX,
+    ymin: minY,
+    xmax: maxX,
+    ymax: maxY,
+    spatialReference: { wkid: 4326 }, // Asegúrate de usar el WKID correcto
+  });
+}
 
   const poblarMunicipios = async ({features, targetDepartment}) => {
     let dataOrdenada = utilsModule?.ajustarDataToRender({ features }, '', 'mpnombre') //simplemente ordena los features
@@ -532,13 +552,13 @@ const TabIndicadores: React.FC<any> = ({ dispatch, departamentos, jimuMapView })
       utilsModule?.goToOneExtentAndZoom({ jimuMapView, extent: itemSelected?.value.geometry.extent, duration: 1000 })
       const graphicMunicipioSlected = lastLayerDeployed.graphics.find(e => e.attributes.mpcodigo === itemSelected?.mpcodigo)
       // setPoligonoSeleccionado(graphicMunicipioSlected)
-      const urlservicioMunicipal = `${servicios?.urls.indicadores[selectIndicadores.url]}/query`
-      const responseUrlservicioMunicipal = await utilsModule?.realizarConsulta('*', urlservicioMunicipal, false, `mpcodigo = '${itemSelected?.mpcodigo}'`)
+      const urlservicioMunicipal = `${servicios?.urls.indicadores[selectIndicadores?.url]}/query`
+      const responseUrlservicioMunicipal = await utilsModule?.realizarConsulta({url:urlservicioMunicipal, where:`mpcodigo = '${itemSelected?.mpcodigo}'`})
       utilsModule?.dibujarPoligonoToResaltar(
         {
-          rings: graphicMunicipioSlected.geometry.rings,
-          wkid: graphicMunicipioSlected.geometry.spatialReference.wkid,
-          attributes: graphicMunicipioSlected.attributes,
+          rings: graphicMunicipioSlected?.geometry.rings,
+          wkid: graphicMunicipioSlected?.geometry.spatialReference.wkid,
+          attributes: graphicMunicipioSlected?.attributes,
           jimuMapView,
           times: 3,
           borrar: true
@@ -549,7 +569,7 @@ const TabIndicadores: React.FC<any> = ({ dispatch, departamentos, jimuMapView })
         // geometry: itemSelected.value.geometry, symbol: {}, attributes: itemSelected, popupTemplate: {}
         geometry: itemSelected?.value.geometry, symbol: {}, attributes: responseUrlservicioMunicipal.features, popupTemplate: {}
       }
-      if (selectIndicadores.urlNal !== '') {
+      if (selectIndicadores?.urlNal !== '') {
         const dataToRender = JSON.stringify({ municipal: { poligonoSeleccionado: tempPoligonoSeleccionado, departmentSelect, selectIndicadores } })
         dispatch(appActions.widgetStatePropChange(widgetIdIndicadores, 'dataFromDispatch', dataToRender))
       } else {
@@ -838,7 +858,7 @@ type StatisticDefinition = {
 };
 
 // El tipo para `outStatistics` puede ser un array de StatisticDefinition o un string
-export  type OutStatistics = StatisticDefinition[] | string;
+export  type OutStatistics = StatisticDefinition[] | string | undefined;
 
 export interface InterfaceIndiSelected {
   value:                  number;
@@ -858,4 +878,42 @@ export interface InterfaceIndiSelected {
   fieldValueNal:          string;
   fieldValueDepartal:     string;
   quintiles:              Array<Array<number | string>>;
+}
+
+type typeGeometria = {
+  attributes: { mpcodigo: string };
+  geometry: any; // Considera tipar `geometry` con algo más específico si es posible (ej: `Geometry` de GeoJSON)
+};
+
+interface Indicador_respuestaDataProcesada {labels: string[];values: any[];}[]
+
+interface IndicadorSeleccionado {
+  fieldlabelNal: string[];
+  urlNal: string;
+  fieldValueNal: string;
+}
+
+interface Servicios {
+  urls: {
+    indicadoresNaci: Record<string, string>;
+  };
+}
+
+interface ResponseQuery {
+  // Define la estructura de tu respuesta según lo que esperas
+  [key: string]: any;
+}
+
+interface interface_DATASET { labels: string[]; datasets: { label: string; data: any[]; backgroundColor: string | undefined; borderColor: string; borderWidth: number; }[] }
+
+interface SpatialReference {
+  wkid: number;  // Well-Known ID del sistema de referencia espacial (4326 = WGS84)
+}
+
+interface GeographicExtent {
+  spatialReference: SpatialReference;
+  xmin: number;  // Longitud mínima (oeste)
+  ymin: number;  // Latitud mínima (sur)
+  xmax: number;  // Longitud máxima (este)
+  ymax: number;  // Latitud máxima (norte)
 }

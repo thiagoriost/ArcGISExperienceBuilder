@@ -286,12 +286,12 @@ export const dataFuenteIndicadores = [
                 urlNal: 'v_predios_campesinos_tit_mun', // data a nivel nacional
                 urlDepartal: 'v_predios_campesinos_tit_mun',
                 urlNalDataAlfanumerica: '', // para alguna data adicional alfanuemrica
-                fieldlabel: ['anio', /* 'proceso', */ 'genero_beneficiario'], // data a nivel municipal
-                fieldlabelNal: ['anio', /* 'proceso', */ 'genero_beneficiario'], // labels a nivel nacional
-                fieldlabelDepartal: ['anio', /* 'proceso', */ 'genero_beneficiario'], // leyenda a nivel nacional
-                leyenda: ['Predios por año', /* 'Predios por proceso', */ 'Predios género beneficiario'], // las leyendas para cada label // leyenda a nivel dapartamental
-                leyendaNal: ['Predios por año', /* 'Predios por proceso', */ 'Predios género beneficiario'], // labels a nivel municipal
-                leyendaDepartal: ['Predios por año', /* 'Predios por proceso', */ 'Predios género beneficiario'],
+                fieldlabel: ['anio', 'proceso', 'genero_beneficiario'], // data a nivel municipal
+                fieldlabelNal: ['anio', 'proceso', 'genero_beneficiario'], // labels a nivel nacional
+                fieldlabelDepartal: ['anio', 'proceso', 'genero_beneficiario'], // leyenda a nivel nacional
+                leyenda: ['Predios por año', 'Predios por proceso', 'Predios género beneficiario'], // las leyendas para cada label // leyenda a nivel dapartamental
+                leyendaNal: ['Predios por año', 'Predios por proceso', 'Predios género beneficiario'], // labels a nivel municipal
+                leyendaDepartal: ['Predios por año', 'Predios por proceso', 'Predios género beneficiario'],
                 fieldValue: 'cantidad_predios',
                 fieldValueNal: 'cantidad_predios', // labels a nivel departamental
                 fieldValueDepartal: 'cantidad_predios', // data a nivel depatamental
@@ -311,12 +311,12 @@ export const dataFuenteIndicadores = [
                 urlNal: 'v_predios_campesinos_tit_mun', // data a nivel nacional
                 urlDepartal: 'v_predios_campesinos_tit_mun',
                 urlNalDataAlfanumerica: '', // para alguna data adicional alfanuemrica
-                fieldlabel: ['anio', /* 'proceso', */ 'genero_beneficiario'], // data a nivel municipal
-                fieldlabelNal: ['anio', /* 'proceso', */ 'genero_beneficiario'], // labels a nivel nacional
-                fieldlabelDepartal: ['anio', /* 'proceso', */ 'genero_beneficiario'], // leyenda a nivel nacional
-                leyenda: ['Área por año (ha)', /* 'Área por proceso (ha)', */ 'Área género beneficiario (ha)'], // las leyendas para cada label // leyenda a nivel dapartamental
-                leyendaNal: ['Área por año (ha)', /* 'Área por proceso (ha)', */ 'Área género beneficiario (ha)'], // labels a nivel municipal
-                leyendaDepartal: ['Área por año (ha)', /* 'Área por proceso (ha)', */ 'Área género beneficiario (ha)'],
+                fieldlabel: ['anio', 'proceso', 'genero_beneficiario'], // data a nivel municipal
+                fieldlabelNal: ['anio', 'proceso', 'genero_beneficiario'], // labels a nivel nacional
+                fieldlabelDepartal: ['anio', 'proceso', 'genero_beneficiario'], // leyenda a nivel nacional
+                leyenda: ['Área por año (ha)', 'Área por proceso (ha)', 'Área género beneficiario (ha)'], // las leyendas para cada label // leyenda a nivel dapartamental
+                leyendaNal: ['Área por año (ha)', 'Área por proceso (ha)', 'Área género beneficiario (ha)'], // labels a nivel municipal
+                leyendaDepartal: ['Área por año (ha)', 'Área por proceso (ha)', 'Área género beneficiario (ha)'],
                 fieldValue: 'total_area_ha',
                 fieldValueNal: 'total_area_ha', // labels a nivel departamental
                 fieldValueDepartal: 'total_area_ha', // data a nivel depatamental
@@ -397,7 +397,7 @@ export const dataFuenteIndicadores = [
                 label: '1.7.1 Porcentaje de predios rurales actualizados',
                 descripcion: 'Porcentaje de predios rurales actualizados',
                 url: '', // trae info a nivel municipal
-                urlNal: '', //para data coropletica a nivel municipal // data a nivel nacional
+                urlNal: 'v_predios_actualizados_depto', //para data coropletica a nivel municipal // data a nivel nacional
                 urlDepartal: 'v_predios_actualizados_depto',
                 urlNalDataAlfanumerica: '', //para data alfanumerica a nivel nacional // para alguna data adicional alfanuemrica
                 fieldlabel: ['anio_vigencia'], // con esto se especifica la cantidad de graficas q se desplegaran segun la data de cada feature // data a nivel municipal
@@ -422,7 +422,7 @@ export const dataFuenteIndicadores = [
                 label: '1.7.2 Porcentaje de área de predios rurales actualizados',
                 descripcion: 'Porcentaje de área de predios rurales actualizados',
                 url: '', // trae info a nivel municipal
-                urlNal: '', //para data coropletica a nivel municipal // data a nivel nacional
+                urlNal: 'v_predios_actualizados_depto', //para data coropletica a nivel municipal // data a nivel nacional
                 urlDepartal: 'v_predios_actualizados_depto',
                 urlNalDataAlfanumerica: '', //para data alfanumerica a nivel nacional // para alguna data adicional alfanuemrica
                 fieldlabel: ['anio_vigencia'], // con esto se especifica la cantidad de graficas q se desplegaran segun la data de cada feature // data a nivel municipal
@@ -447,7 +447,7 @@ export const dataFuenteIndicadores = [
                 label: '1.7.3 Cantidad de municipios actualizados en cada vigencia',
                 descripcion: 'Cantidad de municipios actualizados en cada vigencia',
                 url: '', // trae info a nivel municipal
-                urlNal: '', //para data coropletica a nivel municipal // data a nivel nacional
+                urlNal: 'v_municipios_actualizados_depto', //para data coropletica a nivel municipal // data a nivel nacional
                 urlDepartal: 'v_municipios_actualizados_depto',
                 urlNalDataAlfanumerica: '', //para data alfanumerica a nivel nacional // para alguna data adicional alfanuemrica
                 fieldlabel: [], // con esto se especifica la cantidad de graficas q se desplegaran segun la data de cada feature // data a nivel municipal

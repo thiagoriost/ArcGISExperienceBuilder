@@ -130,7 +130,14 @@ const renderLayer = async (url: string, jimuMapView: JimuMapView) => {
  * @param where '1=1'
  * @returns jsonResponse
  */
-const realizarConsulta = async ({campo='*', url, returnGeometry=false, where='1=1', outStatistics=''}) => {
+const realizarConsulta = async ({
+  OutFields='*',
+  url,
+  returnGeometry=false,
+  where='1=1',
+  outStatistics ='',
+  groupByFieldsForStatistics=''
+}) => {
   const controller = new AbortController();
   
   try {
@@ -143,13 +150,13 @@ const realizarConsulta = async ({campo='*', url, returnGeometry=false, where='1=
 
     // Agregar parámetros específicos según el tipo de consulta
     if (outStatistics && outStatistics.length > 0) {
-      baseParams.append('groupByFieldsForStatistics', 'mpcodigo');
-      baseParams.append('outStatistics', JSON.stringify(outStatistics));
-    } else if (campo) {
-      baseParams.append('outFields', campo);
+      baseParams.append('groupByFieldsForStatistics', groupByFieldsForStatistics);
+      baseParams.append('outStatistics', outStatistics);
+    } else if (OutFields) {
+      baseParams.append('outFields', OutFields);
       // baseParams.append('geometryType', 'esriGeometryEnvelope');
     } else {
-      throw new Error('Debe proporcionar campo o outStatistics');
+      throw new Error('Debe proporcionar OutFields o outStatistics');
     }
 
     // Construir URL final
