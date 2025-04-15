@@ -451,13 +451,13 @@ export const dataFuenteIndicadores = [
                 urlDepartal: 'v_municipios_actualizados_depto',
                 urlNalDataAlfanumerica: '', //para data alfanumerica a nivel nacional // para alguna data adicional alfanuemrica
                 fieldlabel: [], // con esto se especifica la cantidad de graficas q se desplegaran segun la data de cada feature // data a nivel municipal
-                fieldlabelNal: [], // con esto se especifica la cantidad de graficas q se desplegaran segun la data de cada feature // labels a nivel nacional
+                fieldlabelNal: ['anio_vigencia', 'estado_actualizacion'], // con esto se especifica la cantidad de graficas q se desplegaran segun la data de cada feature // labels a nivel nacional
                 fieldlabelDepartal: ['anio_vigencia', 'estado_actualizacion'], // con esto se especifica la cantidad de graficas q se desplegaran segun la data de cada feature // leyenda a nivel nacional
-                leyenda: ['Año vigencia', 'Estado de actualización'], // las leyendas para cada label // leyenda a nivel dapartamental
+                leyenda: [], // las leyendas para cada label // leyenda a nivel dapartamental
                 leyendaNal: ['Año vigencia', 'Estado de actualización'], // las leyendas para cada label // labels a nivel municipal
                 leyendaDepartal: ['Año vigencia', 'Estado de actualización'],
                 fieldValue: '', // estees el valor que tomara generar las cantidades para cada label
-                fieldValueNal: '', // estees el valor que tomara generar las cantidades para cada label // labels a nivel departamental
+                fieldValueNal: 'cantidad_mpios', // estees el valor que tomara generar las cantidades para cada label // labels a nivel departamental
                 fieldValueDepartal: 'cantidad_mpios', // estees el valor que tomara generar la // data a nivel depatamentals cantidades para cada label
                 quintiles: [
                   ['<=', 0,'Sin municipios actualizados'],
@@ -615,9 +615,11 @@ export const dataFuenteIndicadores = [
                 value: 1,
                 label: '3.1.1 Índice de Gini de la propiedad',
                 descripcion: 'Índice de Gini de la propiedad',
-                url: 'v_indice_gini_ids_mun',
+                url: 'v_indice_gini_ids_mun', // municipios
                 urlNal: 'v_indice_gini_ids_nac_tot', // data a nivel nacional
-                urlDepartal: 'v_indice_gini_ids_mun',
+                // urlNal: 'v_indice_gini_ids_mun', // data a nivel nacional
+                urlDepartal: 'v_indice_gini_ids_depto',
+                // urlDepartal: 'v_indice_gini_ids_mun',
                 urlNalDataAlfanumerica: '', // para alguna data adicional alfanuemrica
                 fieldlabel: ['anio_vigencia'/* , 'destino' *//* , 'categoria_gini', 'categoria_ids' */], // data a nivel municipal
                 fieldlabelNal: ['anio_vigencia'/* , 'destino' */], // labels a nivel nacional
@@ -641,7 +643,9 @@ export const dataFuenteIndicadores = [
                 descripcion: 'Índice de Disparidad Superior - IDS',
                 url: 'v_indice_gini_ids_mun', // data a nivel municipal
                 urlNal: 'v_indice_gini_ids_nac_tot', // data a nivel nacional
-                urlDepartal: 'v_indice_gini_ids_mun', // data a nivel depatamental
+                // urlNal: 'v_indice_gini_ids_mun', // data a nivel nacional
+                urlDepartal: 'v_indice_gini_ids_depto',
+                // urlDepartal: 'v_indice_gini_ids_mun', // data a nivel depatamental
                 urlNalDataAlfanumerica: '', // para alguna data adicional alfanuemrica
                 fieldlabel: ['anio_vigencia'/*, 'destino' , 'categoria_gini', 'categoria_ids' */], // labels a nivel municipal
                 fieldlabelNal: ['anio_vigencia'/* , 'destino' */], // labels a nivel nacional

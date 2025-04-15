@@ -48,7 +48,12 @@ const urls = {
     v_indice_gini_ids_nac_tot: `${mapServerNal}/17`,
     v_predios_ley2da_nacmun: `${mapServerNal}/18`,
     v_predios_zrc_nacmun: `${mapServerNal}/19`,
-    v_predios_actualizados_depto: `${mapServerDepartal}/15`
+    v_predios_actualizados_depto: `${mapServerDepartal}/15`,
+    v_municipios_actualizados_depto: `${mapServerDepartal}/16`,
+    v_predios_zrc_mun: `${MapServerMunicipal}/15`,
+    v_indice_gini_ids_depto: `${mapServerDepartal}/9`,
+
+
 
   },
   /* indicadoresNaci: { // nacionales Indicadores_nacionales_municipales
