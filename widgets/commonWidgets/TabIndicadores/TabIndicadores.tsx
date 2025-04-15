@@ -248,7 +248,7 @@ const TabIndicadores: React.FC<any> = ({ dispatch, departamentos, jimuMapView })
     if (!geometrias) {
       try {
         geometrias = await obtenerGeometriasUnicas(responseIndicador);
-        console.log('Geometrías obtenidas:', geometrias);
+        //console.log('Geometrías obtenidas:', geometrias);
       } catch (error) {
         console.error('Error:', error);
       }
@@ -360,7 +360,7 @@ const TabIndicadores: React.FC<any> = ({ dispatch, departamentos, jimuMapView })
        */
       
       const DATASET = ajustarDATASET({dataToRenderGraphic, regionSeleccionada, indiSelected})
-      console.log({DATASET})
+      //console.log({DATASET})
 
 
       // logica para ajustar el extend al departamento seleccionado
@@ -372,11 +372,9 @@ const TabIndicadores: React.FC<any> = ({ dispatch, departamentos, jimuMapView })
           responseIndicador,
           geometryEngine
         })
-        console.log("Setiando extend 1")
         extentAjustado = (responseIndicador.length == 1) ? calculateExtent(responseIndicador[0].geometry.rings) : ajustarExtend({dataToRenderGraphic, responseIndicador, geometryEngine})
-        console.log({extentAjustado})
+        //console.log({extentAjustado})
       }else if (_es_Indicador == 'es=1.7.' && regionSeleccionada == 'Departamental') {
-        console.log("Setiando extend 2")
         extentAjustado = calculateExtent(responseIndicador[0].geometry.rings)
       }
 
@@ -454,7 +452,7 @@ const obtenerGeometriasUnicas = async(
       return { labels, values };
     };
     const respuestaDataProcesada:Indicador_respuestaDataProcesada[] = []
-    console.log({dataToRenderGraphic})
+    //console.log({dataToRenderGraphic})
     dataToRenderGraphic?.forEach(respuesta => {
       const resp = processChartData(respuesta, respuesta.fields[0].name, respuesta.fields[1].name)
       respuestaDataProcesada.push(resp)
@@ -463,7 +461,7 @@ const obtenerGeometriasUnicas = async(
     const leyenda = regionSeleccionada === 'Nacional' ? indiSelected.leyendaNal: regionSeleccionada === 'Municipal'? indiSelected.leyenda : indiSelected.leyendaDepartal
     respuestaDataProcesada.forEach((respDatProc, index) => {
       const colorRGBA: RGBAColor = utilsModule?.getRandomRGBA()
-      console.log({colorRGBA})
+      //console.log({colorRGBA})
       const {rgba, valueRGBA} = colorRGBA
       DATASET.push({
         labels: respDatProc.labels,
@@ -501,7 +499,7 @@ const obtenerGeometriasUnicas = async(
     }
   
     // Combina las geometrías en una sola
-    console.log({geometriaDepto}, geometriaDepto.length)
+    //console.log({geometriaDepto}, geometriaDepto.length)
     if (geometriaDepto.length > 9) {
       console.warn(`Demasiadas geometrías ${geometriaDepto.length} para unir y generar el extend, por tiempos toma parte de las geometrias para generar extend y aplicarlo`);
       geometriaDepto.splice(9)
@@ -566,7 +564,7 @@ const obtenerGeometriasUnicas = async(
       // 3. Filtrado de respuestas inválidas
       const validResponses = dataTorenderGraphics.filter(Boolean);
       
-      console.log('Datos para gráficos:', validResponses);
+      //console.log('Datos para gráficos:', validResponses);
       return validResponses;
       
     } catch (error) {
@@ -606,7 +604,7 @@ const obtenerGeometriasUnicas = async(
     }
     handleIndicadorSelectedContinua({
       _where:`cod_departamento='${target.value}'`,
-      indiSelected:selectIndicadores,
+      indiSelected:{...selectIndicadores, deparmetSelected:itemSelected.denombre},
       target,
       _es_Indicador:tipoConsulta,
       geometrias:_geometrias,
@@ -682,7 +680,7 @@ const calculateExtent = (rings) => {
       // utilsModule?.goToOneExtentAndZoom({ jimuMapView, extent: itemSelected?.value.geometry.extent, duration: 1000 })
       handleIndicadorSelectedContinua({
         _where:`mpcodigo = '${itemSelected?.mpcodigo}'`,
-        indiSelected:selectIndicadores,
+        indiSelected:{...selectIndicadores, municipioSelected:itemSelected?.mpnombre, deparmetSelected:departmentSelect?.denombre},
         target,
         _es_Indicador:'Municipal',
         geometrias:geometriaMunicipios,
@@ -819,7 +817,7 @@ const calculateExtent = (rings) => {
   const getGeometriasMunicipios = async ({url, where='1=1'}:{url:String; where:String}) => {
     setIsLoading(true)
     try {
-      console.info("Consultando geometrias municipios ...")
+      if (utilsModule?.logger())console.info("Consultando geometrias municipios ...")
       const municipiosResponse = await utilsModule?.queryAttributesLayer({ url: url + '/query', definitionExpression: where, returnGeometry: true, outFields: '*' })
       let resumenMunicipios = {
         features: municipiosResponse.features,
@@ -831,7 +829,7 @@ const calculateExtent = (rings) => {
       if (utilsModule?.logger()) console.log({ municipiosResponse, resumenMunicipios })
       resumenMunicipios.features = [...geometriaMunicipios?geometriaMunicipios.features:'', ...resumenMunicipios.features]
       setGeometriaMunicipios(resumenMunicipios)
-      // setIsLoading(false)
+      setIsLoading(false)
       return resumenMunicipios
     } catch (error) {
       setIsLoading(false)

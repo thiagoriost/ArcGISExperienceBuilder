@@ -141,7 +141,7 @@ const realizarConsulta = async ({
   groupByFieldsForStatistics=''
 }) => {
   const controller = new AbortController();    
-  console.info(`REALIZANDO CONSULTA..... realizarConsulta()`,
+  if (logger())  console.info(`REALIZANDO CONSULTA..... realizarConsulta()`,
     {
       id: consecutivoConsultas,
       Parametros_Consulta:{ OutFields, url, returnGeometry, where, outStatistics, groupByFieldsForStatistics, },      
@@ -181,7 +181,7 @@ const realizarConsulta = async ({
     }
     const toResponse = await response.json();
 
-    console.info(`Respuesta Consulta ...... realizarConsulta()`,
+    if (logger())    console.info(`Respuesta Consulta ...... realizarConsulta()`,
       {
         id: consecutivoConsultas,
         Repuesta_Consulta:toResponse
@@ -499,7 +499,7 @@ const queryAttributesLayer = async ({ url, definitionExpression, returnGeometry,
     url: 'https://js.arcgis.com/4.29/'
   })
 
-  console.info(`REALIZANDO CONSULTA..... queryAttributesLayer()`,
+  if (logger())console.info(`REALIZANDO CONSULTA..... queryAttributesLayer()`,
     {
       id: consecutivoConsultas,
       Parametros_Consulta:{ url, definitionExpression, returnGeometry, outFields},     
@@ -516,7 +516,7 @@ const queryAttributesLayer = async ({ url, definitionExpression, returnGeometry,
 
   const dataResponse = await layer.queryFeatures(query)
   // if (logger()) 
-    console.info(`Respuesta Consulta ...... queryAttributesLayer()`,
+  if (logger())console.info(`Respuesta Consulta ...... queryAttributesLayer()`,
       {
         id: consecutivoConsultas,        
         Repuesta_Consulta:dataResponse

@@ -384,7 +384,8 @@ const Indicadores = (props: AllWidgetProps<any>) => {
         legend: { position: 'top' as const },
         title: {
           display: true,
-          text: `${descripcion}`
+          text: `${descripcion} - Municipio: ${poligonoSeleccionado.attributes.mpnombre ? poligonoSeleccionado.attributes.mpnombre : poligonoSeleccionado.attributes[0].attributes.mpnombre} - Departamento: ${departmentSelect?.label ? departmentSelect.label : poligonoSeleccionado.attributes.depto}`
+
         },
         tooltip: {
           enabled: true
@@ -456,20 +457,15 @@ const Indicadores = (props: AllWidgetProps<any>) => {
         setDataGrafico([])
         setOptions(null)
       } else if (dataFromDispatch?.nacional || dataFromDispatch?.municipal) {
-        let fieldlabel, dataAlfanumerica
+        let fieldlabel, dataAlfanumerica, deparmetSelected=undefined, municipioSelected=undefined
         if (dataFromDispatch?.nacional) {
           const { dataAlfanumericaNal, indiSelected } = dataFromDispatch.nacional
           extentAjustado = dataFromDispatch.nacional.extentAjustado
           descripcion = indiSelected.descripcion
           fieldlabel = indiSelected.fieldlabelNal
           dataAlfanumerica = dataAlfanumericaNal
-        }else if (dataFromDispatch?.municipal) {
-          const { poligonoSeleccionado, selectIndicadores, regionSeleccionada } = dataFromDispatch.municipal
-          _regionSeleccionada = regionSeleccionada
-          extentAjustado = dataFromDispatch.municipal.extentAjustado
-          descripcion = selectIndicadores.descripcion
-          fieldlabel = selectIndicadores.fieldlabelNal
-          dataAlfanumerica = poligonoSeleccionado
+          deparmetSelected= indiSelected.deparmetSelected
+          municipioSelected = indiSelected.municipioSelected
         }
         if (dataAlfanumerica.error) {
           setMensajeModal({
@@ -488,7 +484,7 @@ const Indicadores = (props: AllWidgetProps<any>) => {
             legend: { position: 'top' as const },
             title: {
               display: true,
-              text: `${descripcion}`
+              text: `${descripcion} ${deparmetSelected ? `- Departamento:  ${deparmetSelected}` : ''}${municipioSelected ? ` - Municipio:  ${municipioSelected}` : ''}  `
             },
             tooltip: {
               enabled: true

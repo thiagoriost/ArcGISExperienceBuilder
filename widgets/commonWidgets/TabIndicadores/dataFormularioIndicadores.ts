@@ -763,11 +763,11 @@ export const dataFuenteIndicadores = [
                 fieldValueNal: 'porcentaje_area',
                 fieldValueDepartal: 'porcentaje_area',
                 quintiles: [
-                  ['<=', 0],
-                  [0, 0.3],
-                  [0.3, 0.6],
-                  [0.6, 0.9],
-                  [0.9, '=>']
+                  ['<=', 0, '0% del área'],
+                  [0, 0.3, 'Hasta 30% del área'],
+                  [0.3, 0.6, 'Entre 30% y 60% del área'],
+                  [0.6, 0.9, 'Entre 60% y 90% del área'],
+                  [0.9, '=>', 'Más del 90% del área']
                 ]
               }
             ]
