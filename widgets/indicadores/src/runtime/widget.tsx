@@ -384,7 +384,8 @@ const Indicadores = (props: AllWidgetProps<any>) => {
         legend: { position: 'top' as const },
         title: {
           display: true,
-          text: `${descripcion}`
+          text: `${descripcion} - Municipio: ${poligonoSeleccionado.attributes.mpnombre ? poligonoSeleccionado.attributes.mpnombre : poligonoSeleccionado.attributes[0].attributes.mpnombre} - Departamento: ${departmentSelect?.label ? departmentSelect.label : poligonoSeleccionado.attributes.depto}`
+
         },
         tooltip: {
           enabled: true
@@ -447,24 +448,26 @@ const Indicadores = (props: AllWidgetProps<any>) => {
   }, [jimuMapView]) */
 
   useEffect(() => {
-    // eslint-disable-next-line no-prototype-builtins
     if (props.hasOwnProperty('stateProps')) {
-      // const { nacional, poligonoSeleccionado } = props.stateProps
-      // const { dataFromDispatch } = props.stateProps
       const dataFromDispatch = JSON.parse(props.stateProps.dataFromDispatch)
+      let descripcion: string = '', extentAjustado, _regionSeleccionada
       if (utilsModule?.logger()) console.log({ props, id: props.id, dataFromDispatch })
       if (dataFromDispatch?.clear) {
         if (utilsModule?.logger()) console.log('clearing graphic')
         setDataGrafico([])
         setOptions(null)
-      } else if (dataFromDispatch?.municipal) {
-        // const data = JSON.parse(props.stateProps.poligonoSeleccionado)
-        // setPoligonoSeleccionado(dataFromDispatch.municipal)
-        _fixDataToRenderGrafig(dataFromDispatch.municipal)
-      } else if (dataFromDispatch?.nacional) {
-        if (utilsModule?.logger()) console.log(dataFromDispatch.nacional)
-        const { dataAlfanuemricaNal, indiSelected, extentAjustado } = dataFromDispatch.nacional
-        if (dataAlfanuemricaNal.error) {
+      } else if (dataFromDispatch?.nacional || dataFromDispatch?.municipal) {
+        let fieldlabel, dataAlfanumerica, deparmetSelected=undefined, municipioSelected=undefined
+        if (dataFromDispatch?.nacional) {
+          const { dataAlfanumericaNal, indiSelected } = dataFromDispatch.nacional
+          extentAjustado = dataFromDispatch.nacional.extentAjustado
+          descripcion = indiSelected.descripcion
+          fieldlabel = indiSelected.fieldlabelNal
+          dataAlfanumerica = dataAlfanumericaNal
+          deparmetSelected= indiSelected.deparmetSelected
+          municipioSelected = indiSelected.municipioSelected
+        }
+        if (dataAlfanumerica.error) {
           setMensajeModal({
             deployed: true,
             type: typeMSM.warning,
@@ -474,15 +477,14 @@ const Indicadores = (props: AllWidgetProps<any>) => {
           })
           return
         }
-        const { fieldlabelNal, descripcion/* fieldValueNal, leyendaNal,  */ } = indiSelected
-        setDataGrafico(dataAlfanuemricaNal)
+        setDataGrafico(dataAlfanumerica)
         setOptions({
           responsive: true,
           plugins: {
             legend: { position: 'top' as const },
             title: {
               display: true,
-              text: `${descripcion}`
+              text: `${descripcion} ${deparmetSelected ? `- Departamento:  ${deparmetSelected}` : ''}${municipioSelected ? ` - Municipio:  ${municipioSelected}` : ''}  `
             },
             tooltip: {
               enabled: true
@@ -502,15 +504,10 @@ const Indicadores = (props: AllWidgetProps<any>) => {
             }
           }
         })
-        setTotalPage(fieldlabelNal.length)
+        setTotalPage(fieldlabel.length)
         setTimeout(() => {
-          // console.log(5555555555555, { zoom: jimuMapView.view.zoom })
-          // setInitialExtent(jmv.view.extent)
-          jimuMapView.view.extent = extentAjustado?extentAjustado:initialExtent
-          // jimuMapView.view.zoom = jimuMapView.view.zoom - 1.5
-          // jimuMapView.view.zoom = 5
+            jimuMapView.view.extent = extentAjustado?extentAjustado:initialExtent
         }, 1000)
-        // fixDataToRenderStadisticGraphic(fieldlabelNal, fieldValueNal, features, leyendaNal, descripcion + ' a nivel nacional')
       } else if (dataFromDispatch?.departamental) {
         if (utilsModule?.logger()) console.log(dataFromDispatch.departamental)
         const { itemSelected, selectIndicadores, filtroSoloFeaturesDelDepartaSeleccionado } = dataFromDispatch.departamental

@@ -4,7 +4,9 @@ import { exportToCSV } from './exportToCSV'
 import { type JimuMapView, loadArcGISJSAPIModules } from 'jimu-arcgis'
 import Polygon from '@arcgis/core/geometry/Polygon'
 import { coloresMapaCoropletico } from './constantes'
-import { OutStatistics } from '../commonWidgets/TabIndicadores/TabIndicadores'
+
+
+let consecutivoConsultas = 0
 
 const moduleExportToCSV = (rows, fileName) => { exportToCSV(rows, fileName) }
 
@@ -130,9 +132,21 @@ const renderLayer = async (url: string, jimuMapView: JimuMapView) => {
  * @param where '1=1'
  * @returns jsonResponse
  */
-const realizarConsulta = async ({campo='*', url, returnGeometry=false, where='1=1', outStatistics=''}) => {
-  const controller = new AbortController();
-  
+const realizarConsulta = async ({
+  OutFields='*',
+  url,
+  returnGeometry=false,
+  where='1=1',
+  outStatistics ='',
+  groupByFieldsForStatistics=''
+}) => {
+  const controller = new AbortController();    
+  if (logger())  console.info(`REALIZANDO CONSULTA..... realizarConsulta()`,
+    {
+      id: consecutivoConsultas,
+      Parametros_Consulta:{ OutFields, url, returnGeometry, where, outStatistics, groupByFieldsForStatistics, },      
+    }
+  )
   try {
     // Construcción de parámetros base
     const baseParams = new URLSearchParams({
@@ -143,13 +157,13 @@ const realizarConsulta = async ({campo='*', url, returnGeometry=false, where='1=
 
     // Agregar parámetros específicos según el tipo de consulta
     if (outStatistics && outStatistics.length > 0) {
-      baseParams.append('groupByFieldsForStatistics', 'mpcodigo');
-      baseParams.append('outStatistics', JSON.stringify(outStatistics));
-    } else if (campo) {
-      baseParams.append('outFields', campo);
+      baseParams.append('groupByFieldsForStatistics', groupByFieldsForStatistics);
+      baseParams.append('outStatistics', outStatistics);
+    } else if (OutFields) {
+      baseParams.append('outFields', OutFields);
       // baseParams.append('geometryType', 'esriGeometryEnvelope');
     } else {
-      throw new Error('Debe proporcionar campo o outStatistics');
+      throw new Error('Debe proporcionar OutFields o outStatistics');
     }
 
     // Construir URL final
@@ -165,8 +179,16 @@ const realizarConsulta = async ({campo='*', url, returnGeometry=false, where='1=
     if (!response.ok) {
       throw new Error(`Error en la petición: ${response.status}`);
     }
+    const toResponse = await response.json();
 
-    return await response.json();
+    if (logger())    console.info(`Respuesta Consulta ...... realizarConsulta()`,
+      {
+        id: consecutivoConsultas,
+        Repuesta_Consulta:toResponse
+      }
+    )
+    consecutivoConsultas++
+    return toResponse;
   } catch (error) {
     if (logger()) console.error('Error en realizarConsulta:', error);
     throw error; // Re-lanzar el error para manejo superior
@@ -473,10 +495,16 @@ const calculoValoresQuintiles = (features, fieldValueToSetRangeCoropletico) => {
 }
 
 const queryAttributesLayer = async ({ url, definitionExpression, returnGeometry, outFields }) => {
-  if (logger()) console.log({ url, definitionExpression, returnGeometry, outFields })
   const [FeatureLayer] = await loadModules(['esri/layers/FeatureLayer'], {
     url: 'https://js.arcgis.com/4.29/'
   })
+
+  if (logger())console.info(`REALIZANDO CONSULTA..... queryAttributesLayer()`,
+    {
+      id: consecutivoConsultas,
+      Parametros_Consulta:{ url, definitionExpression, returnGeometry, outFields},     
+    }
+  )
 
   const layer = new FeatureLayer({ url })
   // Crear y ejecutar la consulta
@@ -487,7 +515,14 @@ const queryAttributesLayer = async ({ url, definitionExpression, returnGeometry,
   // query.outFields = ['OBJECTID', 'OBJECTID_1', 'DEPARTAMEN', 'MUNICIPIO', 'PCC', 'VEREDA']
 
   const dataResponse = await layer.queryFeatures(query)
-  if (logger()) console.log(dataResponse)
+  // if (logger()) 
+  if (logger())console.info(`Respuesta Consulta ...... queryAttributesLayer()`,
+      {
+        id: consecutivoConsultas,        
+        Repuesta_Consulta:dataResponse
+      }
+    )
+  consecutivoConsultas++
   return dataResponse
 }
 
@@ -580,7 +615,7 @@ const dibujarPoligono = async (
       })
       // Definir el símbolo basado en un atributo
       let color = [51, 51, 204, 0.5] // Color por defecto
-      if (!fieldToFixRange) {
+      if (!fieldToFixRange && fieldToFixRange < 0) {
         color = [255, 255, 255, 0.1]
         if (logger()) console.log({ fieldToFixRange })
       // } else if (rangos[0][0] <= fieldToFixRange && fieldToFixRange <= rangos[0][1]) {
@@ -768,11 +803,11 @@ const getRandomRGBA = () => {
   const a = 0.5 // Valores entre 0 y 1, con dos decimales
 
   // Formatear el resultado como rgba
-  return `rgba(${r}, ${g}, ${b}, ${a})`
+  return {rgba:`rgba(${r}, ${g}, ${b}, ${a})`, valueRGBA: [r,g,b,a]}
 }
 
 const discriminarRepetidos = (data, campo) => {
-  const filteredData = []
+  const filteredData: any = []
   const codMunicipiosSet = new Set()
   data.forEach(item => {
     const valueKey = item[campo] ? item[campo] : item.attributes[campo]

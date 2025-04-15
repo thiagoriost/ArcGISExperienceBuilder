@@ -286,12 +286,12 @@ export const dataFuenteIndicadores = [
                 urlNal: 'v_predios_campesinos_tit_mun', // data a nivel nacional
                 urlDepartal: 'v_predios_campesinos_tit_mun',
                 urlNalDataAlfanumerica: '', // para alguna data adicional alfanuemrica
-                fieldlabel: ['anio', /* 'proceso', */ 'genero_beneficiario'], // data a nivel municipal
-                fieldlabelNal: ['anio', /* 'proceso', */ 'genero_beneficiario'], // labels a nivel nacional
-                fieldlabelDepartal: ['anio', /* 'proceso', */ 'genero_beneficiario'], // leyenda a nivel nacional
-                leyenda: ['Predios por año', /* 'Predios por proceso', */ 'Predios género beneficiario'], // las leyendas para cada label // leyenda a nivel dapartamental
-                leyendaNal: ['Predios por año', /* 'Predios por proceso', */ 'Predios género beneficiario'], // labels a nivel municipal
-                leyendaDepartal: ['Predios por año', /* 'Predios por proceso', */ 'Predios género beneficiario'],
+                fieldlabel: ['anio', 'proceso', 'genero_beneficiario'], // data a nivel municipal
+                fieldlabelNal: ['anio', 'proceso', 'genero_beneficiario'], // labels a nivel nacional
+                fieldlabelDepartal: ['anio', 'proceso', 'genero_beneficiario'], // leyenda a nivel nacional
+                leyenda: ['Predios por año', 'Predios por proceso', 'Predios género beneficiario'], // las leyendas para cada label // leyenda a nivel dapartamental
+                leyendaNal: ['Predios por año', 'Predios por proceso', 'Predios género beneficiario'], // labels a nivel municipal
+                leyendaDepartal: ['Predios por año', 'Predios por proceso', 'Predios género beneficiario'],
                 fieldValue: 'cantidad_predios',
                 fieldValueNal: 'cantidad_predios', // labels a nivel departamental
                 fieldValueDepartal: 'cantidad_predios', // data a nivel depatamental
@@ -311,12 +311,12 @@ export const dataFuenteIndicadores = [
                 urlNal: 'v_predios_campesinos_tit_mun', // data a nivel nacional
                 urlDepartal: 'v_predios_campesinos_tit_mun',
                 urlNalDataAlfanumerica: '', // para alguna data adicional alfanuemrica
-                fieldlabel: ['anio', /* 'proceso', */ 'genero_beneficiario'], // data a nivel municipal
-                fieldlabelNal: ['anio', /* 'proceso', */ 'genero_beneficiario'], // labels a nivel nacional
-                fieldlabelDepartal: ['anio', /* 'proceso', */ 'genero_beneficiario'], // leyenda a nivel nacional
-                leyenda: ['Área por año (ha)', /* 'Área por proceso (ha)', */ 'Área género beneficiario (ha)'], // las leyendas para cada label // leyenda a nivel dapartamental
-                leyendaNal: ['Área por año (ha)', /* 'Área por proceso (ha)', */ 'Área género beneficiario (ha)'], // labels a nivel municipal
-                leyendaDepartal: ['Área por año (ha)', /* 'Área por proceso (ha)', */ 'Área género beneficiario (ha)'],
+                fieldlabel: ['anio', 'proceso', 'genero_beneficiario'], // data a nivel municipal
+                fieldlabelNal: ['anio', 'proceso', 'genero_beneficiario'], // labels a nivel nacional
+                fieldlabelDepartal: ['anio', 'proceso', 'genero_beneficiario'], // leyenda a nivel nacional
+                leyenda: ['Área por año (ha)', 'Área por proceso (ha)', 'Área género beneficiario (ha)'], // las leyendas para cada label // leyenda a nivel dapartamental
+                leyendaNal: ['Área por año (ha)', 'Área por proceso (ha)', 'Área género beneficiario (ha)'], // labels a nivel municipal
+                leyendaDepartal: ['Área por año (ha)', 'Área por proceso (ha)', 'Área género beneficiario (ha)'],
                 fieldValue: 'total_area_ha',
                 fieldValueNal: 'total_area_ha', // labels a nivel departamental
                 fieldValueDepartal: 'total_area_ha', // data a nivel depatamental
@@ -397,7 +397,7 @@ export const dataFuenteIndicadores = [
                 label: '1.7.1 Porcentaje de predios rurales actualizados',
                 descripcion: 'Porcentaje de predios rurales actualizados',
                 url: '', // trae info a nivel municipal
-                urlNal: '', //para data coropletica a nivel municipal // data a nivel nacional
+                urlNal: 'v_predios_actualizados_depto', //para data coropletica a nivel municipal // data a nivel nacional
                 urlDepartal: 'v_predios_actualizados_depto',
                 urlNalDataAlfanumerica: '', //para data alfanumerica a nivel nacional // para alguna data adicional alfanuemrica
                 fieldlabel: ['anio_vigencia'], // con esto se especifica la cantidad de graficas q se desplegaran segun la data de cada feature // data a nivel municipal
@@ -422,7 +422,7 @@ export const dataFuenteIndicadores = [
                 label: '1.7.2 Porcentaje de área de predios rurales actualizados',
                 descripcion: 'Porcentaje de área de predios rurales actualizados',
                 url: '', // trae info a nivel municipal
-                urlNal: '', //para data coropletica a nivel municipal // data a nivel nacional
+                urlNal: 'v_predios_actualizados_depto', //para data coropletica a nivel municipal // data a nivel nacional
                 urlDepartal: 'v_predios_actualizados_depto',
                 urlNalDataAlfanumerica: '', //para data alfanumerica a nivel nacional // para alguna data adicional alfanuemrica
                 fieldlabel: ['anio_vigencia'], // con esto se especifica la cantidad de graficas q se desplegaran segun la data de cada feature // data a nivel municipal
@@ -447,17 +447,17 @@ export const dataFuenteIndicadores = [
                 label: '1.7.3 Cantidad de municipios actualizados en cada vigencia',
                 descripcion: 'Cantidad de municipios actualizados en cada vigencia',
                 url: '', // trae info a nivel municipal
-                urlNal: '', //para data coropletica a nivel municipal // data a nivel nacional
+                urlNal: 'v_municipios_actualizados_depto', //para data coropletica a nivel municipal // data a nivel nacional
                 urlDepartal: 'v_municipios_actualizados_depto',
                 urlNalDataAlfanumerica: '', //para data alfanumerica a nivel nacional // para alguna data adicional alfanuemrica
                 fieldlabel: [], // con esto se especifica la cantidad de graficas q se desplegaran segun la data de cada feature // data a nivel municipal
-                fieldlabelNal: [], // con esto se especifica la cantidad de graficas q se desplegaran segun la data de cada feature // labels a nivel nacional
+                fieldlabelNal: ['anio_vigencia', 'estado_actualizacion'], // con esto se especifica la cantidad de graficas q se desplegaran segun la data de cada feature // labels a nivel nacional
                 fieldlabelDepartal: ['anio_vigencia', 'estado_actualizacion'], // con esto se especifica la cantidad de graficas q se desplegaran segun la data de cada feature // leyenda a nivel nacional
-                leyenda: ['Año vigencia', 'Estado de actualización'], // las leyendas para cada label // leyenda a nivel dapartamental
+                leyenda: [], // las leyendas para cada label // leyenda a nivel dapartamental
                 leyendaNal: ['Año vigencia', 'Estado de actualización'], // las leyendas para cada label // labels a nivel municipal
                 leyendaDepartal: ['Año vigencia', 'Estado de actualización'],
                 fieldValue: '', // estees el valor que tomara generar las cantidades para cada label
-                fieldValueNal: '', // estees el valor que tomara generar las cantidades para cada label // labels a nivel departamental
+                fieldValueNal: 'cantidad_mpios', // estees el valor que tomara generar las cantidades para cada label // labels a nivel departamental
                 fieldValueDepartal: 'cantidad_mpios', // estees el valor que tomara generar la // data a nivel depatamentals cantidades para cada label
                 quintiles: [
                   ['<=', 0,'Sin municipios actualizados'],
@@ -615,9 +615,11 @@ export const dataFuenteIndicadores = [
                 value: 1,
                 label: '3.1.1 Índice de Gini de la propiedad',
                 descripcion: 'Índice de Gini de la propiedad',
-                url: 'v_indice_gini_ids_mun',
+                url: 'v_indice_gini_ids_mun', // municipios
                 urlNal: 'v_indice_gini_ids_nac_tot', // data a nivel nacional
-                urlDepartal: 'v_indice_gini_ids_mun',
+                // urlNal: 'v_indice_gini_ids_mun', // data a nivel nacional
+                urlDepartal: 'v_indice_gini_ids_depto',
+                // urlDepartal: 'v_indice_gini_ids_mun',
                 urlNalDataAlfanumerica: '', // para alguna data adicional alfanuemrica
                 fieldlabel: ['anio_vigencia'/* , 'destino' *//* , 'categoria_gini', 'categoria_ids' */], // data a nivel municipal
                 fieldlabelNal: ['anio_vigencia'/* , 'destino' */], // labels a nivel nacional
@@ -641,7 +643,9 @@ export const dataFuenteIndicadores = [
                 descripcion: 'Índice de Disparidad Superior - IDS',
                 url: 'v_indice_gini_ids_mun', // data a nivel municipal
                 urlNal: 'v_indice_gini_ids_nac_tot', // data a nivel nacional
-                urlDepartal: 'v_indice_gini_ids_mun', // data a nivel depatamental
+                // urlNal: 'v_indice_gini_ids_mun', // data a nivel nacional
+                urlDepartal: 'v_indice_gini_ids_depto',
+                // urlDepartal: 'v_indice_gini_ids_mun', // data a nivel depatamental
                 urlNalDataAlfanumerica: '', // para alguna data adicional alfanuemrica
                 fieldlabel: ['anio_vigencia'/*, 'destino' , 'categoria_gini', 'categoria_ids' */], // labels a nivel municipal
                 fieldlabelNal: ['anio_vigencia'/* , 'destino' */], // labels a nivel nacional
@@ -759,11 +763,11 @@ export const dataFuenteIndicadores = [
                 fieldValueNal: 'porcentaje_area',
                 fieldValueDepartal: 'porcentaje_area',
                 quintiles: [
-                  ['<=', 0],
-                  [0, 0.3],
-                  [0.3, 0.6],
-                  [0.6, 0.9],
-                  [0.9, '=>']
+                  ['<=', 0, '0% del área'],
+                  [0, 0.3, 'Hasta 30% del área'],
+                  [0.3, 0.6, 'Entre 30% y 60% del área'],
+                  [0.6, 0.9, 'Entre 60% y 90% del área'],
+                  [0.9, '=>', 'Más del 90% del área']
                 ]
               }
             ]
