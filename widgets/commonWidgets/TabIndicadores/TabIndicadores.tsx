@@ -801,10 +801,10 @@ const calculateExtent = (rings) => {
           <div className='legend'>
             <h3 style={{ color: 'white' }}>{/* { indicadores.label  } por  */}{selectIndicadores.label} {selectIndicadores.fieldValue === 'total_area_ha' ? '(ha)' : ''}</h3>
             <ul>
-              {constantes.coloresMapaCoropletico.map((item, index) => (
+              {constantes.coloresMapaCoropletico.map((color, index) => (
                 rangosLeyenda[index] &&
                   <li key={index}>
-                        <span style={{ backgroundColor: item.colorRgb }}></span> {` ${rangosLeyenda[index][2]?`${rangosLeyenda[index][2]} : `:''} ${rangosLeyenda[index][0]}     ${index==0?'':'-'}     ${rangosLeyenda[index][1]}`}
+                        <span style={{ backgroundColor: color.colorRgb }}></span> {` ${rangosLeyenda[index][2]?`${rangosLeyenda[index][2]} : `:''} ${rangosLeyenda[index][0]}     ${index==0?'':'-'}     ${rangosLeyenda[index][1]}`}
                   </li>
               ))}
             </ul>
