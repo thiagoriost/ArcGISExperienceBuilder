@@ -66,13 +66,13 @@ const TabIndicadores: React.FC<any> = ({
   const [clickHandler, setClickHandler] = useState(null); // Estado para almacenar el manejador del evento click y capturar las geometrias seleccionadas con un click
   const [poligonoSeleccionado, setPoligonoSeleccionado] = useState<inter_poligonoSeleccionado | undefined>(undefined);
   const [geometriaMunicipios, setGeometriaMunicipios] = useState<{ features: typeGeometria[] } | undefined>(undefined);
-  const [geometriasDepartamentos, setGeometriasDepartamentos] = useState< { features: { attributes: Indicadores; geometry: any }[] } | undefined >(undefined);
+  const [geometriasDepartamentos, setGeometriasDepartamentos] = useState< interfa_geometriasDepartamentos | undefined >(undefined);
   const [apuestaEstrategica, setApuestaEstrategica] = useState<any | undefined>(undefined);
   const [selectApuestaEstategica, setSelectApuestaEstategica] = useState<interf_APUESTA_ESTRATEGICA| undefined>(undefined);
   const [selectCategoriaTematica, setSelectCategoriaTematica] = useState<CategoriaTematica| undefined>(undefined);
-  const [indicadores, setIndicadores] = useState< ({ value: number; label: string } | { value: number; label: string })[]| null>(null);
+  const [indicadores, setIndicadores] = useState< interfa_indicadores[]| null>(null);
   const [selectIndicadores, setSelectIndicadores] = useState<InitSelectIndicadores | InterfaceIndiSelected>(initSelectIndicadores);
-  const [departmentSelect, setDepartmentSelect] = useState<{ value: string; label: string; denombre: string } | undefined>(undefined);
+  const [departmentSelect, setDepartmentSelect] = useState<interfa_itemSelected | undefined>(undefined);
   const [municipios, setMunicipios] = useState< { value: any; [key: string]: any }[] >([]);
   const [municipioSelect, setMunicipioSelect] = useState< { [key: string]: any; value: any } | undefined >(undefined);
   const [rangosLeyenda, setRangosLeyenda] = useState([]);
@@ -282,6 +282,10 @@ const TabIndicadores: React.FC<any> = ({
     fieldValueToSetRangeCoropletico,
     regionSeleccionada = "",
   }) => {
+    if (!esriModules) {
+      console.error("Esri modules are not loaded.");
+      return;
+    }
     const { SimpleFillSymbol, Polygon, Graphic, GraphicsLayer } = esriModules;
     const [geometryEngine] = await loadModules([
       "esri/geometry/geometryEngine",
@@ -461,7 +465,7 @@ const TabIndicadores: React.FC<any> = ({
         }); // realiza las consultas teniendo encuenta el fieldLabel en el Output Statistics
 
         const DATASET = ajustarDATASET({
-          dataToRenderGraphic,
+          dataToRenderGraphic: dataToRenderGraphic || [],
           regionSeleccionada,
           indiSelected,
         });
@@ -669,7 +673,7 @@ const TabIndicadores: React.FC<any> = ({
   const getDataToRenderGraficosEstadisticos = async ({
     indiSelected,
     _where = "1=1",
-    regionSeleccionada,
+    regionSeleccionada="",
   }: {
     indiSelected: IndicadorSeleccionado;
     _where: string;
@@ -739,7 +743,7 @@ const TabIndicadores: React.FC<any> = ({
    */
   const handleDepartamentoSelected = async ({ target }) => {
     const targetDepartment = target.value;
-    const itemSelected = departamentos.find(
+    const itemSelected: interfa_itemSelected = departamentos.find(
       (departamento) => departamento.value === targetDepartment
     );
     if (itemSelected.value === 0) return;
@@ -895,7 +899,11 @@ const TabIndicadores: React.FC<any> = ({
       await processMunicipioIndicator(itemSelected);
 
       // 7. Resaltar polígono del municipio
-      highlightMunicipioPolygon(itemSelected);
+      if (itemSelected) {
+        highlightMunicipioPolygon(itemSelected);
+      }else{
+        console.log({itemSelected})
+      }
     } catch (error) {
       console.error("Error en handleMunicipioSelected:", error);
       setMensajeModal({
@@ -948,11 +956,7 @@ const TabIndicadores: React.FC<any> = ({
   };
 
   // 2. Función corregida con tipado explícito
-  const highlightMunicipioPolygon = (itemSelected: {
-    mpnombre?: string;
-    mpcodigo?: string;
-    value?: any;
-  }) => {
+  const highlightMunicipioPolygon = (itemSelected: interfa_itemSelected) => {
     // Asegurar que lastLayerDeployed tenga el tipo correcto
     const layer = lastLayerDeployed as LayerDeployed;
 
@@ -1386,7 +1390,9 @@ interface interf_APUESTA_ESTRATEGICA{
   descripcion: string;
   CATEGORIA_TEMATICA: CategoriaTematica[];
   APUESTA_ESTRATEGICA:{
-    value: number; label: string; descripcion: string;
+    value: number;
+    label: string;
+    descripcion: string;
   }[]
 }
 interface CategoriaTematica {
@@ -1440,7 +1446,7 @@ interface DatasetItem {
 
 interface AjustarDatasetParams {
   dataToRenderGraphic: ChartData[];
-  regionSeleccionada: "Nacional" | "Municipal" | "Departamental";
+  regionSeleccionada: string;
   indiSelected: {
     leyendaNal: string[];
     leyenda: string[];
@@ -1507,4 +1513,23 @@ interface interface_Extent {
   xmax: number;
   ymax: number;
   spatialReference: Interface_SpatialReference;
+}
+
+interface interfa_itemSelected{
+  mpnombre?: string;
+  mpcodigo?: string;
+  value: any;
+  label?: string;
+  denombre?: string; 
+}
+
+interface interfa_geometriasDepartamentos{
+  features:{
+    attributes: Indicadores;
+    geometry: any
+  }[]
+}
+interface interfa_indicadores{
+  value: number;
+  label: string
 }
