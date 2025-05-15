@@ -147,6 +147,7 @@ const Widget = (props: AllWidgetProps<any>) => {
         }
         {/*Si el estado dado en la constante es verdadero (true), invoca método tablaResultCons(), el cual renderiza el componente DataGrid. De lo contrario, invoca método filtrosCons(), el cual renderiza el componente con los filtros del widget */ }
         {controlForms && <TablaResultCS
+          props={props}
           rows={rows}
           columns={columns}
           view={view}
@@ -162,6 +163,7 @@ const Widget = (props: AllWidgetProps<any>) => {
           ></TablaResultCS>
         }
         {!controlForms && <FiltersCS
+          props={props}
           temas={temas}
           selTema={selTema}
           setselTema={setselTema}

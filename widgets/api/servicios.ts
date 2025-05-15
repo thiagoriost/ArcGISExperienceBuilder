@@ -7,7 +7,10 @@ const urls = {
 // tablaContenido: 'https://sigquindio.gov.co:8443/ADMINSERV/AdminGeoApplication/AdminGeoWebServices/getTablaContenidoJsTree/public',
   // tablaContenido: 'http://172.17.3.205:8080/ADMINSERV/AdminGeoApplication/AdminGeoWebServices/getTablaContenidoJsTree/public',
   // tablaContenido: 'https://sae.igac.gov.co:8443/ADMINSERV/AdminGeoApplication/AdminGeoWebServices/getTablaContenidoJsTree/public', // REFORMA AGRARIA
-  tablaContenido: 'https://snra.igac.gov.co/ADMINSERV/AdminGeoApplication/AdminGeoWebServices/getTablaContenidoJsTree/public', // REFORMA AGRARIA
+  // tablaContenido: 'localhost:8080/ADMINSERV/AdminGeoApplication/AdminGeoWebServices/getTablaContenidoJsTree/public', // REFORMA AGRARIA
+  // tablaContenido: 'http://localhost:8080/ADMINSERV/AdminGeoApplication/AdminGeoWebServices/getTablaContenidoJsTree/public', // REFORMA AGRARIA
+  // tablaContenido: 'https://snra.igac.gov.co/ADMINSERV/AdminGeoApplication/AdminGeoWebServices/getTablaContenidoJsTree/public', // REFORMA AGRARIA
+  tablaContenido: '/ADMINSERV/AdminGeoApplication/AdminGeoWebServices/getTablaContenidoJsTree/public', // REFORMA AGRARIA docker
   // tablaContenido: 'https://sae.igac.gov.co:8444/ADMINSERV/AdminGeoApplication/AdminGeoWebServices/getTablaContenidoJsTree/public', // FIRMAS ESPECTRALES
 
   Municipios: `${MapServerMunicipal}/0`,
@@ -51,9 +54,7 @@ const urls = {
     v_predios_actualizados_depto: `${mapServerDepartal}/15`,
     v_municipios_actualizados_depto: `${mapServerDepartal}/16`,
     v_predios_zrc_mun: `${MapServerMunicipal}/15`,
-    v_indice_gini_ids_depto: `${mapServerDepartal}/9`,
-
-
+    v_indice_gini_ids_depto: `${mapServerDepartal}/9`
 
   },
   /* indicadoresNaci: { // nacionales Indicadores_nacionales_municipales

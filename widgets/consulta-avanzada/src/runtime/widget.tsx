@@ -447,6 +447,7 @@ const ConsultaAvanzada = (props: AllWidgetProps<any>) => {
     setLayerSelectedDeployed(null)
     jimuMapView.view.map.removeAll()
     goToInitialExtent(jimuMapView, initialExtent)
+    setMostrarResultadoFeaturesConsulta(false)
   }
 
   const removeLayer = (layer: __esri.Layer) => {
@@ -595,7 +596,7 @@ const ConsultaAvanzada = (props: AllWidgetProps<any>) => {
     // setValores([])
     const campo = target.value
     setCampo(campo)
-    const adicionSimbolo = `${condicionBusqueda} ${campo}`
+    const adicionSimbolo = `${condicionBusqueda}${campo}`
     setCondicionBusqueda(adicionSimbolo)
     setValorSelected(null)
   }
@@ -606,7 +607,7 @@ const ConsultaAvanzada = (props: AllWidgetProps<any>) => {
   }
 
   const handleValor = ({ target }) => {
-    const adicionValor = `${condicionBusqueda} ${typeof (target.value) === 'number' ? target.value : `' ${target.value} '`} `
+    const adicionValor = `${condicionBusqueda} ${typeof (target.value) === 'number'?target.value :`'${target.value}'`}`
     setValorSelected(target.value)
     setCondicionBusqueda(adicionValor)
   }
@@ -785,6 +786,13 @@ const ConsultaAvanzada = (props: AllWidgetProps<any>) => {
     return () => {}
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [servicios])
+
+  useEffect(() => {
+    if (props.state === 'CLOSED') {
+      limpiarFormulario({target:{value:''}})
+    }
+  }, [props.state])
+  
 
   useEffect(() => {
     // setResponseConsulta(dataPruebaResponse)

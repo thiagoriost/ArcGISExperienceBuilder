@@ -2,7 +2,7 @@
     Sección de importación
     @date 2024-06-11
 */
-import React from "react";
+import React, { useEffect } from "react";
 
 import DataGrid from "react-data-grid"; 
 import 'react-data-grid/lib/styles.css';
@@ -35,7 +35,7 @@ import { typeMSM } from "../../types/interfaceResponseConsultaSimple";
  * @param setAlertDial
  * @param setMensModal
  */
-const TablaResultCS = function({rows, columns, view, setControlForms, jimuMapView, setResponseConsultaSimple, lastGeometriDeployed, setLastGeometriDeployed, typeGraphMap, spatialRefer, setAlertDial, setMensModal}){
+const TablaResultCS = function({props, rows, columns, view, setControlForms, jimuMapView, setResponseConsultaSimple, lastGeometriDeployed, setLastGeometriDeployed, typeGraphMap, spatialRefer, setAlertDial, setMensModal}){
     /**
      * método limpiarCapaMapa() => quita capa del mapa asociada al filtro consulta simple. Centra el mapa con un nivel de ampliación a 6 unidades
      * @date 2024-06-17
@@ -343,6 +343,12 @@ const TablaResultCS = function({rows, columns, view, setControlForms, jimuMapVie
           }
           return nTime;      
       }
+
+    useEffect(() => {
+      if (props.state === 'CLOSED') {
+        retornarFormulario()
+      }
+    }, [props.state])
   return (
     <>
         <Button size="sm" className="mb-1" type="primary" onClick={retornarFormulario}>

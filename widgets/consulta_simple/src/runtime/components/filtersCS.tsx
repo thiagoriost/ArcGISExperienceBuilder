@@ -15,7 +15,7 @@ import { urls } from '../../../../api/servicios';
  * @param param0 
  * @returns (HTML)
  */
-const FiltersCS = function({jsonSERV, setJsonSERV, temas, setTemas, subtemas, setSubtemas, capas, setCapas, urlCapa, setUrlCapa, grupos,
+const FiltersCS = function({props, jsonSERV, setJsonSERV, temas, setTemas, subtemas, setSubtemas, capas, setCapas, urlCapa, setUrlCapa, grupos,
   setGrupos, capasAttr, setCapasAttr, txtValorState, setValorState, txtValor, setValor, selTema, setselTema, selSubtema, setselSubtema,
   selGrupo, setselGrupo, selCapas, setselCapas, selAttr, setselAttr, ResponseConsultaSimple, setResponseConsultaSimple, view, setView,
   jimuMapView, lastGeometriDeployed, condic, setCond, setRenderMap, setAlertDial, mensModal, setMensModal, setIsLoading}){
@@ -682,6 +682,13 @@ const FiltersCS = function({jsonSERV, setJsonSERV, temas, setTemas, subtemas, se
      * @remarks Estructura de las opciones en objeto selOptions = [{label:"Tema_11", value: "11"},{label:"Tema_22", value: "22"},{label:"Tema_3",value:"3"}];    
      */
     const [utilsModule, setUtilsModule] = useState(null);
+
+    useEffect(() => {
+          if (props.state === 'CLOSED') {
+            limpiarCons({target:{value:''}})
+          }
+        }, [props.state])
+    
     
     useEffect(() =>
     {      
