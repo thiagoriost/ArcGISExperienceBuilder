@@ -65,7 +65,10 @@ const ConsultaAvanzada = (props: AllWidgetProps<any>) => {
   */
   const getJSONContenido = async (jsonSERV) => {
     try {
-      const urlServicioTOC = servicios.urls.tablaContenido
+      const baseURL = process.env.REACT_APP_BASE_URL + process.env.REACT_APP_WILDFLY_PORT
+      const urlServicioTOC = `${baseURL}${servicios.urls.tablaContenido}`
+      console.log({ urlServicioTOC })
+      // const urlServicioTOC = servicios.urls.tablaContenido
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       let nombreServicio: any
       let idTematica
@@ -607,7 +610,7 @@ const ConsultaAvanzada = (props: AllWidgetProps<any>) => {
   }
 
   const handleValor = ({ target }) => {
-    const adicionValor = `${condicionBusqueda} ${typeof (target.value) === 'number'?target.value :`'${target.value}'`}`
+    const adicionValor = `${condicionBusqueda} ${typeof (target.value) === 'number' ? target.value : `'${target.value}'`}`
     setValorSelected(target.value)
     setCondicionBusqueda(adicionValor)
   }
@@ -789,10 +792,9 @@ const ConsultaAvanzada = (props: AllWidgetProps<any>) => {
 
   useEffect(() => {
     if (props.state === 'CLOSED') {
-      limpiarFormulario({target:{value:''}})
+      limpiarFormulario({ target: { value: '' } })
     }
   }, [props.state])
-  
 
   useEffect(() => {
     // setResponseConsulta(dataPruebaResponse)

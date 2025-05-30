@@ -67,9 +67,9 @@ export default Widget
    * En este meto se realiza la consulta del jeison de la tabla de contenido
    */
 export const getDataTablaContenido = async (servicios: { urls: { tablaContenido: string } }) => {
-  // const baseURL = process.env.REACT_APP_BASE_URL + process.env.REACT_APP_WILDFLY_PORT
-  // const url = `${baseURL}${servicios.urls.tablaContenido}`
-  const url = servicios.urls.tablaContenido
+  const baseURL = process.env.REACT_APP_BASE_URL + process.env.REACT_APP_WILDFLY_PORT
+  const url = `${baseURL}${servicios.urls.tablaContenido}`
+  // const url = servicios.urls.tablaContenido
   let responseTablaDeContenido: TablaDeContenidoInterface[] = []
   // let responseTablaDeContenido: any[] = [];
   try {

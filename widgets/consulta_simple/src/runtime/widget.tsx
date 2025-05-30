@@ -38,6 +38,7 @@ const Widget = (props: AllWidgetProps<any>) => {
   const [selAttr, setselAttr] = useState(undefined)
   const [urlCapa, setUrlCapa] = useState('')
   const [widgetModules, setWidgetModules] = useState(null)
+  const [servicios, setServicios] = useState(null)
 
   //2024-06-13 - DataGrid
   const [rows, setRows] = useState([])
