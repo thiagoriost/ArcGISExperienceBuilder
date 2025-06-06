@@ -12,7 +12,8 @@ const urls = {
   // tablaContenido: 'https://snra.igac.gov.co/ADMINSERV/AdminGeoApplication/AdminGeoWebServices/getTablaContenidoJsTree/public', // REFORMA AGRARIA
   tablaContenido: '/ADMINSERV/AdminGeoApplication/AdminGeoWebServices/getTablaContenidoJsTree/public', // REFORMA AGRARIA docker
   // tablaContenido: 'https://sae.igac.gov.co:8444/ADMINSERV/AdminGeoApplication/AdminGeoWebServices/getTablaContenidoJsTree/public', // FIRMAS ESPECTRALES
-
+  firmasEsp:"https://pruebassig.igac.gov.co/server/rest/services/FE_Edicion/MapServer/0",
+  
   Municipios: `${MapServerMunicipal}/0`,
   Departamentos: `${MapServerMunicipal}/1`,
 

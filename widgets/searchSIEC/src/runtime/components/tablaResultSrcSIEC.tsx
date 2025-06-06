@@ -11,8 +11,10 @@
     @changes Importar componente webMercatorUtils (utilidades del sistema)
     @dateUpdated 2025-05-19
     @changes Importar objeto pathDataGridSIEC desde dataDG
+    @dateUpdated 2025-05-30
+    @changes Importar objeto useEffect
 */
-import React from "react";
+import React, { useEffect } from "react";
 
 import { DataGrid } from "@mui/x-data-grid";
 
@@ -36,96 +38,15 @@ import '@mui/x-data-grid/lib/style.css';
 //Imagenes - Path del sistema acceso (2025-05-19)
 import { pathDataGridSIEC } from '../../types/dataDG';
 
-/**
- * Componente tablaResultSrcSIEC => Visualiza la tabla de búsqueda firma, asociado a un Data Grid
- * @date 2025-04-01
- * @author IGAC - DIP
- * @param rows
- * @param columns
- * @param view
- * @param setControlForms 
- * @param setResponseBusquedaFirma 
- * @param typeGraphMap (NU)
- * @param spatialRefer
- * @param setAlertDial
- * @param setMensModal
- * @param pagination
- * @param paginationModel
- * @param setPaginationModel
- * @param files
- * @param setFiles
- * @param modalDetail
- * @param setModalDetail
- * @param props
- * @param initialExtent
- * @param modalHead
- * @param setModalHeadState
- * @param modalBody
- * @param setModalBodyState
- * @param jsonDpto
- * @param setJsonDptoState
- * @param jsonMpio
- * @param setJsonMpioState
- * @dateUpdated 2025-04-09
- * @changes Adición param (prop) pagination para paginar data grid 
- * @changes Adición param (prop) paginationModel para paginar data grid 
- * @changes Adición param (prop) setPaginationModel para paginar data grid 
- * @dateUpdated 2025-04-10
- * @changes Actualización atributos color, y background-color, para presentación del componente DataGrid.
- * @dateUpdated 2025-04-11
- * @changes Adición estados para implementar opción Descargar, pasados al componente DataGrid
- * @dateUpdated 2025-04-15
- * @changes Importar componente Modal, para implementar opción Detalles
- * @changes Adición param (prop) modalDetail, para implementar opción Detalles
- * @changes Adición param (prop) setModalDetail, para implementar opción Detalles
- * @dateUpdated 2025-05-08
- * @changes Uso del parámetro rows
- * @dateUpdated 2025-05-12
- * @changes Uso del parámetro props
- * @dateUpdated 2025-05-14
- * @changes Uso del parámetro initialExtent
- * @dateUpdated 2025-05-16
- * @changes Uso del parámetro modalHead
- * @changes Uso del parámetro setModalHeadState
- * @changes Uso del parámetro modalBody
- * @changes Uso del parámetro setModalBodyState
- * @dateUpdated 2025-05-20
- * @changes Nombre del archivo en la parte inferior de la imagen
- * @changes Visualización imagen en ventana nueva, seleccionando la imagen del modal (thumbail)
- * @dateUpdated 2025-05-22
- * @changes Uso del parámetro jsonDpto
- * @changes Uso del parámetro setJsonDptoState
- * @changes Uso del parámetro jsonMpio
- * @changes Uso del parámetro setJsonMpioState
- * @Remarks componente datatable en https://primereact.org/datatable/
- */
-const tablaResultSrcSIEC = function({rows, columns, view, setControlForms, jimuMapView, setResponseBusquedaFirma, typeGraphMap,  setAlertDial, setMensModal, pagination, paginationModel, setPaginationModel, files, setFiles, modalDetail, setModalDetail, props, initialExtent, modalHead, setModalHeadState, modalBody, setModalBodyState, jsonDpto, setJsonDptoState, jsonMpio, setJsonMpioState}){
-
+const tablaResultSrcSIEC = function({rows, view, setControlForms, jimuMapView, setResponseBusquedaFirma, paginationModel, setPaginationModel, files, setFiles, modalDetail, setModalDetail, props, initialExtent, modalHead, setModalHeadState, modalBody, setModalBodyState, jsonDpto, jsonMpio}){
+    console.log("tablaResultSrcSIEC",
+        {rows}
+    )
+    if (rows.length > 0) {
+        debugger
+    }
     
-    /**
-     * Columnas del componente DataGrid, invocado desde el componente tablaResultSrcSIEC
-     * @date 2025-04-09
-     * @author IGAC - DIP
-     * @dateUpdated 2025-04-10
-     * @changes Adaptación del atributo width a todas las columnas
-     * @changes Adaptación columna Operaciones, para adicionar botón Descarga
-     * @dateUpdated 2025-05-09
-     * @changes Incluir columnas según el consumo del servicio
-     * @dateUpdated 2025-05-12
-     * @changes Actualizar ancho (width) a campo Código Firma 180 => 240  
-     * @changes Actualizar ancho (width) a campo Instrumento 220 => 270 
-     * @changes Actualizar ancho (width) a campo Proyecto 210 => 240  
-     * @changes Actualizar ancho (width) a campo Archivo firma 220 => 270
-     * @dateUpdated 2025-05-16
-     * @changes Unificación opción Detalles
-     * @changes Actualización invocación método openCloseModalDetail
-     * @changes Actualizar ancho (width) a campo Operaciones 106 => 220
-     * @changes Actualizar ancho (width) a campo Instrumento 270 => 340
-     * @changes Actualizar ancho (width) a campo Archivo firma 270 => 450 (320 Opt)
-     * @dateUpdated 2025-05-23
-     * @changes Actualizar ancho (width) a campo Ubicación 90 => 340
-     * @remarks Fuente consulta https://stackoverflow.com/questions/64331095/how-to-add-a-button-to-every-row-in-mui-x-data-grid
-     */
+    
     const columnsSrcSIEC = [
         {field:"id", headerName:"Object Id", width: 78},    
         {field:"type", headerName:"Cobertura", width: 150},
@@ -280,10 +201,10 @@ const tablaResultSrcSIEC = function({rows, columns, view, setControlForms, jimuM
      */
     const retornarFormulario = function() {
         if (view){
-          limpiarCapaMapa();
+            limpiarCapaMapa();
         }
         setControlForms(false);
-      }
+    }
    
     /**
      * Método openCloseModalDetail => abre / cierra modal asociado a la opción Detalles
@@ -457,14 +378,17 @@ const tablaResultSrcSIEC = function({rows, columns, view, setControlForms, jimuM
    * @dateUpdated 2025-05-14
    * @changes Incluir llamado al método goToInitialExtent(), para reasignar el mapa a su estado inicial
    * @changes Mantenimiento método, para llamado del borrado de markers anteriores, al reprocesar consulta
+   * @dateUpdated 2025-05-29
+   * @changes Fix bug borrado de markers, al no existir alguno
    * @remarks método obtenido del componente FiltersSrcSIEC*/
 
     function componentDidUpdate ()
     {
         //Borrado de markers anteriores
-        jimuMapView.view.map.removeAll();
-        console.log("Punto borrado correctamente al reprocesar consulta");
-
+        if (jimuMapView){
+            jimuMapView.view.map.removeAll();
+            console.log("Punto borrado correctamente al reprocesar consulta");
+        }
         if (props.state === 'CLOSED'){
             console.log("Cerrado...");
             retornarFormulario();
@@ -502,13 +426,15 @@ const tablaResultSrcSIEC = function({rows, columns, view, setControlForms, jimuM
      * Hook para ejecución del Data Grid
      * @date 2025-05-13
      * @author IGAC - DIP
+     * @dateupdated 2025-05-30
+     * @changes Habilitación hook con análisis state sobre objeto rows
      */
     
-    /* useEffect(() => {
+    useEffect(() => {
         componentDidUpdate();
     },
-    [props.state]); */
-     componentDidUpdate();
+    [rows]);
+     
   return (
     <>
         <Button size="sm" className="mb-1" type="primary" onClick={retornarFormulario}>

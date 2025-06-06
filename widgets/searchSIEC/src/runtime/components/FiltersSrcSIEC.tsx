@@ -32,9 +32,7 @@ import Sketch  from "@arcgis/core/widgets/Sketch";
 import Point from "esri/geometry/Point";
 
 //Importaciones varias
-import { url } from 'inspector';
-import { sync } from 'glob';
-import { codDeptoDivip } from '../../types/dataDG';
+import { codDeptoDivip, outFieldsService } from '../../types/dataDG';
 
 /**
  * Componente FiltersSrcSIEC
@@ -93,6 +91,9 @@ import { codDeptoDivip } from '../../types/dataDG';
  * @param setJsonDptoState
  * @param jsonMpio
  * @param setJsonMpioState
+ * @param isLoad
+ * @param setIsLoadState
+ * @param setWidgetModules
  * @dateUpdated 2025-04-03
  * @changes Adicionar las opciones excluyentes "Seleccionar Area" y "Navegar" como radio buttons
  * @dateUpdated 2025-04-07
@@ -169,10 +170,14 @@ import { codDeptoDivip } from '../../types/dataDG';
  * @changes Cargue parámetro setJsonDptoState
  * @changes Cargue parámetro jsonMpio
  * @changes Cargue parámetro setJsonMpioState
+ * @dateUpdated 2025-05-29
+ * @changes Cargue parámetro isLoad
+ * @changes Cargue parámetro setIsLoadState
+ * @changes Cargue parámetro setWidgetModules
  * @remarks Fuente consulta https://mui.com/material-ui/react-radio-button
  * @returns (HTML)
  */
-const FiltersSrcSIEC = function({jsonSERV, setJsonSERV, selCoberVal, setCoberState, coberLst, setCoberLst, radValueNav, setValueNav, txtValorLat, setValorLatState, txtValorLatSuIz, setValorLatSuIzState, txtValorLatInDe, setValorLatInDeState, txtValorLon, setValorLonState, txtValorLonSuIz, setValorLonSuIzState, txtValorLonInDe, setValorLonInDeState, lonPto, setLonPtoState, latPto, setLatPtoState, lonSuIz, setLonSuIzState, latSuIz, setLatSuIzState, lonInDe, setLonInDeState, latInDe, setLatInDeState,selProyVal, setProyState, proyLst, setProyLst, selCampaVal, setCampaState, campaLst, setCampaLst, ResponseBusquedaFirma, setResponseBusquedaFirma, view, setView, jimuMapView, setAlertDial, mensModal, setMensModal, setControlForms, controlForms, props, sketchWeb, setRows, initialExtent, jsonDpto, setJsonDptoState, jsonMpio, setJsonMpioState}){
+const FiltersSrcSIEC = function({jsonSERV, setJsonSERV, selCoberVal, setCoberState, coberLst, setCoberLst, radValueNav, setValueNav, txtValorLat, setValorLatState, txtValorLatSuIz, setValorLatSuIzState, txtValorLatInDe, setValorLatInDeState, txtValorLon, setValorLonState, txtValorLonSuIz, setValorLonSuIzState, txtValorLonInDe, setValorLonInDeState, lonPto, setLonPtoState, latPto, setLatPtoState, lonSuIz, setLonSuIzState, latSuIz, setLatSuIzState, lonInDe, setLonInDeState, latInDe, setLatInDeState,selProyVal, setProyState, proyLst, setProyLst, selCampaVal, setCampaState, campaLst, setCampaLst, ResponseBusquedaFirma, setResponseBusquedaFirma, view, setView, jimuMapView, setAlertDial, mensModal, setMensModal, setControlForms, controlForms, props, sketchWeb, setRows, initialExtent, jsonDpto, setJsonDptoState, jsonMpio, setJsonMpioState, isLoad, setIsLoadState, setWidgetModules}){
   /*console.log("Verif valor state latitud =>", txtValorLat);
   console.log("Verif valor state longitud =>",txtValorLon);*/
   console.log("Verif Radio opc =>",radValueNav);
@@ -192,25 +197,6 @@ const FiltersSrcSIEC = function({jsonSERV, setJsonSERV, selCoberVal, setCoberSta
     console.log("Verif coordenada long pto =>", txtValorLon);
   }
 
-  /**
-   * Método ciclo vida componentDidUpdate => implementación de cierre del widget Buscar Firma, incluyendo la operación "reset" en cada uno de los controles del filtro.
-   * @date 2025-04-15
-   * @author IGAC - DIP
-   * @dateUpdated 2025-05-02
-   * @changes Invocar cierre del widget Sketch al cerrar
-   * @dateUpdated 2025-05-05
-   * @changes Recrear objeto asociado al widget Sketch, cuando éste no existe
-   * @changes Actualizar atributo visible, asociado al objeto widget Sketch
-   * @changes Borrar todos los polígonos de selección al cerrar widget
-   * @dateUpdated 2025-05-06
-   * @changes Implementar opciones radio "Navegar" o "Seleccionar Area"
-   * @dateUpdated 2025-05-13
-   * @changes Implementar borrado de markers en mapa, al cerrar widget
-   * @dateUpdated 2025-05-14
-   * @changes Uso del parámetro initialExtent, a través del método goToInitialExtent()
-   * @remarks  
-   */
-  
   function componentDidUpdate ()
   {
       if (props.state === 'CLOSED'){
@@ -244,7 +230,9 @@ const FiltersSrcSIEC = function({jsonSERV, setJsonSERV, selCoberVal, setCoberSta
       {
         console.log("En pruebas widget abierto...");
         console.log("Estado del sketch =>",sketchWeb);
-        console.log("Valor radio =>",radValueNav);
+        console.log("Valor radio =>",radValueNav);        
+        //Establecer atributo cargando en falso
+        setIsLoadState(false);
 
         //Validación para recrear objeto asociado al widget Sketch, cuando se selecciona opción "Seleccionar Area"
         if (radValueNav === 'selArea')
@@ -325,19 +313,7 @@ const FiltersSrcSIEC = function({jsonSERV, setJsonSERV, selCoberVal, setCoberSta
       }
     }
 
-    /**
-      getJSONData => método para cargue inicial del contenido en  servidor remoto
-      @date 2025-04-08
-      @author IGAC - DIP
-      @param (String) jsonSERV => Variable que guarda la data traida del servidor
-      @dateUpdated 2025-04-23
-      @changes Implementar control de errores en la lógica de solicitud petición al servidor remoto.
-      @dateUpdated 2025-04-29
-      @changes Actualizar función en modo asincrónico en la operación fetch
-      @return (String)
-      @remarks FUENTE: https://www.freecodecamp.org/news/how-to-fetch-api-data-in-react/
-      @remarks URL principal https://pruebassig.igac.gov.co/server/rest/services/FE_Edicion/MapServer/0/query?where=divipoladepto%3D%2717%27&text=&objectIds=&time=&timeRelation=esriTimeRelationOverlaps&geometry=&geometryType=esriGeometryEnvelope&inSR=&spatialRel=esriSpatialRelIntersects&distance=&units=esriSRUnit_Kilometer&relationParam=&outFields=*&returnGeometry=false&returnTrueCurves=false&maxAllowableOffset=&geometryPrecision=&outSR=&havingClause=&returnIdsOnly=false&returnCountOnly=false&orderByFields=&groupByFieldsForStatistics=&outStatistics=&returnZ=false&returnM=false&gdbVersion=&historicMoment=&returnDistinctValues=false&resultOffset=&resultRecordCount=&returnExtentOnly=false&sqlFormat=none&datumTransformation=&parameterValues=&rangeValues=&quantizationParameters=&featureEncoding=esriDefault&f=pjson
-  */
+   
     async function getJSONData()
     {       
       const urlServicioSIEC = await getWhere('*', urls.firmasEsp, false,
@@ -354,14 +330,13 @@ const FiltersSrcSIEC = function({jsonSERV, setJsonSERV, selCoberVal, setCoberSta
           return rows.json();
         })
         .then((data) => {
-          
+          //Desactivar estado cargando
+          setIsLoadState(false);
+
           console.log("Contenido json desde petición =>", data);
           console.log("Contenido longitud =>",data.features.length);
           //Seteo de los datos asociados desde el consumo del Web service
           setJsonSERV(data.features);
-
-          //Cargue lista de municipios
-          //OJO
         })
       }
       catch (error)
@@ -371,23 +346,11 @@ const FiltersSrcSIEC = function({jsonSERV, setJsonSERV, selCoberVal, setCoberSta
       }
     }
 
-    /**
-     * getJSONProyectos => método para cargue del contenido alusivo al listado de proyectos desde el servidor de contenidos
-      @date 2025-04-08
-      @author IGAC - DIP
-      @param (String) jsonSERV => Data traida desde el consumo del servicio
-      @dateUpdated 2025-04-22
-      @changes Asignación listado de proyectos al state lista proyectos      
-      @dateUpdated 2025-04-29
-      @changes Adición opción [Todos] a la lista de proyectos
-      @return (String)
-      @remarks Adición de elementos a un array JSON en https://medium.com/@navneetskahlon/manipulating-immutable-json-arrays-in-javascript-insertion-update-and-deletion-728740af1693
-     */
-
-      async function getJSONProyectos()
+  
+    function getJSONProyectos()
       {
-        var jsonSIEC: any;
-        var proyectos = [];          
+        var jsonSIEC: any           = "";
+        var proyectos: Array<string>= [];          
         console.log("Ingresando a proyectos data...=>",jsonSERV);
         
         //Obtener listado de proyectos
@@ -395,7 +358,18 @@ const FiltersSrcSIEC = function({jsonSERV, setJsonSERV, selCoberVal, setCoberSta
         {
           //console.log("Contenido data.features"+" "+cont+" ",jsonSERV[cont].attributes);
             /*proyectos = data.features[cont].projectname;
-            console.log("Proyecto "+cont+" =>",proyectos);*/           
+            console.log("Proyecto "+cont+" =>",proyectos);*/
+            //Adicionar item [Todos]
+            if (cont === 0)
+            {
+              jsonSIEC = {
+                "objectid": "*",
+                "codigofirma": "*",
+                "projectname": "[Todos]"
+              };
+              proyectos.push(jsonSIEC);
+            }
+
             if (jsonSERV[cont].attributes.projectname != null)
             {
               jsonSIEC = {
@@ -408,7 +382,7 @@ const FiltersSrcSIEC = function({jsonSERV, setJsonSERV, selCoberVal, setCoberSta
             }
         }
         //Adicionar item [Todos]
-        cont = 0;
+        /* cont = 0;
         while (cont < proyectos.length)
         {
             jsonSIEC = {
@@ -418,7 +392,7 @@ const FiltersSrcSIEC = function({jsonSERV, setJsonSERV, selCoberVal, setCoberSta
             };
             proyectos.unshift(jsonSIEC);
             break;
-        }        
+        }   */      
         proyectos = procesaDuplic (proyectos, 'prj');
 
         //console.log("Lista proyectos incluyendo todos =>",proyArr);
@@ -431,14 +405,8 @@ const FiltersSrcSIEC = function({jsonSERV, setJsonSERV, selCoberVal, setCoberSta
         
       }
 
-    /**
-     * Método getJSONCober => Obtener listado de coberturas
-     * @date 2025-04-22
-     * @author IGAC- DIP     
-     * @returns (String) Listado de cobertura en formato JSON
-     * @remarks asociado al método getJSONProyectos
-     */
-    function getJSONCober()
+   
+      function getJSONCober()
     {
         var jsonSIEC: any;
         var coberturaArr = [];
@@ -460,18 +428,28 @@ const FiltersSrcSIEC = function({jsonSERV, setJsonSERV, selCoberVal, setCoberSta
             }
         }
         coberturaArr = procesaDuplic (coberturaArr, 'cov');
-        //console.log("Lista coberturas =>",coberturaArr);
-        //Actualización sobre el objeto coberLst
-        setCoberLst(coberturaArr);
+        
+        
+        const sonArreglosIguales = (arr1, arr2) => {
+          console.log({arr1, arr2})
+          if (arr1.length != arr2.length) return true;
+          
+          // Comparar cada elemento en orden
+          for (let i = 0; i < arr1.length; i++) {
+            if (arr1[i] !== arr2[i]) return true;
+          }
+          
+          return false;
+        }
+        
+        // if (sonArreglosIguales(coberturaArr, coberLst)) {
+          setCoberLst(coberturaArr);          
+        // }
     }
 
-    /**
-     * getJSONDeptoLst => método para proporcionar Lista de departamentos proporcionado por el servicio dado en Departamentos
-     * @date 2025-05-22
-     * @author IGAC - DIP
-     * @returns (String) Salida en formato JSON con el código y nombre del departamento resultado del consumo al servicio
-     * @remarks Se desactiva llamado desde hook, por uso del servicio de municipios (https://pruebassig.igac.gov.co/server/rest/services/Indicadores_municipios/MapServer/0/)
-     */
+    
+
+   
     const getJSONDeptoLst = async function ()
     {
       //Cargue lista de departamentos
@@ -490,7 +468,8 @@ const FiltersSrcSIEC = function({jsonSERV, setJsonSERV, selCoberVal, setCoberSta
           return rows.json();
         })
         .then((data) => {
-          
+          //Desactivar modo cargando
+          setIsLoadState(false);
           console.log("Contenido dptos json desde petición =>", data.features);
           console.log("Contenido longitud =>",data.features.length);
           
@@ -505,16 +484,7 @@ const FiltersSrcSIEC = function({jsonSERV, setJsonSERV, selCoberVal, setCoberSta
       } 
     }
 
-    /**
-     * getJSONMpioLst => método para proporcionar listado de municipios según Divipola
-     * @date 2025-05-22
-     * @author IGAC - DIP
-     * @param codDpto
-     * @dateUpdated 2025-05-23
-     * @changes Optimizar cargue municipio, dado por parámetro codDpto
-     * @returns (String) Salida en formato JSON con el código y nombre del municipio resultado del consumo al servicio
-     * @remarks se desactiva llamado desde método generateRowsDG y se unifica
-     */
+   
     const getJSONMpioLst = async function (codDpto) {
       const urlDivipolaMpios = await getWhere('mpcodigo,mpnombre,decodigo,depto',urls.Municipios, false, "decodigo='"+codDpto+"'", '', '', '', '', '', '', '');
       console.log("URL consumo divipola mpios =>",urlDivipolaMpios);
@@ -553,20 +523,7 @@ const FiltersSrcSIEC = function({jsonSERV, setJsonSERV, selCoberVal, setCoberSta
         throw error;
       } 
     }
-    /**
-     * getCampaByProj => Método para obtener listado de campañas asociado a un proyecto del filtro Proyecto (parámetro proy)
-     * @date 2025-04-22
-     * @author IGAC - DIP
-     * @param proyId
-     * @param proy
-     * @dateUpdated 2025-04-29
-     * @changes Inclusión de la opción [Todas] al control campañas, al seleccionar un proyecto, o al seleccionar todos en control Proyectos
-     * @dateUpdated 2025-04-30
-     * @changes Cuando se selecciona la opción "[Todos]" en control proyectos, desplegar todas las campañas
-     * @dateUpdated 2025-05-07
-     * @changes Fix Lista campañas, al seleccionar del control Proyecto, la opción [Todos], se visualizan todas las campañas
-     * @remarks asociado al método getJSONProyectos
-     */
+   
     function getCampaByProj (proyId, proy)
     {
       console.log("ID proyecto asociado =>",proyId);
@@ -592,6 +549,18 @@ const FiltersSrcSIEC = function({jsonSERV, setJsonSERV, selCoberVal, setCoberSta
         //console.log("Contenido data.features"+" "+cont+" ",jsonSERV[cont].attributes);
         /*proyectos = data.features[cont].projectname;
         console.log("Proyecto "+cont+" =>",proyectos);*/
+        //Incluir la opción Todas
+        //{"objectid": "*","codigofirma": null, "projectname": null, "campananame": "[Todas]"}
+        if (cont === 0)
+        {
+          jsonSIEC = {
+            "objectid": "*",
+            "codigofirma": "*",
+            "projectname": null,
+            "campananame": "[Todas]"
+          };
+          campaArr.push(jsonSIEC);
+        }
         if ((jsonSERV[cont].attributes.projectname != null && 
             (jsonSERV[cont].attributes.projectname === proy || proyId === "*")
             ) && jsonSERV[cont].attributes.campananame != null)
@@ -607,44 +576,12 @@ const FiltersSrcSIEC = function({jsonSERV, setJsonSERV, selCoberVal, setCoberSta
       }
       campaArr = procesaDuplic (campaArr, 'cam');
       
-      //Incluir la opción Todas
-      //{"objectid": "*","codigofirma": null, "projectname": null, "campananame": "[Todas]"}
-      jsonSIEC = {
-        "objectid": "*",
-        "codigofirma": "*",
-        "projectname": null,
-        "campananame": "[Todas]"
-      };
-      campaArr.unshift(jsonSIEC); 
       console.log("Lista campañas =>",campaArr);
       
       //Set al state de campañas
       setCampaLst(campaArr);
     }
-    /**
-     * Método para construcción de la cláusula WHERE asociado al servicio de firmas espectrales.
-     * @date 2025-04-16
-     * @author IGAC - DIP
-     * @param OutFields = '*'
-     * @param url
-     * @param returnGeometry = false
-     * @param where = '1=1'
-     * @param inputGeometry
-     * @param geometryType
-     * @param insr
-     * @param spatialRel
-     * @dateUpdated 2025-05-08
-     * @changes Inclusión parametro inputGeometry para registro de coordenadas latitud, longitud
-     * @changes Inclusión parametro geometryType para registro de coordenadas latitud, longitud
-     * @changes Inclusión parametro insr para registro de coordenadas latitud, longitud
-     * @changes Inclusión parametro spatialRel para registro de coordenadas latitud, longitud
-     * @dateUpdated 2025-05-09
-     * @changes Corrección parámetro base inputGeometry => geometry
-     * @changes Corrección parámetro where '1=1' => ''
-     * @dateUpdated 2025-05-12
-     * @changes Adición parámetro outSR
-     * @remarks módulo obtenido del proyecto REFA, fuente module.ts 
-     */
+   
     const getWhere = 
       async function(
         OutFields='*',
@@ -711,39 +648,6 @@ const FiltersSrcSIEC = function({jsonSERV, setJsonSERV, selCoberVal, setCoberSta
         }
     }
   
-      
-    /* Implementación de la función alterna _.where
-      @date 2024-05-22
-      @author IGAC - DIP
-      @param (Array) array: Array de búsqueda
-      @param (Object) object: Criterio para ser buscado como un objeto
-      @returns (Array) Elemento del array que se busca
-      @remarks método obtenido de Internet (https://stackoverflow.com/questions/58823625/underscore-where-es6-typescript-alternative)
-    */
-    function where(array, object) {
-      let keys = Object.keys(object);
-      return array.filter(item => keys.every(key => item[key] === object[key]));
-    }
-
-    
-    
-    
-    /**
-     * método procesaDuplic => Verifica unicidad de elementos en un array tipo JSON
-     * @param (Array) arrResult => Array con items duplicados
-     * @param (String) opc => opción para filtrado.
-     * @date 2024-06-27
-     * @author IGAC - DIP
-     * @dateUpdated 2025-04-16
-     * @changes Adicionar parametro opc, correspondiente al objeto que se filtra
-     * @dateUpdated 2025-04-22
-     * @changes Adicionar opción 'cov', correspondiente a la cobertura
-     * @dateUpdated 2025-05-07
-     * @changes Caso 'cam' => Actualización filtro campañas unicas (t.campananame === obj.campananame && t.projectname === obj.projectname => t.campananame === obj.campananame)
-     * @returns (Array) Array JSON sin items duplicados
-     * @remarks método obtenido desde URL https://www.geeksforgeeks.org/how-to-remove-duplicates-in-json-array-javascript/
-     */
-    
     function procesaDuplic(arrResult, opc){
       let newArrResult = [];
       switch (opc)
@@ -784,42 +688,18 @@ const FiltersSrcSIEC = function({jsonSERV, setJsonSERV, selCoberVal, setCoberSta
       
   }
    
-    /** 
-      handleTxtChangevalor => Método para cambio de estado, en el campo Latitud que permita setear contenido
-      @date 2025-04-02
-      @author IGAC - DIP
-      @param (Object) event => objeto que representa el evento de cambio de valor en el control Valor
-      @dateUpdated 2025-05-02
-      @changes Borrado del polígono asociado al mapa, al traer coordenadas en los controles
-      @remarks FUENTE => https://www.geeksforgeeks.org/how-to-handle-input-forms-with-usestate-hook-in-react/
-    */
-      const handleTxtChangevalor = function (event) {
+  const handleTxtChangevalor = function (event) {
         //console.log("Estado actual =>",txtValorState);
         setValorLatState(event.target.value);
         //Borrar polígono de selección - En curso
         //jimuMapView.view.ui.delete(sketchWeb);
       }
-    /**
-     * handleTxtChangevalorLon => Método para cambio de estado, en el campo Longitud que permita setear contenido
-      @date 2025-04-02
-      @author IGAC - DIP
-      @param (Object) event => objeto que representa el evento de cambui de valor en el control Valor
-      @remarks FUENTE => https://www.geeksforgeeks.org/how-to-handle-input-forms-with-usestate-hook-in-react/
-     */
-    const handleTxtChangevalorLon = function (event) {
+ 
+      const handleTxtChangevalorLon = function (event) {
       //console.log("Estado actual =>",txtValorState);
       setValorLonState (event.target.value);
     }
 
-    /**
-     * handleChkChange => Método para cambio de estado, en las opciones "Seleccionar Area" y "Navegar"
-     * @date 2025-04-03
-     * @author IGAC - DIP
-     * @param event
-     * @dateUpdated 2025-04-07
-     * @changes Asignar valor del state, cuando no es vacío.
-     * @remarks Valor del evento asociado event.target.value
-     */
     const handleChkChange = function (event) {       
       if (event.target.value != ''){
         setValueNav(event.target.value);
@@ -827,38 +707,7 @@ const FiltersSrcSIEC = function({jsonSERV, setJsonSERV, selCoberVal, setCoberSta
       //console.log("Valor del state =>",radValueNav);
     }
 
-    /**
-    * Método toggleDrawing => Opción Radio asociada al control Seleccionar Area o Navegar
-    * @date 2025-04-07
-    * @author IGAC - DIP
-    * @remarks Tomado del widget Selección Espacial (SelectWidget)
-    */
-  /* const toggleDrawing = function(event) {
-    //Pruebas vars
-    //Seteo del valor
-    handleChkChange(event);
-  } */
-    /**
-      consultaCatal => método que realiza la consulta, seleccionando la opción Buscar en catálogo
-      @date 2025-04-08
-      @author IGAC - DIP
-      @param (event) evt
-      @dateUpdated 2025-04-09
-      @changes Inclusión validación campos requeridos
-      @dateUpdated 2025-05-05
-      @changes Fix validación campos requeridos, excluyendo las opciones Seleccionar Area o Navegar, por estar selecciona Seleccionar Area por defecto
-      @dateUpdated 2025-05-06
-      @changes Fix validación campos requeridos, coordenadas latitud y longitud asociado a las esquinas Sup Der e Inf Izq
-      @dateUpdated 2025-05-07
-      @changes Invocación método getJSONFilter()
-      @dateUpdated 2025-05-08
-      @changes Fix validación campos requeridos, coordenadas latitud y longitud asociado a un punto (modo Navegar)
-      @dateUpdated 2025-05-14
-      @changes Borrado de markers anteriores, al procesar la opción Buscar en catálogo
-      @dateUpdated 2025-05-16
-      @changes Llamado método borradoMarkers() para borrado de markers anteriores
-    */
-      function consultaCatal(evt: { preventDefault: () => void; }){
+    function consultaCatal(evt: { preventDefault: () => void; }){
         //console.log("En pruebas...");
         evt.preventDefault();
         //var cond = "";
@@ -906,33 +755,6 @@ const FiltersSrcSIEC = function({jsonSERV, setJsonSERV, selCoberVal, setCoberSta
         getJSONFilter();
       }
 
-      /**
-         * método getJSONFilter() => obtener data del servicio, con base al filtro especificado
-         * @date 2025-05-07
-         * @author IGAC - DIP
-         * @dateUpdated 2025-05-08
-         * @changes Implementación geometria dada por las coordenadas Latitud, longitud
-         * @dateUpdated 2025-05-09
-         * @changes Actualización geometria dada por las coordenadas espaciales rectángulares (X, Y)
-         * @changes Definición tipo de geometría (Polígono o Punto)
-         * @changes Actualizar campos de salida en consulta al servicio
-         * @dateUpdated 2025-05-12
-         * @changes Actualizar parámetro Output Spatial Reference, al llamado del método getWhere()
-         * @changes Actualizar parámetro Input Spatial Reference, al llamado del método getWhere()
-         * @dateUpdated 2025-05-14
-         * @changes Realizar borrado del objeto rows, que maneja el dataGrid, antes de obtener la data del servicio
-         * @changes Fix validación, para coordenadas geográficas se valide cuando se especifican las mismas. De lo contrario, no se adiciona parámetro de selección de coordenadas
-         * @dateUpdated 2025-05-15
-         * @changes Bug procesamiento sentencia tGeometry
-         * @changes Fix selección para caso Proyectos, Campañas
-         * @dateUpdated 2025-05-19
-         * @changes Fix selección para caso Proyectos, Campañas (proyecto y campaña)
-         * @dateUpdated 2025-05-20
-         * @changes Fix selección para caso Proyectos, Campañas (proyecto todos y campaña)
-         * @dateUpdated 2025-05-22
-         * @changes invocación método getSelectedDataFilter() para optimizar consumo sobre data grid
-         * @returns (String)
-         */
       const getJSONFilter = async function(){
         var where:string;
         var geomCoords:string;
@@ -963,9 +785,9 @@ const FiltersSrcSIEC = function({jsonSERV, setJsonSERV, selCoberVal, setCoberSta
         //parametro Input Geometry
         if (radValueNav === 'navMap')
         {
-          console.log("Latitud pto =>", txtValorLat);
+          /*console.log("Latitud pto =>", txtValorLat);
           console.log("Longitud pto =>", txtValorLon);
-          /* console.log("Pto Longitud (X) =>", lonRect);
+           console.log("Pto Longitud (X) =>", lonRect);
           console.log("Pto Latitud (Y) =>", latRect); */
           if ((typeof txtValorLat !== 'undefined' && txtValorLat !== '') && (typeof txtValorLon !== 'undefined' && txtValorLon !== ''))
           {            
@@ -979,14 +801,14 @@ const FiltersSrcSIEC = function({jsonSERV, setJsonSERV, selCoberVal, setCoberSta
         //parametro Input Geometry     
         else if (radValueNav === 'selArea')
         {
-          //Coord Lat - Sup Izq
+          /* //Coord Lat - Sup Izq
           console.log("Latitud Esq Sup Izq =>",txtValorLatSuIz);
           //Coord Lon - Sup Izq
           console.log("Longitud Esq Sup Izq  =>",txtValorLonSuIz);
           //Coord Lat - Inf Der
           console.log("Latitud Esq Inf Der =>",txtValorLatInDe);
           //Coord Lon - Inf Der
-          console.log("Longitud Esq Inf Der  =>",txtValorLonInDe);
+          console.log("Longitud Esq Inf Der  =>",txtValorLonInDe); */
           
           //Coord Lat (Y) - Sup Izq
           /* console.log("Latitud (Y) Esq Sup Izq =>",latRectSuIz);
@@ -1021,10 +843,6 @@ const FiltersSrcSIEC = function({jsonSERV, setJsonSERV, selCoberVal, setCoberSta
             {
               where = "projectname='"+selProyVal+"'";
             }
-           /*  else
-            {
-              where = "projectname='"+selProyVal+"'";
-            } */
           }
           else if (selProyVal !== '*')
           {
@@ -1088,23 +906,21 @@ const FiltersSrcSIEC = function({jsonSERV, setJsonSERV, selCoberVal, setCoberSta
         console.log("Criterio Input Geometry =>",geomCoords);
 
         //Se usa la petición para paso de parámetros
-        const urlServicioSIEC = await getWhere('objectid,codigofirma,projectname,campananame,covertype,divipoladepto,divipolamunicipio,sealevelaltitude,instrumentname,photosignature,spectralintegrity', urls.firmasEsp, true, where, '', '', geomCoords, tGeometry, '4326', 'esriSpatialRelIntersects', '3857');
+        //const urlServicioSIEC = await getWhere('objectid,codigofirma,projectname,campananame,covertype,divipoladepto,divipolamunicipio,sealevelaltitude,instrumentname,photosignature,spectralintegrity', urls.firmasEsp, true, where, '', '', geomCoords, tGeometry, '4326', 'esriSpatialRelIntersects', '3857');//
+        const urlServicioSIEC = await getWhere(outFieldsService.fieldsOut, urls.firmasEsp, true, where, '', '', geomCoords, tGeometry, '4326', 'esriSpatialRelIntersects', '3857');
         
         console.log("URL consumo =>", urlServicioSIEC);
         
         //Limpieza del data Grid antes de obtener la información del servicio
         setRows([]);
 
+        //Estado cargando
+        console.log("Activando cargando al Buscar en catálogo...");
+        setIsLoadState(true);
         //Consumo del servicio
         getSelectedDataFilter(urlServicioSIEC);
       }
 
-    /**
-     * getSelectedDataFilter => método para traer los registros sobre el componente Data Grid
-     * @date 2025-05-22
-     * @author IGAC - DIP
-     * @remarks Optimización sobre el método getJSONFilter()
-     */
     const getSelectedDataFilter = async function(urlServicioSIEC){
       try{
         await fetch(urlServicioSIEC,{
@@ -1119,8 +935,9 @@ const FiltersSrcSIEC = function({jsonSERV, setJsonSERV, selCoberVal, setCoberSta
         })
         .then((dataJSON) => {
           console.log("Data traida desde remoto...",dataJSON);
-         
-          //PRocesar generación filas data grid
+          //Desactivar cargando
+          setIsLoadState(false);
+          //Procesar generación filas data grid
           generateRowsDG(dataJSON.features);
 
         });
@@ -1129,179 +946,156 @@ const FiltersSrcSIEC = function({jsonSERV, setJsonSERV, selCoberVal, setCoberSta
         console.log("Error generado =>",error);
       }
     }
-    /**
-     * generateRowsDG => método para generar las filas del DataGrid
-     * @date 2025-05-08
-     * @author IGAC - DIP
-     * @param dataJSON => features asociados a la data del server
-     * @param geomDataJSON => Geometria asociados a los features desde server
-     * @dateUpdated 2025-05-09
-     * @changes Incluir columna código firma (codigofirma)
-     * @changes Incluir columna instrumento (instrumentname)
-     * @changes Incluir columna Altura snm (sealevelaltitude)
-     * @changes Incluir columna foto firma (archivo) (photosignature)
-     * @changes Incluir columna % pureza (spectralintegrity)
-     * @changes Incluir columna Proyecto (projectname)
-     * @changes Incluir columna Campaña (campananame)
-     * @dateUpdated 2025-05-12
-     * @changes Procesar geometria dadas en la localización del array geometry (coordenadas X e Y)
-     * @dateUpdated 2025-05-15
-     * @changes Fix validación parámetro dataJSON, el cual debe estar definido.
-     * @changes Fix armado estructura JSON para registros con geometría existente
-     * @changes Inclusión validación para filtrar departamentos y municipios válidos (cuando no son nulos)
-     * @changes Actualización objeto rows, asociado al componente tablaResultSrcSIEC
-     * @dateUpdated 2025-05-22
-     * @changes Búsqueda departamento, para obtener el nombre correspondiente
-     * @dateUpdated 2025-05-23
-     * @changes Búsqueda municipio, para obtener el nombre correspondiente
-     * @changes Búsqueda departamento código 11 (Bogotá)
-     * @changes Invocación listado de municipios con código departamento
-     * @dateUpdated 2025-05-26
-     * @changes Separación con espacio el municipio y su correspondiente departamento
-     */
     
-      const generateRowsDG = async function (dataJSON){
-      var jsonArr = [];
-      var jsonStr, urlDivipolaMpios: any;
-      var codDptoDivipola, codMpioDivipola: string;
-      var deptoJSON = [];
-      
-      console.log("Contenido dptos json traidos al state =>",jsonDpto);
-      if (typeof dataJSON !== 'undefined' && dataJSON.length > 0)
-      {
-        for (var cont = 0; cont < dataJSON.length; cont++){
-          if (dataJSON[cont].attributes.divipolamunicipio !== null && dataJSON[cont].attributes.divipoladepto !== null){
-            //Copia del código Dpto
-            codDptoDivipola = dataJSON[cont].attributes.divipoladepto;
-            //Copia del código Mpio
-            codMpioDivipola = dataJSON[cont].attributes.divipolamunicipio;
+    const generateRowsDG = async function (dataJSON){
+        var jsonArr: Array<string> = [];
+        var jsonStr, urlDivipolaMpios: any = "";
+        var codDptoDivipola, codMpioDivipola, critSeleccDpto: string = "";
+        
+        console.log("Contenido dptos json traidos al state =>",jsonDpto);
+        if (typeof dataJSON !== 'undefined' && dataJSON.length > 0)
+        {
+          for (var cont = 0; cont < dataJSON.length; cont++){
+            if (dataJSON[cont].attributes.divipolamunicipio !== null && dataJSON[cont].attributes.divipoladepto !== null){
+              //Copia del código Dpto
+              codDptoDivipola = dataJSON[cont].attributes.divipoladepto;
+              //Copia del código Mpio
+              codMpioDivipola = dataJSON[cont].attributes.divipolamunicipio;
 
-            //Búsqueda del departamento
-            console.log("Depto Src =>",codDptoDivipola);
-            //Recorrido de deptos excluido código 11
-            for (var contDpto = 0; contDpto < jsonDpto.length; contDpto++)
-            {
-              if (jsonDpto[contDpto].attributes.decodigo === codDptoDivipola)
-              {
-                // console.log("Depto asociado =>",jsonDpto[contDpto].attributes.denombre);
-                //Asignación nombre departamento por su codigo
-                dataJSON[cont].attributes.divipoladepto = jsonDpto[contDpto].attributes.denombre;
-              }
-            }
-            //Procesamiento municipios
-            //Búsqueda del Municipio por el código del departamento
-            //Caso especial, búsqueda departamento con código 11 asociado Bogotá
-            if (codDptoDivipola === codDeptoDivip.codDepto)
-            {
-              urlDivipolaMpios = await getWhere('mpcodigo,mpnombre,decodigo,depto',urls.Municipios, false, "mpcodigo='"+codDptoDivipola+codMpioDivipola+"'", '', '', '', '', '', '', '');  
-            }
-            else
-            {
-              urlDivipolaMpios = await getWhere('mpcodigo,mpnombre,decodigo,depto',urls.Municipios, false, "decodigo='"+codDptoDivipola+"'", '', '', '', '', '', '', '');
-            } 
-            console.log("URL consumo divipola mpios =>",urlDivipolaMpios);
-            try{
-              await fetch(urlDivipolaMpios,{
-                method:"GET"
-              })
-              .then((rows) => {
-                if (!rows.ok)
-                {
-                  throw new Error(`HTTP error! status: ${rows.status}`);
-                }
-                console.log("data JSON del servicio =>",rows);
-                const jsonData = rows.json();
-                return jsonData;
-              })
-              .then((data) => {
-                
-                console.log("Contenido mpios json desde petición =>", data.features);
-                console.log("Contenido longitud =>",data.features.length);
-                
-                setJsonMpioState(data.features);
-                
-                console.log("Array Mpios obtenido del depto"+" ",codDptoDivipola+"=>",data.features);
-
-                //Recorrido para búsqueda de municipio desde servicio municipios
-                for (var contMpio = 0; contMpio < data.features.length; contMpio++)
-                {
-                  console.log("Revisión Mpio =>",dataJSON[cont].attributes.divipoladepto);
-                  //Caso especial, búsqueda departamento con código 11 asociado Bogotá
-                  if (codDptoDivipola === codDeptoDivip.codDepto && data.features[contMpio].attributes.mpcodigo === codDptoDivipola + codMpioDivipola)
-                  {
-                    dataJSON[cont].attributes.divipoladepto = data.features[contMpio].attributes.mpnombre;
-                    dataJSON[cont].attributes.divipolamunicipio = data.features[contMpio].attributes.mpnombre;
-                  }
-                  //Municipios
-                  else if (data.features[contMpio].attributes.decodigo === codDptoDivipola && data.features[contMpio].attributes.mpcodigo === codDptoDivipola + codMpioDivipola)
-                  {
-                    //Asignación nombre municipio por su código
-                    dataJSON[cont].attributes.divipolamunicipio = data.features[contMpio].attributes.mpnombre;
-                  }
-                }
-              })
-              .catch (errFetch => {
-                console.log("Error en fetch =>",errFetch);
-              }) 
-            }
-            catch (error)
-            {
-              console.log("Error cargando data del server =>", error);
-              throw error;
-            }
-            
-            //Validación geometría desde el servicio
-            if (typeof dataJSON[cont].geometry !== 'undefined'){
               //Búsqueda del departamento
+              console.log("Depto Src =>",codDptoDivipola);
+              //Recorrido de deptos excluido código 11
               for (var contDpto = 0; contDpto < jsonDpto.length; contDpto++)
               {
-                if (dataJSON[cont].attributes.divipoladepto === jsonDpto[cont].attributes.decodigo)
+                if (jsonDpto[contDpto].attributes.decodigo === codDptoDivipola)
                 {
+                  // console.log("Depto asociado =>",jsonDpto[contDpto].attributes.denombre);
                   //Asignación nombre departamento por su codigo
-                  dataJSON[cont].attributes.divipoladepto = jsonDpto[cont].attributes.denombre;
+                  dataJSON[cont].attributes.divipoladepto = jsonDpto[contDpto].attributes.denombre;
                 }
               }
-              jsonStr = {
-                "id": dataJSON[cont].attributes.objectid,
-                "type": dataJSON[cont].attributes.covertype,
-                "codSig": dataJSON[cont].attributes.codigofirma,
-                "ins": dataJSON[cont].attributes.instrumentname,
-                "alsnm": dataJSON[cont].attributes.sealevelaltitude,
-                "proj": dataJSON[cont].attributes.projectname,
-                "camp": dataJSON[cont].attributes.campananame,
-                "locat": dataJSON[cont].attributes.divipolamunicipio + " " + "("+dataJSON[cont].attributes.divipoladepto + ")",
-                "phSig": dataJSON[cont].attributes.photosignature,
-                "speInteg": dataJSON[cont].attributes.spectralintegrity,
-                "pointX": dataJSON[cont].geometry.x,
-                "pointY": dataJSON[cont].geometry.y
+              //Procesamiento municipios
+              //Búsqueda del Municipio por el código del departamento
+              //Caso especial, búsqueda departamento con código 11 asociado Bogotá
+              if (codDptoDivipola === codDeptoDivip.codDepto)
+              {
+                critSeleccDpto = "mpcodigo='"+codDptoDivipola+codMpioDivipola+"'";
               }
-            }
-            //No existe geometría asociada al registro del DG
-            else
-            {
-              jsonStr = {
-                "id": dataJSON[cont].attributes.objectid,
-                "type": dataJSON[cont].attributes.covertype,
-                "codSig": dataJSON[cont].attributes.codigofirma,
-                "ins": dataJSON[cont].attributes.instrumentname,
-                "alsnm": dataJSON[cont].attributes.sealevelaltitude,
-                "proj": dataJSON[cont].attributes.projectname,
-                "camp": dataJSON[cont].attributes.campananame,
-                "locat": dataJSON[cont].attributes.divipolamunicipio + " " + "("+dataJSON[cont].attributes.divipoladepto + ")",
-                "phSig": dataJSON[cont].attributes.photosignature,
-                "speInteg": dataJSON[cont].attributes.spectralintegrity
-              }
-            }
-            jsonArr.push(jsonStr);
-          }
-        }
-        console.log("Array resultante data =>",jsonArr);
-        //Seteo al state asociado a las filas del Data Grid
-        setRows(jsonArr);
+              //Los demás departamentos de Colombia
+              else
+              {
+                critSeleccDpto = "decodigo='"+codDptoDivipola+"'";
+              } 
+              urlDivipolaMpios = await getWhere(outFieldsService.fieldOutDivipola,urls.Municipios, false, critSeleccDpto, '', '', '', '', '', '', '');
+              console.log("URL consumo divipola mpios =>",urlDivipolaMpios);
+              
+              //Activar modo cargando
+              console.log("Activando cargando Divipola...");
+              setIsLoadState(true);
+              try{
+                await fetch(urlDivipolaMpios,{
+                  method:"GET"
+                })
+                .then((rows) => {
+                  if (!rows.ok)
+                  {
+                    throw new Error(`HTTP error! status: ${rows.status}`);
+                  }
+                  console.log("data JSON del servicio =>",rows);
+                  const jsonData = rows.json();
+                  return jsonData;
+                })
+                .then((data) => {
+                  //Desactivar modo cargando
+                  setIsLoadState(false);
 
-        //Ubicar markers según consulta
-        /* console.log("Candidato marker X =>",jsonArr[0].pointX);
-        console.log("Candidato marker Y =>",jsonArr[0].pointY); */
+                  console.log("Contenido mpios json desde petición =>", data.features);
+                  console.log("Contenido longitud =>",data.features.length);
+                  
+                  setJsonMpioState(data.features);
+                  
+                  console.log("Array Mpios obtenido del depto"+" ",codDptoDivipola+"=>",data.features);
+                  console.log("Revisión Mpio =>",codDptoDivipola);
+                  //codDptoDivipola = dataJSON[cont].attributes.divipoladepto;
+                  //Recorrido para búsqueda de municipio desde servicio municipios
+                  for (var contMpio = 0; contMpio < data.features.length; contMpio++)
+                  {
+                    //Caso especial, búsqueda departamento con código 11 asociado Bogotá
+                    if (codDptoDivipola === codDeptoDivip.codDepto && data.features[contMpio].attributes.mpcodigo === codDptoDivipola + codMpioDivipola)
+                    {
+                      dataJSON[cont].attributes.divipoladepto = data.features[contMpio].attributes.mpnombre;
+                      dataJSON[cont].attributes.divipolamunicipio = data.features[contMpio].attributes.mpnombre;
+                    }
+                    //Municipios
+                    else if (data.features[contMpio].attributes.decodigo === codDptoDivipola && data.features[contMpio].attributes.mpcodigo === codDptoDivipola + codMpioDivipola)
+                    {
+                      //Asignación nombre municipio por su código
+                      dataJSON[cont].attributes.divipolamunicipio = data.features[contMpio].attributes.mpnombre;
+                    }
+                  }
+                })
+                .catch (errFetch => {
+                  console.log("Error en fetch =>",errFetch);
+                }) 
+              }
+              catch (error)
+              {
+                console.log("Error cargando data del server =>", error);
+                throw error;
+              }
+              
+              //Validación geometría desde el servicio
+              if (typeof dataJSON[cont].geometry !== 'undefined'){
+                //Búsqueda del departamento
+                for (var contDpto = 0; contDpto < jsonDpto.length; contDpto++)
+                {
+                  if (dataJSON[cont].attributes.divipoladepto === jsonDpto[cont].attributes.decodigo)
+                  {
+                    //Asignación nombre departamento por su codigo
+                    dataJSON[cont].attributes.divipoladepto = jsonDpto[cont].attributes.denombre;
+                  }
+                }
+                jsonStr = {
+                  "id": dataJSON[cont].attributes.objectid,
+                  "type": dataJSON[cont].attributes.covertype,
+                  "codSig": dataJSON[cont].attributes.codigofirma,
+                  "ins": dataJSON[cont].attributes.instrumentname,
+                  "alsnm": dataJSON[cont].attributes.sealevelaltitude,
+                  "proj": dataJSON[cont].attributes.projectname,
+                  "camp": dataJSON[cont].attributes.campananame,
+                  "locat": dataJSON[cont].attributes.divipolamunicipio + " " + "("+dataJSON[cont].attributes.divipoladepto + ")",
+                  "phSig": dataJSON[cont].attributes.photosignature,
+                  "speInteg": dataJSON[cont].attributes.spectralintegrity,
+                  "pointX": dataJSON[cont].geometry.x,
+                  "pointY": dataJSON[cont].geometry.y
+                }
+              }
+              //No existe geometría asociada al registro del DG
+              else
+              {
+                jsonStr = {
+                  "id": dataJSON[cont].attributes.objectid,
+                  "type": dataJSON[cont].attributes.covertype,
+                  "codSig": dataJSON[cont].attributes.codigofirma,
+                  "ins": dataJSON[cont].attributes.instrumentname,
+                  "alsnm": dataJSON[cont].attributes.sealevelaltitude,
+                  "proj": dataJSON[cont].attributes.projectname,
+                  "camp": dataJSON[cont].attributes.campananame,
+                  "locat": dataJSON[cont].attributes.divipolamunicipio + " " + "("+dataJSON[cont].attributes.divipoladepto + ")",
+                  "phSig": dataJSON[cont].attributes.photosignature,
+                  "speInteg": dataJSON[cont].attributes.spectralintegrity
+                }
+              }
+              jsonArr.push(jsonStr);
+            }
+          }
+          console.log("Array resultante data =>",jsonArr);
+          //Seteo al state asociado a las filas del Data Grid
+          setRows(jsonArr);
+
+          //Ubicar markers según consulta
+          /* console.log("Candidato marker X =>",jsonArr[0].pointX);
+          console.log("Candidato marker Y =>",jsonArr[0].pointY); */
       }
     }
     
@@ -1316,16 +1110,6 @@ const FiltersSrcSIEC = function({jsonSERV, setJsonSERV, selCoberVal, setCoberSta
       setCoberState (evt.target.value);
     }
 
-    /**
-     * Método handleSelProyChange => Método para procesar el dato asociado al control Proyecto
-     * @date 2025-04-08
-     * @author IGAC - DIP
-     * @param evt => Evento del control asociado
-     * @dateUpdated 2025-04-22
-     * @changes Llamado al método getCampaByProj, para obtener campañas asociadas, con código proyecto conocido
-     * @remarks Establecimiento del campo Proyecto con su state
-     * @remarks Consulta control proyectos, opción text en https://stackoverflow.com/questions/30306486/get-selected-option-text-using-react-js
-     */
     const handleSelProyChange = function(evt){
       var idProy = evt.target.value;
       var proyTxt = evt.nativeEvent.target.textContent;
@@ -1335,45 +1119,10 @@ const FiltersSrcSIEC = function({jsonSERV, setJsonSERV, selCoberVal, setCoberSta
       getCampaByProj(idProy, proyTxt);
     }
 
-    /**
-     * Método handleSelCampaChange => Método para procesar el dato asociado al control Campaña
-     * @date 2025-04-08
-     * @author IGAC - DIP
-     * @param evt => Evento del control asociado
-     * @remarks Establecimiento del campo Campaña con su state
-     * 
-     */    
     const handleSelCampaChange = function(evt){
       setCampaState(evt.target.value);
     }
 
-    /**
-     * Método closeWidget => Cierra el widget, destruyendo los objetos asociados al mismo
-     * @date 2025-04-14
-     * @author IGAC - DIP
-     * @param evt
-     * @dateUpdated 2025-05-16
-     * @changes Desactivación método por no uso en el widget
-     * @remarks Fuente de consulta en: https://community.esri.com/t5/arcgis-web-appbuilder-questions/close-destroy-widget-a-from-widget-b-on-clear/m-p/1206707#M22459
-     */
-
-    /* const closeWidgetEvt = function(evt: { preventDefault: () => void; }){
-      evt.preventDefault();
-      console.log("Cerrando...", props);
-      props.dispatch(appActions.closeWidget(props.widgetId));
-      //Limpieza controles
-      LimpiarControles();
-    } */
-
-    /**
-     * Método limpiarControlesFilter => Borrado de controles asociado al componente FiltersSrcSIEC
-     * @date 2025-05-16
-     * @author IGAC - DIP
-     * @param evt  
-     * @dateUpdated 2025-05-19
-     * @changes Ejecución extent inicial, al seleccionar la opción limpiar filtro / mapa
-     * @remarks Basado en método closeWidgetEvt()
-     */
     const limpiarControlesFilter = function(evt: { preventDefault: () => void; })
     {
       evt.preventDefault();
@@ -1385,20 +1134,7 @@ const FiltersSrcSIEC = function({jsonSERV, setJsonSERV, selCoberVal, setCoberSta
       goToInitialExtent(jimuMapView, initialExtent);
     }
 
-    /**
-     * Método LimpiarControles() => Realiza la operación de "reset" (estado inicial) de los controles según tipo: 1.Combo => Deselecciona valor; 2.Radio => Deselecciona valor; 3.Text => Borra campo
-     * @date 2025-04-14
-     * @author IGAC - DIP
-     * @dateUpdated 2025-04-28
-     * @changes Limpiar campaña al cerrar widget, para no dejar listado de campañas en la sesión anterior
-     * @dateUpdated 2025-05-02
-     * @changes Inicializar valor radio en Seleccionar Area por defecto
-     * @dateUpdated 2025-05-05
-     * @changes Inicializar coordenadas Esquina Sup Izq e Inf Der en vacío
-     * @dateUpdated 2025-05-14
-     * @changes Inicializar coordenadas Esquina Sup Izq e Inf Der en vacío
-     * @returns Estado inicial controles filtros
-     */
+    
     const LimpiarControles = function(){
       //Tipo Combo (Select)
       setCoberState(undefined);
@@ -1422,25 +1158,13 @@ const FiltersSrcSIEC = function({jsonSERV, setJsonSERV, selCoberVal, setCoberSta
       setLonInDeState("");
     }
 
-    /**
-     * goToInitialExtent() => Método para obtener el extent inicial del país Colombia
-     * @author IGAC - DIP
-     * @date 2025-05-14
-     * @param jimuMapView 
-     * @param initialExtent 
-     * @remarks DRA asociado al Widget Consulta Avanzada
-     */
+    
     const goToInitialExtent = (jimuMapView, initialExtent: any) => {
       if (jimuMapView && initialExtent) {
         jimuMapView.view.goTo(initialExtent, { duration: 1000 })
       }
     }
-    /**
-     * borradoMarkers => método para borrar los markers del mapa.
-     * @date 2025-05-16
-     * @author IGAC - DIP
-     * @param jimuMapView
-     */
+    
     const borradoMarkers = function (jimuMapView)
     {
       if (jimuMapView){
@@ -1449,45 +1173,25 @@ const FiltersSrcSIEC = function({jsonSERV, setJsonSERV, selCoberVal, setCoberSta
     }
     
 
-    /**
-     * Hook inicial para cargue del objeto jsonSERV, el cual contiene la data del servidor remoto (a través de acceso a Web Service de ArcGIS Map)
-     * @date 2024-05-29
-     * @author IGAC - DIP
-     * @dateUpdated 2025-04-29
-     * @changes Actualización estado sobre objeto jsonSERV
-     * @changes Validación de cargue inicial, cuando el objeto jsonSERV sea vacío
-     * @remarks Método obtenido del proyecto REFA
-     */
-    
     useEffect(() =>
     {
       if (jsonSERV.length == 0)
       {
+        setIsLoadState(true);
         getJSONData();      
       }
       
     }, [jsonSERV]);
 
     
-    /**
-     * Hook para realizar carga del listado de proyectos, asociado al state del objeto proyLst
-     * @date 2025-04-22
-     * @author IGAC - DIP
-     */
     useEffect(() =>
     {
-      if (proyLst.length == 0)
-      {
+      if (proyLst.length == 0 && jsonSERV.length > 0)
+      { 
         getJSONProyectos();
       }
-      return;
-    }, [proyLst]);
+    }, [jsonSERV]);
 
-    /**
-     * Hook para realizar carga del listado de cobertura, asociado al state del objeto coberLst
-     * @date 2025-04-22
-     * @author IGAC - DIP
-     */
     useEffect(() => {
       if (coberLst.length == 0){
         getJSONCober();
@@ -1495,50 +1199,27 @@ const FiltersSrcSIEC = function({jsonSERV, setJsonSERV, selCoberVal, setCoberSta
       return;
     }, [coberLst])
     
-    /**
-     * 
-     */
+    useEffect(() => {
+      console.log(4444)
 
-
-    /**
-     * Hook para realizar carga del método componentDidUpdate()
-     * @date 2025-05-13
-     * @author IGAC - DIP
-     */
-    /* useEffect(() => {
       componentDidUpdate();
-    },[props.state]) */
-    componentDidUpdate();
-    
-    /**
-     * Hook para realizar carga del método getJSONDeptoLst()
-     * @date 2025-05-22
-     * @author IGAC - DIP
-     * @remarks estado de cargue de la lista de departamentos, al realizar la apertura del widget Búsqueda Firmas
-     * @remarks se desactiva llamado del hook
-     */
+      //Importación componente ourLoading
+      import('../../../../commonWidgets/widgetsModule').then(modulo => { setWidgetModules(modulo) })
 
-    useEffect(() => {      
+    },[props.state])
+    
+    useEffect(() => {
+      console.log(5555)
+      componentDidUpdate();
+    },[radValueNav])
+
+    useEffect(() => {
+      console.log(77777)
+      console.log("Activando cargando en hook cargue Lista Deptos");
+      setIsLoadState(true);
       getJSONDeptoLst();
     }, [])
 
-    /**
-     * Hook para realizar carga del método getJSONMpioLst
-     * @date 2025-05-22
-     * @author IGAC - DIP
-     * @remarks estado de cargue de la lista de municipios, al realizar la apertura del widget Búsqueda Firmas 
-     * @remarks Se desactiva por rendimiento del cargue de información.
-     */
-    /* useEffect(() => {  
-      getJSONMpioLst(25)
-    }, [dataJSON]) */
-
-    //Verificación de asignación estados    
-    // console.log("Data asociada =>",jsonSERV);
-        
-    // console.log("Lista proyectos asignados al state =>",proyLst);
-    // console.log("Listado coberturas asignados al state =>",coberLst);
-    // console.log("Lista campañas asignados al state =>", campaLst);
     
     return (        
           <form onSubmit={consultaCatal}>
