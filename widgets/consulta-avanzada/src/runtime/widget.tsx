@@ -15,6 +15,7 @@ import { loadModules } from 'esri-loader'
 // import InputSelect from './components/InputSelect'
 
 const ConsultaAvanzada = (props: AllWidgetProps<any>) => {
+  console.log("ConsultaAvanzada")
   const [jsonSERV, setJsonSERV] = useState([])
   const [temas, setTemas] = useState([])
   const [subtemas, setSubtemas] = useState([])

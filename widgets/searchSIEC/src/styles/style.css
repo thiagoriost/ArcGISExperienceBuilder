@@ -1,0 +1,381 @@
+/*
+    Clase para distribución de espacios para botones, incluyendo justificación.
+    @author IGAC - DIP
+    @dateUpdated 2025-04-07
+    @changes adición atributo padding-top
+    @dateUpdated 2025-05-16
+    @changes actualización atributo justify-content: space-around =>  justify-content: space-evenly
+*/
+.btns{
+    display: flex;
+    justify-content: space-evenly;
+    padding-top: 10px;
+}
+
+/*
+    @dateUpdated 2024-06-20
+    @changes Estilos incluidos desde el widget consulta avanzada
+    @dateUpdated 2024-06-21
+    @changes Incluir clase app-root-emotion-cache-ltr-jrlfdq asociado al componente Modal
+    @changes Incluir clase app-root-emotion-cache-ltr-umewc2 asociado al componente Modal
+*/
+.fila{
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+}
+
+.app-root-emotion-cache-ltr-1o6kwtr.alert-panel{
+    width: auto !important;
+}
+
+.app-root-emotion-cache-ltr-eoh5jl.alert-panel{
+    width: auto !important;
+}
+
+.app-root-emotion-cache-ltr-jrlfdq.alert-panel{
+    width: auto !important;
+}
+
+.app-root-emotion-cache-ltr-umewc2.alert-panel{
+    width: auto !important;
+}
+
+/*
+    clase para definición medida grados decimales en coordenadas latitud y longitud
+*/
+.latit_txt
+{
+    width: 80px;
+    display: inline-flex;
+}
+/*
+    Clase para alineación de los componentes radio asociado a las opciones Seleccionar Area y Navegar
+    @date 2025-04-04
+    @author IGAC - DIP
+    @dateUpdated 2025-04-07
+    @changes Adición atributo margin-top, mejoramiento aspecto visual opciones "Seleccionar Area" y "Navegar"
+*/
+.alignRad
+{
+    display: inline-flex;
+    margin-top: 3%;
+}
+/*
+    Clase para alineación de los componentes label asociado a las opciones Seleccionar Area y Navegar
+    @date 2025-04-07
+    @author IGAC - DIP
+
+*/
+.alignLab
+{
+    padding-top: 2px;
+}
+
+/*
+    Clase para alineación de los componentes label asociado a las opciones Seleccionar Area y Navegar
+    @date 2025-04-07
+    @author IGAC - DIP
+
+*/
+.alignLab2
+{
+    margin-left: 6px;
+    padding-top: 2px;
+}
+
+/*
+    Clase para alineación de los componentes asociados a coordenasas Latitud y Longitud
+    @date 2025-04-07
+    @author IGAC - DIP
+    @remarks Alineación de la esquina inferior derecha
+*/
+.alignCoordInfDer
+{
+    margin-bottom: -8px !important;
+    margin-top: -8px;
+}
+
+/*
+    Selector que aplica el encabezado del modal Detalles heredado al  botón desde componente tablaResultSrcSIEC
+    @date 2025-04-15
+    @author IGAC - DIP
+*/
+
+#headerDet > button 
+{
+    display: none;
+}
+
+/*
+    Clase que asocia el evento de colocar el mouse encima del título componente Modal
+    @date 2025-04-15
+    @author IGAC - DIP
+*/
+.close:not(:disabled):not(.disabled):hover
+{
+    opacity: unset;
+}
+
+/*
+    Clase que aplica al encabezado del modal
+    @date 2025-04-15
+    @author IGAC - DIP
+    @remarks reimplementación clase
+*/
+.app-root-emotion-cache-ltr-qyqy7f
+.header
+.modal-header
+.modal-content
+{
+    background-color: #0F5879 !important ; 
+    opacity: unset;
+}
+
+/*
+    Clase que aplica al cuerpo del modal (contenido)
+    Clase que aplica al píe del modal (parte inferior)
+    @date 2025-04-15
+    @author IGAC - DIP
+    @remarks reimplementación clase
+*/
+
+.modal-body
+.modal-footer
+{
+    background-color: #0F5879;
+}
+
+
+/*
+    Reimplementación clase botón X desde componente tablaResultSrcSIEC
+    @date 2025-04-15
+    @author IGAC - DIP
+    @dateUpdated 2025-04-16
+    @changes Actualización atributo font-size:  1.21875rem => 20px
+    @changes Adición atributo padding-inline-end
+    @changes Adición atributo margin-top 
+*/
+.closeBtn
+{
+    float: right;
+    font-size: 20px;
+    line-height: 1;
+    color: transparent;
+    background-color: transparent;
+    text-shadow: rgb(255, 255, 255) 0px 1px 0px;
+    opacity: 0.5;
+    border-style: hidden !important;
+    padding-inline-end: initial;
+    margin-top: -0.7%;
+}
+
+.close
+{
+    color:white;
+}
+
+/*
+    Clase que implementa el contenido del modal, aplicando título del modal, contenido y pie de página del modal
+    @date 2025-04-15
+    @author IGAC - DIP
+*/
+.modal-content, .modal-header, .modal-title, .modal-body, .modal-footer
+{
+    color: white;
+    background-color: #0F5879;
+}
+
+/*
+    Clase que implementa el botón de Cierre del modal reimplementado
+    @date 2025-04-15
+    @dateUpdated 2025-04-16
+    @changes Actualización atributo background-color #126A92 => transparent
+    @changes Adición atributo color
+    @author IGAC - DIP
+*/
+.closeBtn:hover
+{
+    background-color: transparent;
+    color: white;
+}
+/*
+    Clase que implementa la opción cerrar modal cuando no se encuentra deshabilitado
+    @date 2025-04-16
+    @author IGAC - DIP
+*/
+.close:not(:disabled):not(.disabled):hover, .close:not(:disabled):not(.disabled):focus
+{
+    color: white;
+}
+
+/*
+    Clases para Modal, asociado al DataGrid
+    @date 2025-05-19
+    @author IGAC - DIP
+*/
+
+/*
+    Clase para manejo label Header Modal
+    @date 2025-05-19
+    @author IGAC - DIP
+*/
+
+.headLab
+{
+    font-weight: bold;
+}
+
+/*
+    Clase para manejo label proyecto
+    @date 2025-05-19
+    @author IGAC - DIP
+*/
+.projLab
+{
+    margin-left: 3%
+}
+
+/*
+    Clase para manejo label Campaña
+    @date 2025-05-19
+    @author IGAC - DIP
+*/
+.campLab
+{
+    margin-left: 16%
+}
+
+/*
+    Clase para manejo Span Ubicación
+    @date 2025-05-19
+    @author IGAC - DIP
+*/
+.ubicSpan
+{
+    margin-left: 40%;
+}
+
+/*
+    Clase para manejo Span Tipo de muestra
+    @date 2025-05-19
+    @author IGAC - DIP
+*/
+.tMuesSpan
+{
+    margin-left: 47%;
+}
+
+/*
+    Clase para manejo Span Altura de la cobertura
+    @date 2025-05-19
+    @author IGAC - DIP
+*/
+.altCoverSpan
+{
+    margin-left: 12%;
+}
+
+/*
+    Clase para manejo Span Instrumento
+    @date 2025-05-19
+    @author IGAC - DIP
+*/
+.insSpan
+{
+    margin-left: 54%;
+    margin-top: -5%;
+}
+
+/*
+    Clase para manejo Span Latitud, y Span Longitud
+    @date 2025-05-19
+    @author IGAC - DIP
+*/
+.latSpan,
+.lonSpan
+{
+    margin-left: 44%;
+}
+/*
+    Clase para manejo Span Altura de vegetación
+    @date 2025-05-19
+    @author IGAC - DIP
+*/
+.altCovSpan
+{
+    margin-left: 24%;
+}
+
+/*
+    Clase para manejo Span Archivo asociado imágenes
+    @date 2025-05-19
+    @author IGAC - DIP
+    @dateUpdated 2025-05-20
+    @changes Ubicación nombre archivo sección Imágenes en la parte inferior de la imágen => atributo margin-left 54% => 8%; atributo margin-top: -5% => 2%
+*/
+.fileSpan
+{
+    margin-left: 8%;
+    margin-top: 2%;
+}
+
+/*
+    Clase para manejo Título Ubicación de la firma
+    @date 2025-05-19
+    @author IGAC - DIP
+*/
+.ubicaDataMues,
+.ubicaSignDiv,
+.ubicaImgFile
+{
+    align-items: center;
+    align-content: center;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    justify-items: center;
+    font-style: italic;
+}
+
+/*
+    Clases para manejo row y column
+    @date 2025-05-19
+    @author IGAC - DIP
+    @remarks Fuente https://dev.to/drews256/ridiculously-easy-row-and-column-layouts-with-flexbox-1k01
+*/
+.row {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    width: 100%;
+  }
+  
+  .column {
+    display: flex;
+    flex-direction: column;
+    flex-basis: 100%;
+    flex: 1;
+  }
+
+  /*
+    Clase para renderización del archivo sección Imágenes del Modal, componente tablaResultSrcSIEC
+    @date 2025-05-19
+    @author IGAC - DIP
+  */
+  .imgSIECSpan
+  {
+    margin-left: 24%;
+  }
+  
+  /*
+    Dimensiones de la imágen sección imágenes
+    @date 2025-05-19
+    @author IGAC - DIP
+  */
+  
+  .imgSIECSpan, .imgSIEC
+  {
+    width: 50%;
+    height: 50%;
+  }
