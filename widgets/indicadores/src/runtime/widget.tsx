@@ -1,3 +1,7 @@
+/* eslint-disable @typescript-eslint/space-infix-ops */
+/* eslint-disable one-var */
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable no-prototype-builtins */
 import React, { useEffect, useState, useRef/* , useCallback */ } from 'react'
 import { type AllWidgetProps } from 'jimu-core'
 import { JimuMapViewComponent, type JimuMapView/* , loadArcGISJSAPIModules */ } from 'jimu-arcgis'
@@ -451,7 +455,7 @@ const Indicadores = (props: AllWidgetProps<any>) => {
         setDataGrafico([])
         setOptions(null)
       } else if (dataFromDispatch?.nacional || dataFromDispatch?.municipal) {
-        let fieldlabel, dataAlfanumerica, deparmetSelected=undefined, municipioSelected=undefined
+        let fieldlabel, dataAlfanumerica, deparmetSelected, municipioSelected
         if (dataFromDispatch?.nacional) {
           const { dataAlfanumericaNal, indiSelected } = dataFromDispatch.nacional
           extentAjustado = dataFromDispatch.nacional.extentAjustado
@@ -500,7 +504,7 @@ const Indicadores = (props: AllWidgetProps<any>) => {
         })
         setTotalPage(fieldlabel.length)
         setTimeout(() => {
-            jimuMapView.view.extent = extentAjustado?extentAjustado:initialExtent
+          jimuMapView.view.extent = extentAjustado || initialExtent
         }, 1000)
       } else if (dataFromDispatch?.departamental) {
         if (utilsModule?.logger()) console.log(dataFromDispatch.departamental)

@@ -132,11 +132,11 @@ export const dataFuenteIndicadores = [
                 fieldValueNal: 'cantidad_predios', // estees el valor que tomara generar las cantidades para cada label // labels a nivel municipal
                 fieldValueDepartal: 'cantidad_predios', // estees el valor que tomara generar las cantidades para cada label
                 quintiles: [
-                  ['<=', 5,"Hasta 5 predios"],
-                  [6, 10,"Entre 6 y 10 predios"],
-                  [11, 20,"Entre 11 y 20 predios"],
-                  [21, 50,"Entre 21 y 50 predios"],
-                  [50, '>',"Más de 50 predios"]
+                  ['<=', 5, 'Hasta 5 predios'],
+                  [6, 10, 'Entre 6 y 10 predios'],
+                  [11, 20, 'Entre 11 y 20 predios'],
+                  [21, 50, 'Entre 21 y 50 predios'],
+                  [50, '>', 'Más de 50 predios']
                 ]
               },
               {
@@ -161,7 +161,7 @@ export const dataFuenteIndicadores = [
                   [20, 60, 'Entre 20 y 60 ha'],
                   [60, 150, 'Entre 60 y 150 ha'],
                   [150, 300, 'Entre 150 y 300 ha'],
-                  [300, '>','Más de 300 ha']
+                  [300, '>', 'Más de 300 ha']
                 ]
               },
               {
@@ -296,10 +296,10 @@ export const dataFuenteIndicadores = [
                 fieldValueNal: 'cantidad_predios', // labels a nivel departamental
                 fieldValueDepartal: 'cantidad_predios', // data a nivel depatamental
                 quintiles: [
-                  ['<=', 30,'Hasta 30 predios'],
-                  [31, 120,'Entre 31 y 120 predios'],
-                  [121, 300,'Entre 121 y 300 predios'],
-                  [301, 600,'Entre 301 y 600 predios'],
+                  ['<=', 30, 'Hasta 30 predios'],
+                  [31, 120, 'Entre 31 y 120 predios'],
+                  [121, 300, 'Entre 121 y 300 predios'],
+                  [301, 600, 'Entre 301 y 600 predios'],
                   [600, '>', 'Más de 600 predios']
                 ]
               },
@@ -325,7 +325,7 @@ export const dataFuenteIndicadores = [
                   [50, 200, 'Entre 50 y 200 ha'],
                   [200, 400, 'Entre 200 y 400 ha'],
                   [400, 900, 'Entre 400 y 900 ha'],
-                  [900, '=>','Más de 900 ha']
+                  [900, '=>', 'Más de 900 ha']
                 ]
               },
               {
@@ -346,11 +346,11 @@ export const dataFuenteIndicadores = [
                 fieldValueNal: 'cantidad_predios', // labels a nivel departamental
                 fieldValueDepartal: 'cantidad_predios', // data a nivel depatamental
                 quintiles: [
-                  ['<=', 30,'Hasta 30 predios'],
-                  [31, 120,'Entre 31 y 120 predios'],
-                  [121, 300,'Entre 121 y 300 predios'],
-                  [301, 600,'Entre 301 y 600 predios'],
-                  [600, '>','Más de 600 predios']
+                  ['<=', 30, 'Hasta 30 predios'],
+                  [31, 120, 'Entre 31 y 120 predios'],
+                  [121, 300, 'Entre 121 y 300 predios'],
+                  [301, 600, 'Entre 301 y 600 predios'],
+                  [600, '>', 'Más de 600 predios']
                 ]
               },
               {
@@ -371,11 +371,11 @@ export const dataFuenteIndicadores = [
                 fieldValueNal: 'total_area_ha', // labels a nivel departamental
                 fieldValueDepartal: 'total_area_ha', // data a nivel depatamental
                 quintiles: [
-                  ['<=', 50,'Hasta 50 ha'],
-                  [50, 200,'Entre 50 y 200 ha'],
-                  [200, 400,'Entre 200 y 400 ha'],
-                  [400, 900,'Entre 400 y 900 ha'],
-                  [900, '>','Más de 900 ha']
+                  ['<=', 50, 'Hasta 50 ha'],
+                  [50, 200, 'Entre 50 y 200 ha'],
+                  [200, 400, 'Entre 200 y 400 ha'],
+                  [400, 900, 'Entre 400 y 900 ha'],
+                  [900, '>', 'Más de 900 ha']
                 ]
               }
             ]
@@ -413,8 +413,8 @@ export const dataFuenteIndicadores = [
                   ['<=', 0, 'Sin predios actualizados'],
                   [0, 0.05, 'Hasta el 5% de los predios actualizados'],
                   [0.05, 0.2, 'Entre 5% y 20% de los predios actualizados'],
-                  [0.2, 0.5,'Entre 20% y 50% de los predios actualizados'],
-                  [0.5, '=>','Más del 50% de los predios actualizados']
+                  [0.2, 0.5, 'Entre 20% y 50% de los predios actualizados'],
+                  [0.5, '=>', 'Más del 50% de los predios actualizados']
                 ]
               },
               {
@@ -435,11 +435,11 @@ export const dataFuenteIndicadores = [
                 fieldValueNal: 'porcentaje_area', // estees el valor que tomara generar las cantidades para cada label // labels a nivel departamental
                 fieldValueDepartal: 'porcentaje_area', // estees el valor que tomara generar l // data a nivel depatamentalas cantidades para cada label
                 quintiles: [
-                  ['<=', 0,'Sin área actualizada'],
-                  [0, 0.05,'Hasta el 5% de área actualizada'],
-                  [0.05, 0.1,'Entre 5% y 10% de área actualizada'],
-                  [0.1, 0.5,'Entre 10% y 50% de área actualizada'],
-                  [0.5, '=>','Más del 50% del área actualizada']
+                  ['<=', 0, 'Sin área actualizada'],
+                  [0, 0.05, 'Hasta el 5% de área actualizada'],
+                  [0.05, 0.1, 'Entre 5% y 10% de área actualizada'],
+                  [0.1, 0.5, 'Entre 10% y 50% de área actualizada'],
+                  [0.5, '=>', 'Más del 50% del área actualizada']
                 ]
               },
               {
@@ -460,10 +460,10 @@ export const dataFuenteIndicadores = [
                 fieldValueNal: 'cantidad_mpios', // estees el valor que tomara generar las cantidades para cada label // labels a nivel departamental
                 fieldValueDepartal: 'cantidad_mpios', // estees el valor que tomara generar la // data a nivel depatamentals cantidades para cada label
                 quintiles: [
-                  ['<=', 0,'Sin municipios actualizados'],
-                  [0, 1,'Un municipio actualizado'],
-                  [1, 5,'Entre 2 y 5 municipios actualizados'],
-                  [5, '>','Más de 5 municipios actualizados']
+                  ['<=', 0, 'Sin municipios actualizados'],
+                  [0, 1, 'Un municipio actualizado'],
+                  [1, 5, 'Entre 2 y 5 municipios actualizados'],
+                  [5, '>', 'Más de 5 municipios actualizados']
                 ]
               }/* ,
               {
@@ -487,7 +487,7 @@ export const dataFuenteIndicadores = [
             ]
           }
         ]
-      }, 
+      },
       {
         value: 5,
         label: '1.8 Gestión de procesos de restitución de tierras',
@@ -516,11 +516,11 @@ export const dataFuenteIndicadores = [
                 fieldValueNal: 'cantidad_predios', // labels a nivel departamental
                 fieldValueDepartal: 'cantidad_predios', // data a nivel depatamental
                 quintiles: [
-                  ['<=', 30,'Hasta 30 predios'],
-                  [31, 150,'Entre 31 y 150 predios'],
-                  [151, 400,'Entre 151 y 400 predios'],
-                  [401, 750,'Entre 401 y 750 predios'],
-                  [750, '>','Más de 750 predios']
+                  ['<=', 30, 'Hasta 30 predios'],
+                  [31, 150, 'Entre 31 y 150 predios'],
+                  [151, 400, 'Entre 151 y 400 predios'],
+                  [401, 750, 'Entre 401 y 750 predios'],
+                  [750, '>', 'Más de 750 predios']
                 ]
               }
             ]
@@ -583,7 +583,7 @@ export const dataFuenteIndicadores = [
                 fieldValueNal: 'porcentaje_area', // labels a nivel departamental
                 fieldValueDepartal: 'porcentaje_area', // data a nivel depatamental
                 quintiles: [
-                  ['<=', 0,'0% del área'],
+                  ['<=', 0, '0% del área'],
                   [0, 0.1, 'Hasta 10% del área'],
                   [0.1, 0.3, 'Entre 10% y 30% del área'],
                   [0.3, 0.6, 'Entre 30% y 60% del área'],
@@ -631,10 +631,10 @@ export const dataFuenteIndicadores = [
                 fieldValueNal: 'gini', // labels a nivel departamental
                 fieldValueDepartal: 'gini', // data a nivel depatamental
                 quintiles: [
-                  ['<=', 0.3,'Desigualdad baja'],
-                  [0.3, 0.6,'Desigualdad media'],
-                  [0.6, 0.8,'Desigualdad alta'],
-                  [0.8, '>','Desigualdad muy alta']
+                  ['<=', 0.3, 'Desigualdad baja'],
+                  [0.3, 0.6, 'Desigualdad media'],
+                  [0.6, 0.8, 'Desigualdad alta'],
+                  [0.8, '>', 'Desigualdad muy alta']
                 ]
               },
               {
@@ -657,10 +657,10 @@ export const dataFuenteIndicadores = [
                 fieldValueNal: 'disparidad_superior',
                 fieldValueDepartal: 'disparidad_superior',
                 quintiles: [
-                  ['<=', 2.7,'Disparidad superior baja'],
-                  [2.7, 5.2,'Disparidad superior media'],
-                  [5.2, 7.2,'Disparidad superior alta'],
-                  [7.2, '=>','Disparidad superior muy alta']
+                  ['<=', 2.7, 'Disparidad superior baja'],
+                  [2.7, 5.2, 'Disparidad superior media'],
+                  [5.2, 7.2, 'Disparidad superior alta'],
+                  [7.2, '=>', 'Disparidad superior muy alta']
                 ]
               },
               {
@@ -681,11 +681,11 @@ export const dataFuenteIndicadores = [
                 fieldValueNal: 'porcentaje_predios',
                 fieldValueDepartal: 'porcentaje_predios',
                 quintiles: [
-                  ['<=', 0,'0% de los predios'],
-                  [0, 0.6,'Hasta 60% de los predios'],
-                  [0.6, 0.8,'Entre 60% y 80% de los predios'],
-                  [0.8, 0.9,'Entre 80% y 90% de los predios'],
-                  [0.9, '=>','Más del 90% de los predios']
+                  ['<=', 0, '0% de los predios'],
+                  [0, 0.6, 'Hasta 60% de los predios'],
+                  [0.6, 0.8, 'Entre 60% y 80% de los predios'],
+                  [0.8, 0.9, 'Entre 80% y 90% de los predios'],
+                  [0.9, '=>', 'Más del 90% de los predios']
                 ]
               },
               {
@@ -706,11 +706,11 @@ export const dataFuenteIndicadores = [
                 fieldValueNal: 'porcentaje_area',
                 fieldValueDepartal: 'porcentaje_area',
                 quintiles: [
-                  ['<=', 0,'0% del área'],
-                  [0, 0.1,'Hasta 10% del área'],
-                  [0.1, 0.25,'Entre 10% y 25% del área'],
-                  [0.25, 0.5,'Entre 25% y 50% del área'],
-                  [0.5, '>','Más del 50% del área']
+                  ['<=', 0, '0% del área'],
+                  [0, 0.1, 'Hasta 10% del área'],
+                  [0.1, 0.25, 'Entre 10% y 25% del área'],
+                  [0.25, 0.5, 'Entre 25% y 50% del área'],
+                  [0.5, '>', 'Más del 50% del área']
                 ]
               }
             ]
@@ -738,11 +738,11 @@ export const dataFuenteIndicadores = [
                 fieldValueNal: 'porcentaje_predios',
                 fieldValueDepartal: 'porcentaje_predios',
                 quintiles: [
-                  ['<=', 0,'Sin predios subutilizados'],
-                  [0, 0.01,'Hasta el 1% de los predios'],
-                  [0.01, 0.05,'Entre 1% y 5% de los predios'],
-                  [0.05, 0.15,'Entre 5% y 15% de los predios'],
-                  [0.15, '>','Más del 15% de los predios']
+                  ['<=', 0, 'Sin predios subutilizados'],
+                  [0, 0.01, 'Hasta el 1% de los predios'],
+                  [0.01, 0.05, 'Entre 1% y 5% de los predios'],
+                  [0.05, 0.15, 'Entre 5% y 15% de los predios'],
+                  [0.15, '>', 'Más del 15% de los predios']
                 ]
               },
               {
