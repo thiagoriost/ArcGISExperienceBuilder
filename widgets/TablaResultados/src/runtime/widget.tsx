@@ -12,12 +12,9 @@ import { pathDataGridSIEC } from '../types/dataDG';
 
 const TablaResultados = (props: AllWidgetProps<any>) => {
 
-  const {view, files, setResponseBusquedaFirma, setControlForms, setFiles, setModalHeadState, setModalBodyState,
-     /* rows, */
-  } = props
   const [utilsModule, setUtilsModule] = useState(null)
-  const [jimuMapView, setJimuMapView] = useState<JimuMapView>()
-  const [initialExtent, setInitialExtent] = useState(null)
+//   const [jimuMapView, setJimuMapView] = useState<JimuMapView>()
+//   const [initialExtent, setInitialExtent] = useState(null)
   const [paginationModel, setPaginationModel]=useState({
       pageSize: 5,
       page: 0
@@ -26,30 +23,19 @@ const TablaResultados = (props: AllWidgetProps<any>) => {
   const [modalBody, setModalBody] = useState({})
   const [modalHead, setModalHead] = useState("")
   const [rows, setRows] = useState([])
-
+  const [files, setFiles] = useState([]);
 
 //   const rows = JSON.parse(rowsMock)
-
-    
-  
-
   
   //https://developers.arcgis.com/experience-builder/guide/add-layers-to-a-map/
-  const activeViewChangeHandler = (jmv: JimuMapView) => {
-    if (utilsModule?.logger()) console.log('Ingresando al evento objeto JimuMapView...')
-    if (jmv) {
-      setJimuMapView(jmv)
-      setInitialExtent(jmv.view.extent) // Guarda el extent inicial
-    }
-  }
+//   const activeViewChangeHandler = (jmv: JimuMapView) => {
+//     if (utilsModule?.logger()) console.log('Ingresando al evento objeto JimuMapView...')
+//     if (jmv) {
+//     //   setJimuMapView(jmv)
+//     //   setInitialExtent(jmv.view.extent) // Guarda el extent inicial
+//     }
+//   }
 
-  function limpiarCapaMapa(){
-    setResponseBusquedaFirma(null);      
-    console.log("Obj Geometria =>",view);      
-    if (view){
-        jimuMapView.view.map.remove(view);
-    }
-  }
 
   const convertBase64 = function(file){
       //Objeto de prueba -- 2025-04-11
@@ -76,12 +62,6 @@ const TablaResultados = (props: AllWidgetProps<any>) => {
       setFiles([...files, arrayFiles]);
   }
 
-  const retornarFormulario = function() {
-    if (view){
-        limpiarCapaMapa();
-    }
-    setControlForms(false);
-  }
 
   const downZipFirma = function(row){
     console.log("Prueba de ingreso a descarga...");
@@ -172,13 +152,13 @@ const TablaResultados = (props: AllWidgetProps<any>) => {
   return (
     <div className='w-100 p-3 bg-primary'>
           {props.useMapWidgetIds && props.useMapWidgetIds.length === 1 && (
-            <JimuMapViewComponent useMapWidgetId={props.useMapWidgetIds?.[0]} onActiveViewChange={activeViewChangeHandler} />
+            <JimuMapViewComponent useMapWidgetId={props.useMapWidgetIds?.[0]} onActiveViewChange={()=>console.log("activeViewChangeHandler")} />
           )}
 
           {
             rows.length > 0 &&
             <>
-                <Button size="sm" className="mb-1" type="primary" onClick={()=>console.log("retornarFormulario")}>
+                <Button size="sm" className="mb-1" type="primary" onClick={()=>console.log("ejecutar alguna logica")}>
                     Tabla Resultados</Button>                   
                 <DataGrid 
                     sx={{'.MuiTablePagination-root':

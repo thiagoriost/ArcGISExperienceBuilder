@@ -8,6 +8,7 @@ import { type InterfaceFeatureSelected } from '../types/interfacesIndicadores'
 // import { PieChart } from 'jimu-ui/advanced/lib/chart/pie'
 import '../styles/style.css'
 import { Pagination } from 'jimu-ui'
+import { typeMSM } from '../../../commonWidgets/modal/interfaces'
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend)
 
@@ -35,13 +36,6 @@ const tiposGraficos: Grafico[] = [
   { label: 'Area Chart', value: 2 },
   { label: 'Bubble Chart', value: 3 }
 ]
-
-enum typeMSM {
-  success = 'success',
-  info = 'info',
-  error = 'error',
-  warning = 'warning',
-}
 
 const Indicadores = (props: AllWidgetProps<any>) => {
   const [jimuMapView, setJimuMapView] = useState<JimuMapView>()
@@ -450,7 +444,7 @@ const Indicadores = (props: AllWidgetProps<any>) => {
   useEffect(() => {
     if (props.hasOwnProperty('stateProps')) {
       const dataFromDispatch = JSON.parse(props.stateProps.dataFromDispatch)
-      let descripcion: string = '', extentAjustado, _regionSeleccionada
+      let descripcion: string = '', extentAjustado
       if (utilsModule?.logger()) console.log({ props, id: props.id, dataFromDispatch })
       if (dataFromDispatch?.clear) {
         if (utilsModule?.logger()) console.log('clearing graphic')

@@ -21,7 +21,7 @@ import { typeMSM } from '../../types/InterfaceResponseBusquedaFirmas';
 //Importación API
 import { urls } from '../../../../api/servicios'; 
 
-import { appActions } from 'jimu-core';
+import { appActions, MessageManager } from 'jimu-core';
 
 //Componente GraphicsLayer - 2025-05-05
 import GraphicsLayer from "@arcgis/core/layers/GraphicsLayer";
@@ -947,157 +947,90 @@ const FiltersSrcSIEC = function({jsonSERV, setJsonSERV, selCoberVal, setCoberSta
       }
     }
     
-    const generateRowsDG = async function (dataJSON){
-        var jsonArr: Array<string> = [];
-        var jsonStr, urlDivipolaMpios: any = "";
-        var codDptoDivipola, codMpioDivipola, critSeleccDpto: string = "";
-        
-        console.log("Contenido dptos json traidos al state =>",jsonDpto);
-        if (typeof dataJSON !== 'undefined' && dataJSON.length > 0)
-        {
-          for (var cont = 0; cont < dataJSON.length; cont++){
-            if (dataJSON[cont].attributes.divipolamunicipio !== null && dataJSON[cont].attributes.divipoladepto !== null){
-              //Copia del código Dpto
-              codDptoDivipola = dataJSON[cont].attributes.divipoladepto;
-              //Copia del código Mpio
-              codMpioDivipola = dataJSON[cont].attributes.divipolamunicipio;
+    const generateRowsDG = async (dataJSON) => {
+  if (!dataJSON || dataJSON.length === 0) return;
 
-              //Búsqueda del departamento
-              console.log("Depto Src =>",codDptoDivipola);
-              //Recorrido de deptos excluido código 11
-              for (var contDpto = 0; contDpto < jsonDpto.length; contDpto++)
-              {
-                if (jsonDpto[contDpto].attributes.decodigo === codDptoDivipola)
-                {
-                  // console.log("Depto asociado =>",jsonDpto[contDpto].attributes.denombre);
-                  //Asignación nombre departamento por su codigo
-                  dataJSON[cont].attributes.divipoladepto = jsonDpto[contDpto].attributes.denombre;
-                }
-              }
-              //Procesamiento municipios
-              //Búsqueda del Municipio por el código del departamento
-              //Caso especial, búsqueda departamento con código 11 asociado Bogotá
-              if (codDptoDivipola === codDeptoDivip.codDepto)
-              {
-                critSeleccDpto = "mpcodigo='"+codDptoDivipola+codMpioDivipola+"'";
-              }
-              //Los demás departamentos de Colombia
-              else
-              {
-                critSeleccDpto = "decodigo='"+codDptoDivipola+"'";
-              } 
-              urlDivipolaMpios = await getWhere(outFieldsService.fieldOutDivipola,urls.Municipios, false, critSeleccDpto, '', '', '', '', '', '', '');
-              console.log("URL consumo divipola mpios =>",urlDivipolaMpios);
-              
-              //Activar modo cargando
-              console.log("Activando cargando Divipola...");
-              setIsLoadState(true);
-              try{
-                await fetch(urlDivipolaMpios,{
-                  method:"GET"
-                })
-                .then((rows) => {
-                  if (!rows.ok)
-                  {
-                    throw new Error(`HTTP error! status: ${rows.status}`);
-                  }
-                  console.log("data JSON del servicio =>",rows);
-                  const jsonData = rows.json();
-                  return jsonData;
-                })
-                .then((data) => {
-                  //Desactivar modo cargando
-                  setIsLoadState(false);
+  let critSeleccDpto, itemDato, attributos
+  const updatedRows = await Promise.all(
+    dataJSON.map(async (item) => {
+      itemDato = item
+      const attributes = item.attributes;
+      attributos = attributes
+      if (!attributes.divipolamunicipio || !attributes.divipoladepto) return null;
 
-                  console.log("Contenido mpios json desde petición =>", data.features);
-                  console.log("Contenido longitud =>",data.features.length);
-                  
-                  setJsonMpioState(data.features);
-                  
-                  console.log("Array Mpios obtenido del depto"+" ",codDptoDivipola+"=>",data.features);
-                  console.log("Revisión Mpio =>",codDptoDivipola);
-                  //codDptoDivipola = dataJSON[cont].attributes.divipoladepto;
-                  //Recorrido para búsqueda de municipio desde servicio municipios
-                  for (var contMpio = 0; contMpio < data.features.length; contMpio++)
-                  {
-                    //Caso especial, búsqueda departamento con código 11 asociado Bogotá
-                    if (codDptoDivipola === codDeptoDivip.codDepto && data.features[contMpio].attributes.mpcodigo === codDptoDivipola + codMpioDivipola)
-                    {
-                      dataJSON[cont].attributes.divipoladepto = data.features[contMpio].attributes.mpnombre;
-                      dataJSON[cont].attributes.divipolamunicipio = data.features[contMpio].attributes.mpnombre;
-                    }
-                    //Municipios
-                    else if (data.features[contMpio].attributes.decodigo === codDptoDivipola && data.features[contMpio].attributes.mpcodigo === codDptoDivipola + codMpioDivipola)
-                    {
-                      //Asignación nombre municipio por su código
-                      dataJSON[cont].attributes.divipolamunicipio = data.features[contMpio].attributes.mpnombre;
-                    }
-                  }
-                })
-                .catch (errFetch => {
-                  console.log("Error en fetch =>",errFetch);
-                }) 
-              }
-              catch (error)
-              {
-                console.log("Error cargando data del server =>", error);
-                throw error;
-              }
-              
-              //Validación geometría desde el servicio
-              if (typeof dataJSON[cont].geometry !== 'undefined'){
-                //Búsqueda del departamento
-                for (var contDpto = 0; contDpto < jsonDpto.length; contDpto++)
-                {
-                  if (dataJSON[cont].attributes.divipoladepto === jsonDpto[cont].attributes.decodigo)
-                  {
-                    //Asignación nombre departamento por su codigo
-                    dataJSON[cont].attributes.divipoladepto = jsonDpto[cont].attributes.denombre;
-                  }
-                }
-                jsonStr = {
-                  "id": dataJSON[cont].attributes.objectid,
-                  "type": dataJSON[cont].attributes.covertype,
-                  "codSig": dataJSON[cont].attributes.codigofirma,
-                  "ins": dataJSON[cont].attributes.instrumentname,
-                  "alsnm": dataJSON[cont].attributes.sealevelaltitude,
-                  "proj": dataJSON[cont].attributes.projectname,
-                  "camp": dataJSON[cont].attributes.campananame,
-                  "locat": dataJSON[cont].attributes.divipolamunicipio + " " + "("+dataJSON[cont].attributes.divipoladepto + ")",
-                  "phSig": dataJSON[cont].attributes.photosignature,
-                  "speInteg": dataJSON[cont].attributes.spectralintegrity,
-                  "pointX": dataJSON[cont].geometry.x,
-                  "pointY": dataJSON[cont].geometry.y
-                }
-              }
-              //No existe geometría asociada al registro del DG
-              else
-              {
-                jsonStr = {
-                  "id": dataJSON[cont].attributes.objectid,
-                  "type": dataJSON[cont].attributes.covertype,
-                  "codSig": dataJSON[cont].attributes.codigofirma,
-                  "ins": dataJSON[cont].attributes.instrumentname,
-                  "alsnm": dataJSON[cont].attributes.sealevelaltitude,
-                  "proj": dataJSON[cont].attributes.projectname,
-                  "camp": dataJSON[cont].attributes.campananame,
-                  "locat": dataJSON[cont].attributes.divipolamunicipio + " " + "("+dataJSON[cont].attributes.divipoladepto + ")",
-                  "phSig": dataJSON[cont].attributes.photosignature,
-                  "speInteg": dataJSON[cont].attributes.spectralintegrity
-                }
-              }
-              jsonArr.push(jsonStr);
-            }
+      // Asignar nombre del departamento
+      const departamento = jsonDpto.find(
+        (dpto) => dpto.attributes.decodigo === attributes.divipoladepto
+      );
+      attributes.divipoladepto = departamento?.attributes.denombre || attributes.divipoladepto;
+
+      // Construcción del criterio de búsqueda de municipios
+      critSeleccDpto =
+        attributes.divipoladepto === codDeptoDivip.codDepto
+          ? `mpcodigo='${attributes.divipoladepto}${attributes.divipolamunicipio}'`
+          : `decodigo='${attributes.divipoladepto}'`;
+
+      
+
+      // Construir objeto para Data Grid
+      const baseData = {
+        id: attributes.objectid,
+        type: attributes.covertype,
+        codSig: attributes.codigofirma,
+        ins: attributes.instrumentname,
+        alsnm: attributes.sealevelaltitude,
+        proj: attributes.projectname,
+        camp: attributes.campananame,
+        locat: `${attributes.divipolamunicipio} (${attributes.divipoladepto})`,
+        phSig: attributes.photosignature,
+        speInteg: attributes.spectralintegrity,
+      };
+
+      return item.geometry
+        ? {
+            ...baseData,
+            pointX: item.geometry.x,
+            pointY: item.geometry.y,
           }
-          console.log("Array resultante data =>",jsonArr);
-          //Seteo al state asociado a las filas del Data Grid
-          setRows(jsonArr);
+        : baseData;
+    })
+  );
 
-          //Ubicar markers según consulta
-          /* console.log("Candidato marker X =>",jsonArr[0].pointX);
-          console.log("Candidato marker Y =>",jsonArr[0].pointY); */
+  try {
+        const urlDivipolaMpios = await getWhere(
+          outFieldsService.fieldOutDivipola,
+          urls.Municipios,
+          false,
+          critSeleccDpto
+        );
+        // console.log({urlDivipolaMpios})
+        console.log("updatedRows", itemDato, critSeleccDpto)
+        const response = await fetch(urlDivipolaMpios);
+
+        if (!response.ok) {
+          console.error(`HTTP error! status: ${response.status}`);
+          return null;
+        }
+
+        const data = await response.json();
+        const municipio = data.features.find(
+          (feature) =>
+            feature.attributes.mpcodigo ===
+            `${attributos.divipoladepto}${attributos.divipolamunicipio}`
+        );
+
+        attributos.divipolamunicipio = municipio?.attributes.mpnombre || attributos.divipolamunicipio;
+      } catch (error) {
+        console.error("Error fetching municipios:", error);
+        return null;
       }
-    }
+
+  const filteredRows = updatedRows.filter((row) => row !== null);
+
+  console.log("Array resultante data =>", filteredRows);
+  setRows(filteredRows);
+};
+
     
     /**
      * Método handleSelCoberChange => Método para procesar el dato asociado al campo Cobertura

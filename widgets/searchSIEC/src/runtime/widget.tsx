@@ -296,12 +296,45 @@ const Widget = (props: AllWidgetProps<any>) => {
       }
     };
 
+    const enviarDispatchs = (rows) => {
+      const dataToRenderTablaResultados = JSON.stringify({ dataToRows: rows })
+      props.dispatch(appActions.widgetStatePropChange('widget_81', 'dataFromDispatchWidget_searchSIEC', dataToRenderTablaResultados))
+      // logica para la barra de graficos
+      const labels: LabelItem[] = [
+        {
+          label: "locat",
+          description: "Cantidad por Ubicación (locat)",
+          color: "rgba(255, 99, 132, 0.6)",
+          tituloGrafico: "Concentración Geográfica por Localidad"
+        },
+        {
+          label: "proj",
+          description: "Cantidad por Proyecto (proj)",
+          color: "rgba(54, 162, 235, 0.6)",
+          tituloGrafico: "Registros por Proyecto"
+        },
+        {
+          label: "ins",
+          description: "Cantidad por Instrumento (ins)",
+          color: "rgba(75, 192, 192, 0.6)",
+          tituloGrafico: "Distribución de Registros por Instrumento"
+        },
+        {
+          label: "type",
+          description: "Cantidad por type ",
+          color: "rgba(75, 192, 85, 0.6)",
+          tituloGrafico: "Distribución de Registros por tipo"
+        }
+      ]   
+      const dataToRenderBarChart = JSON.stringify({ dataToRows: rows, labels})
+      props.dispatch(appActions.widgetStatePropChange('widget_82', 'dataFromDispatchWidget_searchSIEC', dataToRenderBarChart))   
+    }
+
     useEffect(() => {
       
       if (rows.length != 0) {
         console.log({rows})     
-        const dataToRender = JSON.stringify({ dataToRows: rows })
-        props.dispatch(appActions.widgetStatePropChange('widget_81', 'dataFromDispatchWidget_searchSIEC', dataToRender))   
+        enviarDispatchs(rows)
       }
     
       return () => {}
@@ -325,7 +358,7 @@ const Widget = (props: AllWidgetProps<any>) => {
           : null
         }
         {/*Si el estado dado en la constante es verdadero (true), invoca componente TablaResultSrcSIEC, el cual renderiza un  DataGrid. De lo contrario, invoca componente FiltersSrcSIEC, el cual renderiza filtros del widget */ }
-        {controlForms
+        {false/* controlForms */
           && <TablaResultSrcSIEC
           rows={rows}
           view={view}
@@ -348,7 +381,7 @@ const Widget = (props: AllWidgetProps<any>) => {
           jsonMpio={jsonMpio}
           ></TablaResultSrcSIEC>
         }
-        {!controlForms
+        {true/* !controlForms */
          && <FiltersSrcSIEC          
           jsonSERV={jsonSERV} 
           setJsonSERV={setJsonSERV}
@@ -424,3 +457,11 @@ const Widget = (props: AllWidgetProps<any>) => {
   };
 
   export default Widget;
+
+
+  export interface LabelItem {
+  label: string;
+  description: string;
+  color: `rgba(${number}, ${number}, ${number}, ${number})` | string;
+  tituloGrafico: string;
+}
